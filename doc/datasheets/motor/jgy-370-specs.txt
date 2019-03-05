@@ -1,0 +1,35 @@
+1pcs DC6V 12V 24V JGY370 Large Torque Full Metal Gearbox Turbo Worm Gear Motor with Hall Encoder
+Specification:
+Note: Different parameters' motors have their different looks. The lower speed and higher voltage are, the larger the torque is. Please read the parameters table before buying. Thanks!!!
+
+Voltage: DC6V, DC12V, DC24V
+
+No-Load Speed: 6rpm, 10rpm, 18rpm, 23rpm, 30rpm, 40rpm, 90rpm, 150rpm
+
+Error: ±10%
+
+Output Shaft Diameter: 6mm D-type
+
+Output Shaft Length: 14mm
+Gearbox Size:46*32*25mm
+
+Gearbox Size Detal, please see the table
+Wirings:
+
+Notice:  
+1. The yellow and green wires are the speed signal output line, and they can't be connected any power supply, or it will be burnt.
+2. Positive and negative power supply of encoder do not allow connect wrong;voltage is 3.3-5V.
+3. Control CW or CCW of motor by changing the positive and negative power supply of encoder (change Red Wire and White Wire connect)
+
+Red Wire - positive power supply of motor(+)
+
+White Wire - negative power supply of motor(-)
+
+Black Wire - negative power supply of encoder(-) (positive and negative power supply of encoder do not allow connect wrong;voltage is3.3-5V)
+
+Blue Wire - positive power supply of encoder(+) (positive and negative power supply of encoder do not allow connect wrong;voltage is 3.3-5V)
+
+Yellow Wire - signal feedback (11 signals per motor turns a circle)
+
+Green Wire - signal feedback (11 signals per motor turns a circle)
+
