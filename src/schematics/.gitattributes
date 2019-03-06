@@ -1,0 +1,6 @@
+*.prj binary
+*.sch binary
+*.pcb binary
+*.mop binary
+*.cmx binary
+*.cml binary
