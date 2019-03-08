@@ -1,3 +1,5 @@
+* text eol=crlf
+* text eol=lf
 *.prj binary
 *.sch binary
 *.pcb binary
