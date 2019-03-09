@@ -1,3 +1,6 @@
+=======================
+From Aliexpress Website
+=======================
 1pcs DC6V 12V 24V JGY370 Large Torque Full Metal Gearbox Turbo Worm Gear Motor with Hall Encoder
 Specification:
 Note: Different parameters' motors have their different looks. The lower speed and higher voltage are, the larger the torque is. Please read the parameters table before buying. Thanks!!!
@@ -32,4 +35,16 @@ Blue Wire - positive power supply of encoder(+) (positive and negative power sup
 Yellow Wire - signal feedback (11 signals per motor turns a circle)
 
 Green Wire - signal feedback (11 signals per motor turns a circle)
+
+
+========================
+Measurements and Testing
+========================
+At 11 Celsius:
+
+	+6.0V, 150mA unloaded, unable to stall with fingers
+	+4.3V, 150mA unloaded, 1.5A stall
+	+3.0V, 110mA unloaded, 900mA stall
+	+2.5V, 100mA unloaded, 770mA stall
+	+2.0V,  80mA unloaded, 615mA stall
 
