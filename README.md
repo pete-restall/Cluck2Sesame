@@ -50,13 +50,8 @@ The hardware and firmware are all mine.  The board is based around a
 of what was used last time that has allowed considerable simplification of the
 board through more integration and a higher pin count.
 
-While the original project was test-first assembler, this one's not going to
-be.  It's going to be C and probably hacked together without automated tests
-directly on the board since the plan is for a rapid one-off build.  Since I'm
-an advocate of TDD this is a bit indefensible, apart from the flimsy excuse
-that it's a one-off personal project that needs to be done relatively quickly
-and with little scope for future modification.  No doubt this decision will
-come back to bite me.
-
 ## Pictures
 None yet.  But there will be.
+
+## Build
+[![Build Status](https://travis-ci.org/pete-restall/Cluck3Sesame.svg?branch=master)](https://travis-ci.org/pete-restall/Cluck3Sesame)
