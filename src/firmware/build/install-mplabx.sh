@@ -10,7 +10,7 @@ XC8_INSTALLER="xc8-${XC8_VERSION}-full-install-linux-installer.run";
 
 wget "http://ww1.microchip.com/downloads/en/DeviceDoc/${MPLABX_INSTALLER_TAR}";
 tar -xvf "${MPLABX_INSTALLER_TAR}";
-sudo "${MPLABX_INSTALLER}" -- --mode unattended;
+sudo "./${MPLABX_INSTALLER}" -- --mode unattended;
 
 wget "http://ww1.microchip.com/downloads/en/DeviceDoc/${XC8_INSTALLER}";
 chmod +x "${XC8_INSTALLER}";
