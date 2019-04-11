@@ -17,7 +17,7 @@ void tearDown(void)
 
 void test_clockInitialise_called_expectOscillatorIsEnabled(void)
 {
-	OSCEN = anyByte() & ~_OSCEN_SOSCEN_MASK;
+	OSCEN = anyByteWithMaskClear(_OSCEN_SOSCEN_MASK);
 	clockInitialise();
 	TEST_ASSERT_TRUE(OSCENbits.SOSCEN);
 }

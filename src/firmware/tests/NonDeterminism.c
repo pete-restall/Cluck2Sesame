@@ -37,6 +37,16 @@ uint8_t anyByteExcept(uint8_t except)
 	return byte;
 }
 
+uint8_t anyByteWithMaskSet(uint8_t mask)
+{
+	return anyByte() | mask;
+}
+
+uint8_t anyByteWithMaskClear(uint8_t mask)
+{
+	return anyByte() & ~mask;
+}
+
 uint32_t anyDword(void)
 {
 	uint32_t dword = 0;
