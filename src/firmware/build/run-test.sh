@@ -23,12 +23,22 @@ RNG_SEED_LOW=$((${RNG_SEED} & 0xff));
 cat << EOF > ${FIXTURE_FILENAME}
 device ${DEVICE}
 hwtool SIM
-# set codecoverage.enabled Enabled_Reset_on_POR
-set oscillator.frequency 32
+set breakoptions.coreerrors Break
+set breakoptions.corewarnings Break
+set breakoptions.peripheralerrors Break
+set breakoptions.peripheralwarnings Break
+set breakoptions.stimulusmessags.errors Break
+set breakoptions.stimulusmessags.warnings Break
+
+set oscillator.rcfrequency 32
+set oscillator.rcfrequencyunit Mega
+set oscillator.frequency 16
 set oscillator.frequencyunit Mega
+
 set uart1io.uartioenabled true
 set uart2io.uartioenabled true
 set uart2io.output window
+
 program "${TEST_FILENAME}"
 break unityBeforeRunHook
 break unityBreakpointHook

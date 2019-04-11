@@ -1,0 +1,18 @@
+configuration for "PIC16F15355" is
+end configuration;
+
+testbench for "PIC16F15355" is
+begin
+	crystal: process is
+	begin
+		OSCSTAT.SOR := '0';
+		wait for 10 ms;
+		OSCSTAT.SOR := '1';
+		loop
+			SOSCI <= '0';
+			wait for 15258 ns;
+			SOSCI <= '1';
+			wait for 15259 ns;
+		end loop;
+	end process;
+end testbench;
