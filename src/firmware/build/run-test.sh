@@ -42,6 +42,7 @@ set uart2io.output window
 program "${TEST_FILENAME}"
 break unityBeforeRunHook
 break unityBreakpointHook
+break fpbase
 
 reset
 run

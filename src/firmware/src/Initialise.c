@@ -8,6 +8,7 @@ static const struct SystemInitialised emptyEventArgs = { };
 
 void initialise(void)
 {
+	eventInitialise();
 	clockInitialise();
 	eventPublish(SYSTEM_INITIALISED, &emptyEventArgs);
 }

@@ -8,6 +8,8 @@
 #define EMPTY_EVENT_ARGS
 #endif
 
+#define EVENT_TYPE_SYSTEM_MASK ((EventType) 0b10000000)
+
 typedef uint8_t EventType;
 
 struct Event
@@ -26,8 +28,10 @@ struct EventSubscription
 	void *state;
 };
 
+extern void eventInitialise(void);
 extern void eventSubscribe(const struct EventSubscription *const subscription);
 extern void eventUnsubscribe(const struct EventSubscription *const subscription);
 extern void eventPublish(EventType type, const void *const args);
+extern void eventDispatchNext(void);
 
 #endif

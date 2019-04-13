@@ -14,8 +14,15 @@ void tearDown(void)
 {
 }
 
-void test_initialise_called_expectClockIsInitialised(void)
+void test_initialise_called_expectEventSystemIsInitialised(void)
 {
+	eventInitialise_Expect();
+	initialise();
+}
+
+void test_initialise_called_expectClockIsInitialisedAfterEvents(void)
+{
+	eventInitialise_Expect();
 	clockInitialise_Expect();
 	initialise();
 }
