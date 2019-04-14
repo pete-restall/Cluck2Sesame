@@ -8,8 +8,6 @@
 
 TEST_FILE("Event.c")
 
-#define MAX_EVENTS 8
-
 static struct EventSubscription subscription;
 static uint8_t eventState;
 
@@ -50,7 +48,7 @@ void test_eventPublish_called_expectHandlerIsNotCalledBeforeEventDispatch(void)
 	eventHandler_StubWithCallback(eventHandlerThatIncrementsCounter);
 	eventSubscribe(&subscription);
 	eventPublish(subscription.type, &args);
-	TEST_ASSERT_EQUAL_INT8(0, eventHandlerCallCount);
+	TEST_ASSERT_EQUAL_INT(0, eventHandlerCallCount);
 }
 
 void test_eventDispatchNext_calledWhenOneEventPublished_expectHandlerIsCalledWithOldestEvent(void)
@@ -146,35 +144,6 @@ void test_eventDispatchNext_calledWhenMoreThanOneSubscriberForSameType_expectEac
 	eventHandler_Expect(&event);
 	anotherEventHandler_Expect(&anotherEvent);
 	eventDispatchNext();
-}
-
-void test_eventPublish_calledMoreTimesThanAvailableBufferSize_expectCircularBuffer(void)
-{
-	uint8_t i;
-	for (i = 0; i < MAX_EVENTS; i++)
-		eventPublish(subscription.type, NULL);
-
-	eventPublish(anotherSubscription.type, NULL);
-	anotherEventHandler_ExpectAnyArgs();
-
-	eventPublish(subscription.type, NULL);
-	eventHandler_ExpectAnyArgs();
-
-	eventSubscribe(&subscription);
-	eventSubscribe(&anotherSubscription);
-	for (i = 0; i < MAX_EVENTS; i++)
-		eventDispatchNext();
-}
-
-void test_eventDispatchNext_calledMoreTimesThanEvents_expectCorrectNumberOfEventsAreDispatched(void)
-{
-	eventSubscribe(&subscription);
-	eventPublish(subscription.type, NULL);
-	eventHandler_ExpectAnyArgs();
-
-	uint8_t i;
-	for (i = 0; i < MAX_EVENTS + 1; i++)
-		eventDispatchNext();
 }
 
 void test_eventDispatchNext_calledWhenNullHandlerAtSubscription_expectNothingHappens(void)

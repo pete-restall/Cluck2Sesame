@@ -4,7 +4,7 @@
 #include "Event.h"
 
 #define MAX_SUBSCRIPTIONS 32
-#define MAX_EVENTS 8
+#define MAX_EVENTS 16
 
 static const struct EventSubscription *subscriptions[MAX_SUBSCRIPTIONS];
 
@@ -28,23 +28,31 @@ void eventInitialise(void)
 
 void eventSubscribe(const struct EventSubscription *const subscription)
 {
-	// TODO: IF NO MORE SUBSCRIPTIONS...THEN DON'T OVERWRITE ANYTHING (TEST)
-	// TODO: IF HOLES IN SUBSCRIPTIONS...THEN FILL THE HOLE (TEST)
-
+	int8_t freeIndex = -1;
 	uint8_t i;
 	for (i = 0; i < MAX_SUBSCRIPTIONS; i++)
 	{
-		if (!subscriptions[i])
-		{
-			subscriptions[i] = subscription;
-			return;
-		}
+		if (
+			(freeIndex < 0 && !subscriptions[i]) ||
+			subscriptions[i] == subscription)
+				freeIndex = i;
 	}
+
+	if (freeIndex >= 0)
+		subscriptions[freeIndex] = subscription;
 }
 
 void eventUnsubscribe(const struct EventSubscription *const subscription)
 {
-	// TODO
+	uint8_t i;
+	for (i = 0; i < MAX_SUBSCRIPTIONS; i++)
+	{
+		if (subscriptions[i] == subscription)
+		{
+			subscriptions[i] = (const struct EventSubscription *) 0;
+			return;
+		}
+	}
 }
 
 void eventPublish(EventType type, const void *const args)
