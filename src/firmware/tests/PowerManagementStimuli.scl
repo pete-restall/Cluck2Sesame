@@ -1,0 +1,32 @@
+configuration for "PIC16F15355" is
+	shared variable sleepExecuted;
+	shared variable pie0BeforeSleep;
+	shared variable vregconBeforeSleep;
+end configuration;
+
+testbench for "PIC16F15355" is
+begin
+	setup: process is
+	begin
+		RA0 <= '0';
+		IOCAP.IOCAP0 := '1';
+		IOCAN.IOCAN0 := '1';
+		ANSELA.ANSA0 := '0';
+		TRISA.TRISA0 := '1';
+		IOCAF.IOCAF0 := '0';
+		wait;
+	end process;
+
+	waitForSleep: process is
+	begin
+		loop
+			wait until STATUS.nPD == '0';
+			pie0BeforeSleep := PIE0;
+			vregconBeforeSleep := VREGCON;
+			sleepExecuted := 1;
+			wait for 1 us;
+			STATUS.nPD := '1';
+			RA0 <= not RA0;
+		end loop;
+	end process;
+end testbench;

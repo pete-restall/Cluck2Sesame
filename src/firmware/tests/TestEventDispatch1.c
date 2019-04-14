@@ -1,3 +1,4 @@
+#include <xc.h>
 #include <unity.h>
 
 #include "Main.h"
@@ -16,7 +17,9 @@ static uint8_t anotherEventState;
 
 static int eventHandlerCallCount;
 
-static void eventHandlerThatIncrementsCounter(const struct Event *event)
+static void eventHandlerThatIncrementsCounter(
+	const struct Event *event,
+	int numCalls)
 {
 	eventHandlerCallCount++;
 }

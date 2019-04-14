@@ -3,12 +3,13 @@
 #include "Main.h"
 #include "Event.h"
 #include "Clock.h"
-
-static const struct SystemInitialised emptyEventArgs = { };
+#include "PowerManagement.h"
 
 void initialise(void)
 {
+	static const struct SystemInitialised emptyEventArgs = { };
 	eventInitialise();
 	clockInitialise();
+	powerManagementInitialise();
 	eventPublish(SYSTEM_INITIALISED, &emptyEventArgs);
 }

@@ -1,3 +1,4 @@
+#include <xc.h>
 #include <unity.h>
 
 #include "Main.h"
@@ -9,7 +10,10 @@ TEST_FILE("Poll.c")
 
 static int numberOfEventPublishCalls;
 
-static void eventPublishThatIncrementsCounter(EventType type, const void *const args)
+static void eventPublishThatIncrementsCounter(
+	EventType type,
+	const void *const args,
+	int numCalls)
 {
 	numberOfEventPublishCalls++;
 }
