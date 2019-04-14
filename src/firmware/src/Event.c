@@ -63,10 +63,10 @@ void eventPublish(EventType type, const void *const args)
 		eventsWriteIndex = 0;
 }
 
-void eventDispatchNext(void)
+int8_t eventDispatchNext(void)
 {
 	if (eventsReadIndex == eventsWriteIndex)
-		return;
+		return 0;
 
 	static struct Event event;
 	event.type = events[eventsReadIndex].type;
@@ -87,4 +87,6 @@ void eventDispatchNext(void)
 
 	if (++eventsReadIndex >= MAX_EVENTS)
 		eventsReadIndex = 0;
+
+	return 1;
 }

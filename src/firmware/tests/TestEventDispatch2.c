@@ -63,3 +63,16 @@ void test_eventDispatchNext_calledMoreTimesThanEvents_expectCorrectNumberOfEvent
 	for (i = 0; i < MAX_EVENTS + 1; i++)
 		eventDispatchNext();
 }
+
+void test_eventDispatchNext_calledWhenEventsDispatched_ExpectNonZeroIsReturned(void)
+{
+	eventPublish(subscription.type, NULL);
+	TEST_ASSERT_NOT_EQUAL(0, eventDispatchNext());
+}
+
+void test_eventDispatchNext_calledWhenEventsNotDispatched_ExpectZeroIsReturned(void)
+{
+	eventPublish(subscription.type, NULL);
+	eventDispatchNext();
+	TEST_ASSERT_EQUAL_INT8(0, eventDispatchNext());
+}

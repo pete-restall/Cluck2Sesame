@@ -32,6 +32,6 @@ extern void eventInitialise(void);
 extern void eventSubscribe(const struct EventSubscription *const subscription);
 extern void eventUnsubscribe(const struct EventSubscription *const subscription);
 extern void eventPublish(EventType type, const void *const args);
-extern void eventDispatchNext(void);
+extern int8_t eventDispatchNext(void);
 
 #endif
