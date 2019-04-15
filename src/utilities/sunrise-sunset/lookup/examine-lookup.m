@@ -1,4 +1,4 @@
-data = load("-ascii", "lookup.txt");
+data = load("-ascii", "SunEventsTables.txt");
 day = data(:,1);
 referenceSunrise = data(:,2);
 lookupSunrise = data(:,3);

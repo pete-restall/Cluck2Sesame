@@ -4,6 +4,7 @@
 #include "Event.h"
 #include "Clock.h"
 #include "PowerManagement.h"
+#include "SunEvents.h"
 
 void initialise(void)
 {
@@ -11,5 +12,6 @@ void initialise(void)
 	eventInitialise();
 	clockInitialise();
 	powerManagementInitialise();
+	suneventsInitialise();
 	eventPublish(SYSTEM_INITIALISED, &emptyEventArgs);
 }

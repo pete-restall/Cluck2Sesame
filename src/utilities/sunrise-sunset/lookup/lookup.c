@@ -143,8 +143,8 @@ int main(int argc, char *argv[])
 	}
 
 	return
-		writeLookupTableForOctave("lookup.txt", latitude, longitude) +
-		writeLookupTableForAssembler("lookup.asm", latitude, longitude);
+		writeLookupTableForOctave("SunEventsTables.txt", latitude, longitude) +
+		writeLookupTableForAssembler("SunEventsTables.S", latitude, longitude);
 }
 
 static void initialiseLookupTable(void)
@@ -527,11 +527,10 @@ static int writeLookupTableForAssembler(
 
 	printf("Writing table to %s...\n", filename);
 
-	fprintf(fd, "\tradix decimal\n\n");
-	fprintf(fd, "SunriseSunset code\n");
-	fprintf(fd, "\tglobal sunriseLookupTable\n");
-	fprintf(fd, "\tglobal sunsetLookupTable\n\n");
-	fprintf(fd, "sunriseLookupTable:\n");
+	fprintf(fd, "\tpsect SunriseSunset,class=CODE,noexec,pure,delta=2,optim=\n");
+	fprintf(fd, "\tglobal _sunriseLookupTable\n");
+	fprintf(fd, "\tglobal _sunsetLookupTable\n\n");
+	fprintf(fd, "_sunriseLookupTable:\n");
 	for (int i = 0; i < LOOKUP_LENGTH; i++)
 	{
 		LookupEntry *entry = &lookupTable[i];
@@ -546,7 +545,7 @@ static int writeLookupTableForAssembler(
 				(entry->sunriseMinuteSouth & 0xff)));
 	}
 
-	fprintf(fd, "\nsunsetLookupTable:\n");
+	fprintf(fd, "\n_sunsetLookupTable:\n");
 	for (int i = 0; i < LOOKUP_LENGTH; i++)
 	{
 		LookupEntry *entry = &lookupTable[i];

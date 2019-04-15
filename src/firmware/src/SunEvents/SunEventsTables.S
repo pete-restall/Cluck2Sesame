@@ -1,10 +1,8 @@
-	radix decimal
+	psect SunriseSunset,class=CODE,noexec,pure,delta=2,optim=
+	global _sunriseLookupTable
+	global _sunsetLookupTable
 
-SunriseSunset code
-	global sunriseLookupTable
-	global sunsetLookupTable
-
-sunriseLookupTable:
+_sunriseLookupTable:
 	dw 0x0828, 0x01e4
 	dw 0x0726, 0x3ee6
 	dw 0x0724, 0x39e8
@@ -67,7 +65,7 @@ sunriseLookupTable:
 	dw 0x072a, 0x3fe3
 	dw 0x0829, 0x01e4
 
-sunsetLookupTable:
+_sunsetLookupTable:
 	dw 0x0ed7, 0x271b
 	dw 0x0eda, 0x2f1a
 	dw 0x0edd, 0x3819

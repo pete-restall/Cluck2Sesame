@@ -1,0 +1,5 @@
+#ifndef __CLUCK3SESAME_SRC_SUNEVENTS_SUNEVENTS_H
+#define __CLUCK3SESAME_SRC_SUNEVENTS_SUNEVENTS_H
+#include "../SunEvents.h"
+
+#endif

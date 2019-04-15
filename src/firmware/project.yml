@@ -32,6 +32,7 @@
   :source:
 
   :assembly:
+    - +:src/SunEvents/SunEventsTables.S
 
   :support:
     - +:src/ConfigurationWords.c
