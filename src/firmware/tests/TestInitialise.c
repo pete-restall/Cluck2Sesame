@@ -27,7 +27,7 @@ static uint8_t callSequence;
 static struct CallDetails eventInitialiseCalls;
 static struct CallDetails clockInitialiseCalls;
 static struct CallDetails powerManagementInitialiseCalls;
-static struct CallDetails suneventsInitialiseCalls;
+static struct CallDetails sunEventsInitialiseCalls;
 static struct CallDetails systemInitialisedEventPublishCalls;
 
 void setUp(void)
@@ -36,7 +36,7 @@ void setUp(void)
 	clearCallsFor(&eventInitialiseCalls);
 	clearCallsFor(&clockInitialiseCalls);
 	clearCallsFor(&powerManagementInitialiseCalls);
-	clearCallsFor(&suneventsInitialiseCalls);
+	clearCallsFor(&sunEventsInitialiseCalls);
 	clearCallsFor(&systemInitialisedEventPublishCalls);
 
 	eventInitialise_StubWithCallback(&eventInitialiseCallback);
@@ -103,12 +103,12 @@ void powerManagementInitialise(void)
 void test_initialise_called_expectSunEventsAreInitialisedAfterPowerManagement(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&suneventsInitialiseCalls, 4);
+	assertCalledOnceAtSequence(&sunEventsInitialiseCalls, 4);
 }
 
-void suneventsInitialise(void)
+void sunEventsInitialise(void)
 {
-	registerCallFor(&suneventsInitialiseCalls);
+	registerCallFor(&sunEventsInitialiseCalls);
 }
 
 void test_initialise_called_expectSystemInitialisedEventIsPublishedLast(void)

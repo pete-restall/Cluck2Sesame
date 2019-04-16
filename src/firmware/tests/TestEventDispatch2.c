@@ -5,7 +5,7 @@
 #include "Event.h"
 
 #include "Mock_EventHandler.h"
-#include "../NonDeterminism.h"
+#include "NonDeterminism.h"
 
 TEST_FILE("Event.c")
 

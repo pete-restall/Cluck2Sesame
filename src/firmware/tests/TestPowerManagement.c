@@ -5,7 +5,7 @@
 #include "Mock_Event.h"
 #include "PowerManagement.h"
 
-#include "../NonDeterminism.h"
+#include "NonDeterminism.h"
 
 TEST_FILE("Poll.c")
 
