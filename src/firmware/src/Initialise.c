@@ -12,6 +12,6 @@ void initialise(void)
 	eventInitialise();
 	clockInitialise();
 	powerManagementInitialise();
-	suneventsInitialise();
+	sunEventsInitialise();
 	eventPublish(SYSTEM_INITIALISED, &emptyEventArgs);
 }
