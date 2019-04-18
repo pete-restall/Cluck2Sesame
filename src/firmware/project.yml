@@ -147,6 +147,7 @@
       - -Wl,-Map="${3}"
       - -o "${2}"
       - "#{'${1}'.split(' ').map { |x| (x.include? '/out/c/') ? (Pathname(x).sub_ext '.p1').to_s : x }.join(' ') }"
+      - src/SunEvents/SunEventsTables.S
       - "${4}"
 
   :test_fixture:

@@ -1,0 +1,66 @@
+configuration for "PIC16F15355" is
+	shared variable scenarioIndex;
+
+	shared variable stubDayOfYearHigh;
+	shared variable stubDayOfYearLow;
+	shared variable stubLatitudeOffset;
+	shared variable stubLongitudeOffset;
+
+	shared variable expectedSunriseHour;
+	shared variable expectedSunriseMinute;
+	shared variable expectedSunsetHour;
+	shared variable expectedSunsetMinute;
+end configuration;
+
+testbench for "PIC16F15355" is
+begin
+	scenarioInjection: process is
+		variable stubDayOfYear : integer;
+	begin
+		scenarioIndex := 0;
+		loop
+			// TODO: ALL OF THE SCENARIOS FROM CLUCK2SESAME !
+			if scenarioIndex == 0 then
+				report("*** [SCENARIO] Day 0, position=(0,0)");
+				stubDayOfYear := 0;
+				stubLatitudeOffset := 0;
+				stubLongitudeOffset := 0;
+				expectedSunriseHour := 8;
+				expectedSunriseMinute := 33;
+				expectedSunsetHour := 15;
+				expectedSunsetMinute := 35;
+			elsif scenarioIndex == 1 then
+				report("*** [SCENARIO] Day 180, position=(0,0)");
+				stubDayOfYear := 180;
+				stubLatitudeOffset := 0;
+				stubLongitudeOffset := 0;
+				expectedSunriseHour := 3;
+				expectedSunriseMinute := 33;
+				expectedSunsetHour := 20;
+				expectedSunsetMinute := 34;
+			elsif scenarioIndex == 2 then
+				report("*** [SCENARIO] Day 365, position=(0,0)");
+				stubDayOfYear := 365;
+				stubLatitudeOffset := 0;
+				stubLongitudeOffset := 0;
+				expectedSunriseHour := 8;
+				expectedSunriseMinute := 33;
+				expectedSunsetHour := 15;
+				expectedSunsetMinute := 34;
+			else
+				report("*** [SCENARIO] Done");
+				stubDayOfYear := 666;
+				stubLatitudeOffset := 0;
+				stubLongitudeOffset := 0;
+				expectedSunriseHour := 0;
+				expectedSunriseMinute := 0;
+				expectedSunsetHour := 0;
+				expectedSunsetMinute := 0;
+			end if;
+
+			stubDayOfYearHigh := stubDayOfYear / 256;
+			stubDayOfYearLow := stubDayOfYear - 256 * stubDayOfYearHigh;
+			wait on scenarioIndex;
+		end loop;
+	end process;
+end testbench;

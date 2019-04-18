@@ -9,13 +9,10 @@
 #include "../NonDeterminism.h"
 
 TEST_FILE("SunEvents/SunEventsInitialise.c")
+TEST_FILE("SunEvents/SunEventsCalculate.c")
 
 static struct Event onDateChangedEvent;
 static const struct EventSubscription *onDateChanged;
-
-static const uint8_t dummyLookupTables[300];
-const __rom void *const sunriseLookupTable = &dummyLookupTables;
-const __rom void *const sunsetLookupTable = &dummyLookupTables;
 
 static void eventSubscribeStub(
 	const struct EventSubscription *const subscription,
