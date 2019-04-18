@@ -66,6 +66,7 @@
     - CMOCK_MEM_SIZE=256
   :plugins:
     - :ignore
+    - :ignore_arg
     - :callback
     - :expect_any_args
 

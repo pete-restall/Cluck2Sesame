@@ -52,9 +52,21 @@ void test_sunEventsInitialise_called_expectSubscriptionToDateChanged(void)
 
 void test_onDateChanged_ExpectSunEventsChangedIsPublishedWithCalculatedSunEventTimes(void)
 {
-	static const struct SunEventsChanged args = { /* TODO ! */ };
+	static const struct Date today =
+	{
+		.day = 0, .month = 0, .year = 0,
+		.dayOfYear = 0,
+		.flags = { .isLeapYear = 0, .isDaylightSavings = 0 }
+	};
+
+	static const struct DateChanged dateChanged =
+	{
+		.today = &today
+	};
+
 	sunEventsInitialise();
-	//onDateChangedEvent.args = ...; // TODO !
-	eventPublish_Expect(SUN_EVENTS_CHANGED, &args);
+	onDateChangedEvent.args = &dateChanged;
+	eventPublish_Expect(SUN_EVENTS_CHANGED, NULL);
+	eventPublish_IgnoreArg_args();
 	onDateChanged->handler(&onDateChangedEvent);
 }
