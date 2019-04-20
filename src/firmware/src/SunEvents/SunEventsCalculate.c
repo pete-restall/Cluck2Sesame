@@ -3,8 +3,11 @@
 
 #include "../Event.h"
 #include "../Clock.h"
+#include "../Location.h"
 
 #include "SunEvents.h"
+
+#define MINUTES_PER_DEGREE_LONGITUDE 4
 
 static void calculateSunEvent(void);
 
@@ -34,6 +37,7 @@ void sunEventsCalculate(void)
 
 static void calculateSunEvent(void)
 {
+	// TODO: LOOK AT USING 'div()' FROM stdlib AS A SPACE SAVER ?
 	int16_t lookupIndex =
 		sunEventsCalculationContext.inputs.dayOfYear / LOOKUP_STEP;
 
@@ -52,11 +56,21 @@ static void calculateSunEvent(void)
 
 	int16_t interpolatedMinuteOfDay = lookupEntries[0].minuteOfDay + delta;
 
+	int16_t longitudeDelta =
+		(LOOKUP_LONGITUDE - sunEventsCalculationContext.inputs.longitudeOffset) *
+		MINUTES_PER_DEGREE_LONGITUDE;
+
+	int16_t longitudeMinutes = longitudeDelta / LONGLAT_ONE_DEGREE;
+	int16_t longitudeMinutesResidual = longitudeDelta % LONGLAT_ONE_DEGREE;
+	int16_t longitudeAdjustmentMinutes = longitudeMinutes + (longitudeMinutesResidual >= LONGLAT_HALF_DEGREE ? 1 : longitudeMinutesResidual <= -LONGLAT_HALF_DEGREE ? -1 : 0);
+
+	uint16_t minuteOfDay = interpolatedMinuteOfDay + longitudeAdjustmentMinutes;
+
 	sunEventsCalculationContext.working.destination->hour =
-		interpolatedMinuteOfDay / 60;
+		minuteOfDay / 60;
 
 	sunEventsCalculationContext.working.destination->minute =
-		interpolatedMinuteOfDay % 60;
+		minuteOfDay % 60;
 }
 
 static void readLookupEntryInto(

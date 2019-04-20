@@ -27,8 +27,6 @@ static void eventSubscribeStub(
 		onDateChangedEvent.state = subscription->state;
 		onDateChangedEvent.args = (void *) 0;
 	}
-	else
-		TEST_FAIL_MESSAGE("Unknown subscription type");
 }
 
 void setUp(void)

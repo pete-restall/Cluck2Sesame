@@ -5,6 +5,7 @@
 
 #define LOOKUP_STEP 6
 #define LOOKUP_LENGTH (366 / LOOKUP_STEP)
+#define LOOKUP_LONGITUDE 0
 
 struct SunEventsCalculationContext
 {

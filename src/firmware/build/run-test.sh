@@ -32,7 +32,7 @@ set breakoptions.stimulusmessags.warnings Break
 
 set oscillator.rcfrequency 32
 set oscillator.rcfrequencyunit Mega
-set oscillator.frequency 16
+set oscillator.frequency 8
 set oscillator.frequencyunit Mega
 
 set uart1io.uartioenabled true
