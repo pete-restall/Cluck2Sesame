@@ -61,31 +61,63 @@ static void calculateSunEvent(void)
 	div_t latitudeAdjustmentMinutes;
 	if (sunEventsCalculationContext.inputs.latitudeOffset >= 0)
 	{
-		int offsetMinutes = lookupEntries[0].offsetMinutesNorth + (lookupEntries[1].offsetMinutesNorth - lookupEntries[0].offsetMinutesNorth) / LOOKUP_STEP;
-		int interpolatedMinutes = offsetMinutes * sunEventsCalculationContext.inputs.latitudeOffset;
-		latitudeAdjustmentMinutes = div(interpolatedMinutes, LOOKUP_LATITUDE_NORTH - LOOKUP_LATITUDE);
-		latitudeAdjustmentMinutes.quot += (latitudeAdjustmentMinutes.rem >= LONGLAT_HALF_DEGREE ? 1 : latitudeAdjustmentMinutes.rem <= -LONGLAT_HALF_DEGREE ? -1 : 0);
+		int offsetMinutes =
+			lookupEntries[0].offsetMinutesNorth +
+			(lookupEntries[1].offsetMinutesNorth - lookupEntries[0].offsetMinutesNorth) /
+			LOOKUP_STEP;
+
+		int interpolatedMinutes =
+			offsetMinutes * sunEventsCalculationContext.inputs.latitudeOffset;
+
+		latitudeAdjustmentMinutes = div(
+			interpolatedMinutes,
+			LOOKUP_LATITUDE_NORTH - LOOKUP_LATITUDE);
 	}
 	else
 	{
-		int offsetMinutes = lookupEntries[0].offsetMinutesSouth + (lookupEntries[1].offsetMinutesSouth - lookupEntries[0].offsetMinutesSouth) / LOOKUP_STEP;
-		int interpolatedMinutes = offsetMinutes * -sunEventsCalculationContext.inputs.latitudeOffset;
-		latitudeAdjustmentMinutes = div(interpolatedMinutes, LOOKUP_LATITUDE - LOOKUP_LATITUDE_SOUTH);
-		latitudeAdjustmentMinutes.quot += (latitudeAdjustmentMinutes.rem >= LONGLAT_HALF_DEGREE ? 1 : latitudeAdjustmentMinutes.rem <= -LONGLAT_HALF_DEGREE ? -1 : 0);
+		int offsetMinutes =
+			lookupEntries[0].offsetMinutesSouth +
+			(lookupEntries[1].offsetMinutesSouth - lookupEntries[0].offsetMinutesSouth) /
+			LOOKUP_STEP;
+
+		int interpolatedMinutes =
+			offsetMinutes * -sunEventsCalculationContext.inputs.latitudeOffset;
+
+		latitudeAdjustmentMinutes = div(
+			interpolatedMinutes,
+			LOOKUP_LATITUDE - LOOKUP_LATITUDE_SOUTH);
 	}
+
+	latitudeAdjustmentMinutes.quot +=
+		latitudeAdjustmentMinutes.rem >= LONGLAT_HALF_DEGREE
+			? 1
+			: latitudeAdjustmentMinutes.rem <= -LONGLAT_HALF_DEGREE
+				? -1
+				: 0;
 
 	int longitudeDelta =
 		sunEventsCalculationContext.inputs.longitudeOffset *
 		-MINUTES_PER_DEGREE_LONGITUDE;
 
 	div_t longitudeAdjustmentMinutes = div(longitudeDelta, LONGLAT_ONE_DEGREE);
-	longitudeAdjustmentMinutes.quot += (longitudeAdjustmentMinutes.rem >= LONGLAT_HALF_DEGREE ? 1 : longitudeAdjustmentMinutes.rem <= -LONGLAT_HALF_DEGREE ? -1 : 0);
+	longitudeAdjustmentMinutes.quot +=
+		longitudeAdjustmentMinutes.rem >= LONGLAT_HALF_DEGREE
+			? 1
+			: longitudeAdjustmentMinutes.rem <= -LONGLAT_HALF_DEGREE
+				? -1
+				: 0;
 
-	int minuteOfDay = interpolatedMinuteOfDay.quot + latitudeAdjustmentMinutes.quot + longitudeAdjustmentMinutes.quot;
+	int minuteOfDay =
+		interpolatedMinuteOfDay.quot +
+		latitudeAdjustmentMinutes.quot +
+		longitudeAdjustmentMinutes.quot;
 
 	div_t hours = div(minuteOfDay, 60);
-	sunEventsCalculationContext.working.destination->hour = (uint8_t) hours.quot;
-	sunEventsCalculationContext.working.destination->minute = (uint8_t) hours.rem;
+	sunEventsCalculationContext.working.destination->hour =
+		(uint8_t) hours.quot;
+
+	sunEventsCalculationContext.working.destination->minute =
+		(uint8_t) hours.rem;
 }
 
 static void readLookupEntryInto(
