@@ -91,78 +91,78 @@ begin
 				expectedSunriseMinute := 29;
 				expectedSunsetHour := 15;
 				expectedSunsetMinute := 31;
-//			elsif scenarioIndex == 8 then
-//				report("*** [SCENARIO] Day 180, position=(-50,0)");
-//				stubDayOfYear := 180;
-//				stubLatitudeOffset := -50;
-//				stubLongitudeOffset := 0;
-//				expectedSunriseHour := 4;
-//				expectedSunriseMinute := 1;
-//				expectedSunsetHour := 20;
-//				expectedSunsetMinute := 6;
-//			elsif scenarioIndex == 9 then
-//				report("*** [SCENARIO] Day 365, position=(+50,0)");
-//				stubDayOfYear := 365;
-//				stubLatitudeOffset := 50;
-//				stubLongitudeOffset := 0;
-//				expectedSunriseHour := 9;
-//				expectedSunriseMinute := 14;
-//				expectedSunsetHour := 14;
-//				expectedSunsetMinute := 53;
-//			elsif scenarioIndex == 10 then
-//				report("*** [SCENARIO] Day 45, position=(-25,0)");
-//				stubDayOfYear := 45;
-//				stubLatitudeOffset := -25;
-//				stubLongitudeOffset := 0;
-//				expectedSunriseHour := 7;
-//				expectedSunriseMinute := 23;
-//				expectedSunsetHour := 17;
-//				expectedSunsetMinute := 5;
-//			elsif scenarioIndex == 11 then
-//				report("*** [SCENARIO] Day 72, position=(+25,0)");
-//				stubDayOfYear := 72;
-//				stubLatitudeOffset := 25;
-//				stubLongitudeOffset := 0;
-//				expectedSunriseHour := 6;
-//				expectedSunriseMinute := 25;
-//				expectedSunsetHour := 17;
-//				expectedSunsetMinute := 54;
-//			elsif scenarioIndex == 12 then
-//				report("*** [SCENARIO] Day 67, position=(-50,-20)");
-//				stubDayOfYear := 67;
-//				stubLatitudeOffset := -50;
-//				stubLongitudeOffset := -20;
-//				expectedSunriseHour := 6;
-//				expectedSunriseMinute := 41;
-//				expectedSunsetHour := 17;
-//				expectedSunsetMinute := 58;
-//			elsif scenarioIndex == 13 then
-//				report("*** [SCENARIO] Day 67, position=(-50,+20)");
-//				stubDayOfYear := 67;
-//				stubLatitudeOffset := -50;
-//				stubLongitudeOffset := 20;
-//				expectedSunriseHour := 6;
-//				expectedSunriseMinute := 25;
-//				expectedSunsetHour := 17;
-//				expectedSunsetMinute := 42;
-//			elsif scenarioIndex == 14 then
-//				report("*** [SCENARIO] Day 266, position=(+50,-20)");
-//				stubDayOfYear := 266;
-//				stubLatitudeOffset := 50;
-//				stubLongitudeOffset := -20;
-//				expectedSunriseHour := 6;
-//				expectedSunriseMinute := 2;
-//				expectedSunsetHour := 17;
-//				expectedSunsetMinute := 57;
-//			elsif scenarioIndex == 15 then
-//				report("*** [SCENARIO] Day 266, position=(+50,+20)");
-//				stubDayOfYear := 266;
-//				stubLatitudeOffset := 50;
-//				stubLongitudeOffset := 20;
-//				expectedSunriseHour := 5;
-//				expectedSunriseMinute := 46;
-//				expectedSunsetHour := 17;
-//				expectedSunsetMinute := 41;
+			elsif scenarioIndex == 8 then
+				report("*** [SCENARIO] Day 180, position=(-50,0)");
+				stubDayOfYear := 180;
+				stubLatitudeOffset := -50;
+				stubLongitudeOffset := 0;
+				expectedSunriseHour := 4;
+				expectedSunriseMinute := 1;
+				expectedSunsetHour := 20;
+				expectedSunsetMinute := 6;
+			elsif scenarioIndex == 9 then
+				report("*** [SCENARIO] Day 365, position=(+50,0)");
+				stubDayOfYear := 365;
+				stubLatitudeOffset := 50;
+				stubLongitudeOffset := 0;
+				expectedSunriseHour := 9;
+				expectedSunriseMinute := 14;
+				expectedSunsetHour := 14;
+				expectedSunsetMinute := 53;
+			elsif scenarioIndex == 10 then
+				report("*** [SCENARIO] Day 45, position=(-25,0)");
+				stubDayOfYear := 45;
+				stubLatitudeOffset := -25;
+				stubLongitudeOffset := 0;
+				expectedSunriseHour := 7;
+				expectedSunriseMinute := 23;
+				expectedSunsetHour := 17;
+				expectedSunsetMinute := 7;
+			elsif scenarioIndex == 11 then
+				report("*** [SCENARIO] Day 72, position=(+25,0)");
+				stubDayOfYear := 72;
+				stubLatitudeOffset := 25;
+				stubLongitudeOffset := 0;
+				expectedSunriseHour := 6;
+				expectedSunriseMinute := 26;
+				expectedSunsetHour := 17;
+				expectedSunsetMinute := 54;
+			elsif scenarioIndex == 12 then
+				report("*** [SCENARIO] Day 67, position=(-50,-20)");
+				stubDayOfYear := 67;
+				stubLatitudeOffset := -50;
+				stubLongitudeOffset := -20;
+				expectedSunriseHour := 6;
+				expectedSunriseMinute := 41;
+				expectedSunsetHour := 17;
+				expectedSunsetMinute := 58;
+			elsif scenarioIndex == 13 then
+				report("*** [SCENARIO] Day 67, position=(-50,+20)");
+				stubDayOfYear := 67;
+				stubLatitudeOffset := -50;
+				stubLongitudeOffset := 20;
+				expectedSunriseHour := 6;
+				expectedSunriseMinute := 25;
+				expectedSunsetHour := 17;
+				expectedSunsetMinute := 42;
+			elsif scenarioIndex == 14 then
+				report("*** [SCENARIO] Day 266, position=(+50,-20)");
+				stubDayOfYear := 266;
+				stubLatitudeOffset := 50;
+				stubLongitudeOffset := -20;
+				expectedSunriseHour := 6;
+				expectedSunriseMinute := 2;
+				expectedSunsetHour := 17;
+				expectedSunsetMinute := 57;
+			elsif scenarioIndex == 15 then
+				report("*** [SCENARIO] Day 266, position=(+50,+20)");
+				stubDayOfYear := 266;
+				stubLatitudeOffset := 50;
+				stubLongitudeOffset := 20;
+				expectedSunriseHour := 5;
+				expectedSunriseMinute := 46;
+				expectedSunsetHour := 17;
+				expectedSunsetMinute := 41;
 			else
 				report("*** [SCENARIO] Done");
 				stubDayOfYear := 666;

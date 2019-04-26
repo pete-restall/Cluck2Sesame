@@ -11,6 +11,8 @@
 TEST_FILE("SunEvents/SunEventsInitialise.c")
 TEST_FILE("SunEvents/SunEventsCalculate.c")
 
+static void ensureEventHandlerDoesNotGetOmittedByTheCompiler(void);
+
 static struct Event onLocationChangedEvent;
 static const struct EventSubscription *onLocationChanged;
 
@@ -42,25 +44,13 @@ void tearDown(void)
 void test_sunEventsInitialise_called_expectSubscriptionToLocationChanged(void)
 {
 	sunEventsInitialise();
+	ensureEventHandlerDoesNotGetOmittedByTheCompiler();
 	TEST_ASSERT_NOT_NULL(onLocationChanged);
 }
 
-void test_onLocationChanged_ExpectSunEventsChangedIsPublishedWithCalculatedSunEventTimes(void)
+static void ensureEventHandlerDoesNotGetOmittedByTheCompiler(void)
 {
-	static const struct Location location =
-	{
-		.latitudeOffset = 0,
-		.longitudeOffset = 0
-	};
-
-	static const struct LocationChanged locationChanged =
-	{
-		.location = &location
-	};
-
-	sunEventsInitialise();
-	onLocationChangedEvent.args = &locationChanged;
-	eventPublish_Expect(SUN_EVENTS_CHANGED, NULL);
-	eventPublish_IgnoreArg_args();
-	onLocationChanged->handler(&onLocationChangedEvent);
+	static volatile uint8_t dummy = 0;
+	if (onLocationChanged && dummy)
+		onLocationChanged->handler(&onLocationChangedEvent);
 }

@@ -1,11 +1,15 @@
 #ifndef __CLUCK3SESAME_SRC_SUNEVENTS_SUNEVENTS_H
 #define __CLUCK3SESAME_SRC_SUNEVENTS_SUNEVENTS_H
 #include "../SunEvents.h"
+#include "../Location.h"
 #include "../Clock.h"
 
 #define LOOKUP_STEP 6
 #define LOOKUP_LENGTH (366 / LOOKUP_STEP)
-#define LOOKUP_LONGITUDE 0
+#define LOOKUP_LATITUDE (55 * LONGLAT_ONE_DEGREE)
+#define LOOKUP_LATITUDE_NORTH (LOOKUP_LATITUDE + 5 * LONGLAT_ONE_DEGREE)
+#define LOOKUP_LATITUDE_SOUTH (LOOKUP_LATITUDE - 5 * LONGLAT_ONE_DEGREE)
+#define LOOKUP_LONGITUDE (0 * LONGLAT_ONE_DEGREE)
 
 struct SunEventsCalculationContext
 {
@@ -26,8 +30,8 @@ struct SunEventsCalculationContext
 struct SunEventsLookupEntry
 {
 	uint16_t minuteOfDay;
-	int8_t offsetNorth;
-	int8_t offsetSouth;
+	int8_t offsetMinutesNorth;
+	int8_t offsetMinutesSouth;
 };
 
 extern struct SunEventsCalculationContext sunEventsCalculationContext;
