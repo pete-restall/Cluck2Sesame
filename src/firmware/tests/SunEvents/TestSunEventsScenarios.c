@@ -65,7 +65,6 @@ void test_onDateChanged_ExpectSunEventsChangedIsPublishedWithCalculatedSunEventT
 		location.latitudeOffset = stubLatitudeOffset;
 		location.longitudeOffset = stubLongitudeOffset;
 
-		// TODO: ANOTHER SET OF TESTS THAT VERIFY THE SAME THINGS, BUT USING THE ORDER OF 'onDateChanged()' FOLLOWED BY 'onLocationChanged()'
 		assertSunEventsChanged = 0;
 		onLocationChanged->handler(&onLocationChangedEvent);
 
@@ -143,4 +142,37 @@ void eventPublish(EventType type, const void *const args)
 	}
 	else if (type != SUN_EVENTS_CHANGED)
 		TEST_FAIL_MESSAGE("Unknown event type");
+}
+
+void test_onLocationChanged_ExpectSunEventsChangedIsPublishedWithCalculatedSunEventTimes(void)
+{
+	static struct Location location;
+	static const struct LocationChanged locationArgs = { .location = &location };
+
+	static struct Date today;
+	static const struct DateChanged dateArgs = { .today = &today };
+
+	sunEventsInitialise();
+	onLocationChangedEvent.args = &locationArgs;
+	onDateChangedEvent.args = &dateArgs;
+
+	for (scenarioIndex = 0; ; scenarioIndex++)
+	{
+		today.dayOfYear = (stubDayOfYearHigh << 8) | stubDayOfYearLow;
+		if (today.dayOfYear > 365)
+			break;
+
+		location.latitudeOffset = stubLatitudeOffset;
+		location.longitudeOffset = stubLongitudeOffset;
+
+		assertSunEventsChanged = 0;
+		onDateChanged->handler(&onDateChangedEvent);
+
+		assertSunEventsChanged = 1;
+		onLocationChanged->handler(&onLocationChangedEvent);
+		TEST_ASSERT_EQUAL_UINT8_MESSAGE(
+			scenarioIndex,
+			scenarioIndexLastAsserted,
+			"No event published");
+	}
 }
