@@ -47,13 +47,11 @@ uint8_t anyByteWithMaskClear(uint8_t mask)
 	return anyByte() & ~mask;
 }
 
-uint32_t anyDword(void)
+uint16_t anyWord(void)
 {
-	uint32_t dword = 0;
-	int i;
+	uint16_t word = 0;
+	for (uint8_t i = 0; i < 2; i++)
+		word |= ((uint16_t) anyByte()) << (i * 8);
 
-	for (i = 0; i < 4; i++)
-		dword |= ((uint32_t) anyByte()) << (i * 8);
-
-	return dword;
+	return word;
 }

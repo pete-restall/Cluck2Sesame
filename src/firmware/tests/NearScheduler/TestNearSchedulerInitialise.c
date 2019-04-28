@@ -19,8 +19,7 @@ void tearDown(void)
 
 void test_MS_TO_TICKS_calledWithUpToTenMilliseconds_ExpectOneTick(void)
 {
-	uint8_t ms;
-	for (ms = 1; ms <= 10; ms++)
+	for (uint8_t ms = 1; ms <= 10; ms++)
 	{
 		TEST_ASSERT_EQUAL_UINT8(1, MS_TO_TICKS(ms));
 	}
@@ -41,8 +40,7 @@ void test_MS_TO_TICKS_calledWithRemainderOfTenMillisecondMultiples_ExpectTicksRo
 	uint8_t ms = anyByte();
 	uint8_t roundedUpTicks = ms / 10 + 1;
 	uint8_t msMultipleOfTen = (ms / 10) * 10;
-	uint8_t remainder;
-	for (remainder = 1; remainder <= 9; remainder++)
+	for (uint8_t remainder = 1; remainder <= 9; remainder++)
 	{
 		TEST_ASSERT_EQUAL_UINT8(
 			roundedUpTicks,
