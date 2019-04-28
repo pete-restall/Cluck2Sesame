@@ -41,8 +41,7 @@ void setUp(void)
 	anotherSubscription.handler = &anotherEventHandler;
 	anotherSubscription.state = &anotherEventState;
 
-	uint8_t i;
-	for (i = 0; i < MAX_SUBSCRIPTIONS; i++)
+	for (uint8_t i = 0; i < MAX_SUBSCRIPTIONS; i++)
 	{
 		lotsOfEventStates[i] = anyByte();
 		lotsOfSubscriptions[i].type = 3;
@@ -73,8 +72,7 @@ void test_eventSubscribe_calledMoreTimesThanBufferSize_expectExistingSubscriptio
 	eventSubscribe(&subscription);
 	eventHandler_ExpectAnyArgs();
 
-	uint8_t i;
-	for (i = 0; i < MAX_SUBSCRIPTIONS; i++)
+	for (uint8_t i = 0; i < MAX_SUBSCRIPTIONS; i++)
 		eventSubscribe(&lotsOfSubscriptions[i]);
 
 	eventPublish(subscription.type, NULL);
@@ -97,8 +95,7 @@ void test_eventUnsubscribe_called_expectEventsAreNotDispatchedAnymore(void)
 
 void test_eventUnsubscribe_called_expectHoleInListCanBeRefilledByNewSubscription(void)
 {
-	uint8_t i;
-	for (i = 0; i < MAX_SUBSCRIPTIONS; i++)
+	for (uint8_t i = 0; i < MAX_SUBSCRIPTIONS; i++)
 		eventSubscribe(&lotsOfSubscriptions[i]);
 
 	eventUnsubscribe(&lotsOfSubscriptions[7]);

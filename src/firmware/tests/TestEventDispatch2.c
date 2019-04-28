@@ -38,8 +38,7 @@ void tearDown(void)
 
 void test_eventPublish_calledMoreTimesThanAvailableBufferSize_expectCircularBuffer(void)
 {
-	uint8_t i;
-	for (i = 0; i < MAX_EVENTS; i++)
+	for (uint8_t i = 0; i < MAX_EVENTS; i++)
 		eventPublish(subscription.type, NULL);
 
 	eventPublish(anotherSubscription.type, NULL);
@@ -50,7 +49,7 @@ void test_eventPublish_calledMoreTimesThanAvailableBufferSize_expectCircularBuff
 
 	eventSubscribe(&subscription);
 	eventSubscribe(&anotherSubscription);
-	for (i = 0; i < MAX_EVENTS; i++)
+	for (uint8_t i = 0; i < MAX_EVENTS; i++)
 		eventDispatchNext();
 }
 
@@ -60,8 +59,7 @@ void test_eventDispatchNext_calledMoreTimesThanEvents_expectCorrectNumberOfEvent
 	eventPublish(subscription.type, NULL);
 	eventHandler_ExpectAnyArgs();
 
-	uint8_t i;
-	for (i = 0; i < MAX_EVENTS + 1; i++)
+	for (uint8_t i = 0; i < MAX_EVENTS + 1; i++)
 		eventDispatchNext();
 }
 
