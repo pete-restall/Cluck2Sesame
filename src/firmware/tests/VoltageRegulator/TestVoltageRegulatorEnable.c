@@ -25,3 +25,17 @@ void test_voltageRegulatorEnable_calledOnce_expectEnablePinIsHigh(void)
 	voltageRegulatorEnable();
 	TEST_ASSERT_EQUAL_UINT8(originalLatb | _LATB_LATB2_MASK, LATB);
 }
+
+// TODO: TEST FOLLOWING SCENARIOS:
+//     voltageRegulatorEnable();
+//     startup time elapsed
+//     EXPECT VOLTAGE_REGULATOR_ENABLED EVENT PUBLISHED
+//
+//     voltageRegulatorEnable();
+//     voltageRegulatorDisable();
+//     startup time elapsed
+//     EXPECT NO VOLTAGE_REGULATOR_ENABLED EVENT PUBLISHED !
+//
+//     voltageRegulatorEnable();
+//     voltageRegulatorEnable();
+//     EXPECT ONLY SINGLE VOLTAGE_REGULATOR_ENABLED EVENT PUBLISHED

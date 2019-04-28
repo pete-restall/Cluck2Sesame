@@ -6,6 +6,7 @@
 
 static void onAllEventsDispatched(const struct Event *event);
 
+// TODO: DISABLE ALL UNNECESSARY PERIPHERALS VIA THE PMD REGISTERS !
 void powerManagementInitialise(void)
 {
 	static const struct EventSubscription onAllEventsDispatchedSubscription =
@@ -16,6 +17,7 @@ void powerManagementInitialise(void)
 	};
 
 	eventSubscribe(&onAllEventsDispatchedSubscription);
+	INTCONbits.PEIE = 1;
 }
 
 static void onAllEventsDispatched(const struct Event *event)

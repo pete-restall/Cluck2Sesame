@@ -26,6 +26,7 @@ static void registerCallFor(struct CallDetails *const calls);
 static uint8_t callSequence;
 static struct CallDetails eventInitialiseCalls;
 static struct CallDetails clockInitialiseCalls;
+static struct CallDetails nearSchedulerInitialiseCalls;
 static struct CallDetails powerManagementInitialiseCalls;
 static struct CallDetails sunEventsInitialiseCalls;
 static struct CallDetails systemInitialisedEventPublishCalls;
@@ -35,6 +36,7 @@ void setUp(void)
 	callSequence = 1;
 	clearCallsFor(&eventInitialiseCalls);
 	clearCallsFor(&clockInitialiseCalls);
+	clearCallsFor(&nearSchedulerInitialiseCalls);
 	clearCallsFor(&powerManagementInitialiseCalls);
 	clearCallsFor(&sunEventsInitialiseCalls);
 	clearCallsFor(&systemInitialisedEventPublishCalls);
@@ -89,10 +91,21 @@ void clockInitialise(void)
 	registerCallFor(&clockInitialiseCalls);
 }
 
-void test_initialise_called_expectPowerManagementIsInitialisedAfterClock(void)
+void test_initialise_called_expectNearSchedulerIsInitialisedAfterClock(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&powerManagementInitialiseCalls, 3);
+	assertCalledOnceAtSequence(&nearSchedulerInitialiseCalls, 3);
+}
+
+void nearSchedulerInitialise(void)
+{
+	registerCallFor(&nearSchedulerInitialiseCalls);
+}
+
+void test_initialise_called_expectPowerManagementIsInitialisedAfterNearScheduler(void)
+{
+	initialise();
+	assertCalledOnceAtSequence(&powerManagementInitialiseCalls, 4);
 }
 
 void powerManagementInitialise(void)
@@ -103,7 +116,7 @@ void powerManagementInitialise(void)
 void test_initialise_called_expectSunEventsAreInitialisedAfterPowerManagement(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&sunEventsInitialiseCalls, 4);
+	assertCalledOnceAtSequence(&sunEventsInitialiseCalls, 5);
 }
 
 void sunEventsInitialise(void)

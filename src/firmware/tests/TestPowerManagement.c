@@ -1,4 +1,5 @@
 #include <xc.h>
+#include <stdint.h>
 #include <unity.h>
 
 #include "Main.h"
@@ -42,6 +43,14 @@ void setUp(void)
 
 void tearDown(void)
 {
+}
+
+void test_powerManagementInitialise_called_expectPeripheralInterruptsAllowWakeFromSleep(void)
+{
+	INTCON = anyByteWithMaskClear(_INTCON_PEIE_MASK);
+	uint8_t originalIntcon = INTCON;
+	powerManagementInitialise();
+	TEST_ASSERT_EQUAL_UINT8(originalIntcon | _INTCON_PEIE_MASK, INTCON);
 }
 
 void test_powerManagementInitialise_called_expectSubscriptionToAllEventsDispatched(void)
