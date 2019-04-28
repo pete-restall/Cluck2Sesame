@@ -5,6 +5,7 @@
 #include "Clock.h"
 #include "NearScheduler.h"
 #include "PowerManagement.h"
+#include "VoltageRegulator.h"
 #include "SunEvents.h"
 
 void initialise(void)
@@ -14,6 +15,7 @@ void initialise(void)
 	clockInitialise();
 	nearSchedulerInitialise();
 	powerManagementInitialise();
+	voltageRegulatorInitialise();
 	sunEventsInitialise();
 	eventPublish(SYSTEM_INITIALISED, &emptyEventArgs);
 }

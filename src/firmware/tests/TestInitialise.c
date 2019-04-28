@@ -28,6 +28,7 @@ static struct CallDetails eventInitialiseCalls;
 static struct CallDetails clockInitialiseCalls;
 static struct CallDetails nearSchedulerInitialiseCalls;
 static struct CallDetails powerManagementInitialiseCalls;
+static struct CallDetails voltageRegulatorInitialiseCalls;
 static struct CallDetails sunEventsInitialiseCalls;
 static struct CallDetails systemInitialisedEventPublishCalls;
 
@@ -38,6 +39,7 @@ void setUp(void)
 	clearCallsFor(&clockInitialiseCalls);
 	clearCallsFor(&nearSchedulerInitialiseCalls);
 	clearCallsFor(&powerManagementInitialiseCalls);
+	clearCallsFor(&voltageRegulatorInitialiseCalls);
 	clearCallsFor(&sunEventsInitialiseCalls);
 	clearCallsFor(&systemInitialisedEventPublishCalls);
 
@@ -113,10 +115,21 @@ void powerManagementInitialise(void)
 	registerCallFor(&powerManagementInitialiseCalls);
 }
 
-void test_initialise_called_expectSunEventsAreInitialisedAfterPowerManagement(void)
+void test_initialise_called_expectVoltageRegulatorIsInitialisedAfterPowerManagement(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&sunEventsInitialiseCalls, 5);
+	assertCalledOnceAtSequence(&voltageRegulatorInitialiseCalls, 5);
+}
+
+void voltageRegulatorInitialise(void)
+{
+	registerCallFor(&voltageRegulatorInitialiseCalls);
+}
+
+void test_initialise_called_expectSunEventsAreInitialisedAfterVoltageRegulator(void)
+{
+	initialise();
+	assertCalledOnceAtSequence(&sunEventsInitialiseCalls, 6);
 }
 
 void sunEventsInitialise(void)
