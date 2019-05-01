@@ -50,7 +50,11 @@ void test_nearSchedulerAdd_calledWhenPendingSchedules_expectNcoAccumulatorIsNotC
 
 void test_nearSchedulerAdd_calledWhenNoPendingSchedulesAndInsufficientTicksElapsed_expectNoHandlersCalled(void)
 {
-	struct NearSchedule schedule = { .ticks = anyByteExcept(0) };
+	struct NearSchedule schedule =
+	{
+		.ticks = anyByteExcept(0),
+		.handler = &spyHandler
+	};
 
 	nearSchedulerAdd(&schedule);
 	for (uint8_t i = 0; i < schedule.ticks - 1; i++)
@@ -69,7 +73,12 @@ void test_nearSchedulerAdd_notCalledButNcoHasTicked_expectNcoInterruptFlagIsClea
 
 void test_nearSchedulerAdd_calledAndWokenFromSleepBecauseOfNonTickEvent_expectNoHandlersAreCalled(void)
 {
-	struct NearSchedule schedule = { .ticks = 1 };
+	const struct NearSchedule schedule =
+	{
+		.ticks = 1,
+		.handler = &spyHandler
+	};
+
 	nearSchedulerAdd(&schedule);
 
 	PIR7 = anyByteWithMaskClear(_PIR7_NCO1IF_MASK);

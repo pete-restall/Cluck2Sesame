@@ -18,9 +18,9 @@ static const struct EventSubscription *onWokenFromSleep;
 static struct Event wokenFromSleepEvent;
 
 static uint8_t numberOfHandlerCalls;
-static const struct NearSchedule *handlerSchedules[16];
-static const struct NearSchedule **handlerScheduleWrptr;
-static const struct NearSchedule **handlerScheduleRdptr;
+static struct NearSchedule handlerSchedules[16];
+static struct NearSchedule *handlerScheduleWrptr;
+static const struct NearSchedule *handlerScheduleRdptr;
 
 void setUp(void)
 {
@@ -83,7 +83,7 @@ void assertHandlerCalledWith(const struct NearSchedule *const schedule)
 		TEST_FAIL_MESSAGE("Not enough calls");
 	}
 
-	const struct NearSchedule *actual = *(handlerScheduleRdptr++);
+	const struct NearSchedule *actual = handlerScheduleRdptr++;
 	TEST_ASSERT_NOT_NULL_MESSAGE(actual, "Null schedule");
 	TEST_ASSERT_NOT_EQUAL_MESSAGE(schedule, actual, "Expected copy");
 	TEST_ASSERT_EQUAL_MESSAGE(schedule->handler, actual->handler, "Handler");
@@ -109,7 +109,10 @@ void eventSubscribe(const struct EventSubscription *const subscription)
 void spyHandler(const struct NearSchedule *const schedule)
 {
 	numberOfHandlerCalls++;
-	*(handlerScheduleWrptr++) = schedule;
+	handlerScheduleWrptr->ticks = schedule->ticks;
+	handlerScheduleWrptr->handler = schedule->handler;
+	handlerScheduleWrptr->state = schedule->state;
+	handlerScheduleWrptr++;
 }
 
 void dummyHandler(const struct NearSchedule *const schedule)

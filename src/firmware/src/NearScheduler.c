@@ -49,7 +49,8 @@ void nearSchedulerAdd(const struct NearSchedule *const schedule)
 		}
 	}
 
-	// TODO: NULL CHECK, IE. NO SPACE LEFT FOR HANDLERS !
+	if (!ptr)
+		return;
 
 	ptr->handler = schedule->handler;
 	ptr->state = schedule->state;
