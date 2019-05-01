@@ -10,8 +10,8 @@ extern void assertNoHandlersCalled(void);
 extern void assertHandlerCalledOnceWith(const void *const state);
 extern void assertHandlerCalledTimes(uint8_t times);
 extern void assertHandlerCalledWith(const void *const state);
-extern void spyHandler(const void *const state);
-extern void dummyHandler(const void *const state);
+extern void spyHandler(void *const state);
+extern void dummyHandler(void *const state);
 
 extern const struct NearSchedule dummySchedule;
 

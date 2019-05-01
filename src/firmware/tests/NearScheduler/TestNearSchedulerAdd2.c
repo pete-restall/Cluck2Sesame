@@ -13,7 +13,7 @@ TEST_FILE("NearScheduler.c")
 TEST_FILE("NearSchedulerFixture.c")
 
 static void assertNcoInterruptFlagIsClear(const void *const state);
-static void handlerAddingAnotherSchedule(const void *const state);
+static void handlerAddingAnotherSchedule(void *const state);
 
 void test_nearSchedulerAdd_called_expectHandlerIsNotCalledOnTickRollover(void)
 {
@@ -77,7 +77,7 @@ void test_nearSchedulerAdd_calledWithHandlerThatAddsAnotherScheduleWhenBufferExc
 
 	nearSchedulerAdd(&schedule);
 
-	struct NearSchedule pendingSchedule =
+	static const struct NearSchedule pendingSchedule =
 	{
 		.ticks = 3,
 		.handler = &dummyHandler
@@ -91,7 +91,7 @@ void test_nearSchedulerAdd_calledWithHandlerThatAddsAnotherScheduleWhenBufferExc
 	assertHandlerCalledOnceWith(schedule.state);
 }
 
-static void handlerAddingAnotherSchedule(const void *const state)
+static void handlerAddingAnotherSchedule(void *const state)
 {
 	struct NearSchedule anotherSchedule =
 	{
@@ -101,4 +101,57 @@ static void handlerAddingAnotherSchedule(const void *const state)
 	};
 
 	nearSchedulerAdd(&anotherSchedule);
+}
+
+void test_nearSchedulerAdd_calledWhenPendingSchedules_expectNcoIsEnabled(void)
+{
+	struct NearSchedule schedule =
+	{
+		.ticks = 0,
+		.handler = &dummyHandler
+	};
+
+	nearSchedulerAdd(&schedule);
+
+	static const struct NearSchedule pendingSchedule =
+	{
+		.ticks = 2,
+		.handler = &dummyHandler
+	};
+
+	nearSchedulerAdd(&pendingSchedule);
+
+	uint8_t originalNco1con = NCO1CON;
+	tick();
+	TEST_ASSERT_EQUAL_UINT8(originalNco1con | _NCO1CON_N1EN_MASK, NCO1CON);
+}
+
+void test_nearSchedulerAdd_calledWhenPendingScheduleAddedFromLastHandler_expectNcoRemainsEnabled(void)
+{
+	static const struct NearSchedule schedule =
+	{
+		.ticks = 0,
+		.handler = &handlerAddingAnotherSchedule
+	};
+
+	nearSchedulerAdd(&schedule);
+
+	uint8_t originalNco1con = NCO1CON;
+	tick();
+	TEST_ASSERT_EQUAL_UINT8(originalNco1con | _NCO1CON_N1EN_MASK, NCO1CON);
+}
+
+void test_nearSchedulerAdd_calledWhenNoPendingSchedules_expectNcoIsDisabled(void)
+{
+	static const struct NearSchedule schedule =
+	{
+		.ticks = 0,
+		.handler = &dummyHandler
+	};
+
+	nearSchedulerAdd(&schedule);
+
+	uint8_t originalNco1con = NCO1CON;
+	tick();
+	TEST_ASSERT_EQUAL_UINT8(originalNco1con & ~_NCO1CON_N1EN_MASK, NCO1CON);
 }

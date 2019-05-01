@@ -2,6 +2,7 @@
 #include <unity.h>
 
 #include "Mock_Event.h"
+#include "Mock_NearScheduler.h"
 #include "VoltageRegulator.h"
 
 #include "NonDeterminism.h"

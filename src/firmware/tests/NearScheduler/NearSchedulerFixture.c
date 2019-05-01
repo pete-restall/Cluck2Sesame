@@ -103,12 +103,12 @@ void eventSubscribe(const struct EventSubscription *const subscription)
 	wokenFromSleepEvent.args = &emptyEventArgs;
 }
 
-void spyHandler(const void *const state)
+void spyHandler(void *const state)
 {
 	numberOfHandlerCalls++;
 	*(handlerStateWrptr++) = state;
 }
 
-void dummyHandler(const void *const state)
+void dummyHandler(void *const state)
 {
 }
