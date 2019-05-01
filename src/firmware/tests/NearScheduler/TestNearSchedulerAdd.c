@@ -2,56 +2,13 @@
 #include <stdint.h>
 #include <unity.h>
 
-#include "TestNearSchedulerAdd.h"
 #include "NearScheduler.h"
 
 #include "NonDeterminism.h"
+#include "NearSchedulerFixture.h"
 
 TEST_FILE("NearScheduler.c")
-
-static void tick(void);
-static void wokenFromSleep(void);
-static void assertNoHandlersCalled(void);
-static void assertHandlerCalledOnceWith(const struct NearSchedule *const schedule);
-static void assertHandlerCalledTimes(uint8_t times);
-static void assertHandlerCalledWith(const struct NearSchedule *const schedule);
-static void spyHandler(const struct NearSchedule *const schedule);
-static void dummyHandler(const struct NearSchedule *const schedule) { }
-
-static const struct NearSchedule dummySchedule =
-{
-	.ticks = 0,
-	.handler = &dummyHandler,
-	.state = (void *) 0
-};
-
-static const struct EventSubscription *onWokenFromSleep;
-static struct Event wokenFromSleepEvent;
-
-static uint8_t numberOfHandlerCalls;
-static const struct NearSchedule *handlerSchedules[16];
-static const struct NearSchedule **handlerScheduleWrptr;
-static const struct NearSchedule **handlerScheduleRdptr;
-
-void setUp(void)
-{
-	onWokenFromSleep = (struct EventSubscription *) 0;
-	nearSchedulerInitialise();
-	numberOfHandlerCalls = 0;
-	handlerScheduleWrptr = &handlerSchedules[0];
-	handlerScheduleRdptr = handlerScheduleWrptr;
-
-	// HACK: Simulator does not respect NCO clock source, so NCO1ACC*
-	// manipulation does not produce the correct values if there is an
-	// increment.
-	NCO1INCU = 0;
-	NCO1INCH = 0;
-	NCO1INCL = 0;
-}
-
-void tearDown(void)
-{
-}
+TEST_FILE("NearSchedulerFixture.c")
 
 void test_nearSchedulerAdd_calledWhenNoPendingSchedules_expectNcoIsEnabled(void)
 {
@@ -102,29 +59,6 @@ void test_nearSchedulerAdd_calledWhenNoPendingSchedulesAndInsufficientTicksElaps
 	assertNoHandlersCalled();
 }
 
-static void tick(void)
-{
-	PIR7bits.NCO1IF = 1;
-	wokenFromSleep();
-}
-
-static void wokenFromSleep(void)
-{
-	if (onWokenFromSleep && onWokenFromSleep->handler)
-	{
-		onWokenFromSleep->handler(&wokenFromSleepEvent);
-	}
-	else
-	{
-		TEST_FAIL_MESSAGE("No WokenFromSleep handler");
-	}
-}
-
-static void assertNoHandlersCalled(void)
-{
-	TEST_ASSERT_EQUAL_UINT8(0, numberOfHandlerCalls);
-}
-
 void test_nearSchedulerAdd_notCalledButNcoHasTicked_expectNcoInterruptFlagIsCleared(void)
 {
 	PIR7 = anyByteWithMaskClear(_PIR7_NCO1IF_MASK);
@@ -171,31 +105,6 @@ void test_nearSchedulerAdd_calledWhenNoPendingSchedulesAndExactNumberOfTicksElap
 		tick();
 
 	assertHandlerCalledOnceWith(&schedule);
-}
-
-static void assertHandlerCalledOnceWith(const struct NearSchedule *const schedule)
-{
-	assertHandlerCalledTimes(1);
-	assertHandlerCalledWith(schedule);
-}
-
-static void assertHandlerCalledTimes(uint8_t times)
-{
-	TEST_ASSERT_EQUAL_UINT8(times, numberOfHandlerCalls);
-}
-
-static void assertHandlerCalledWith(const struct NearSchedule *const schedule)
-{
-	if (handlerScheduleRdptr == handlerScheduleWrptr)
-	{
-		TEST_FAIL_MESSAGE("Not enough calls");
-	}
-
-	const struct NearSchedule *actual = *(handlerScheduleRdptr++);
-	TEST_ASSERT_NOT_NULL_MESSAGE(actual, "Null schedule");
-	TEST_ASSERT_NOT_EQUAL_MESSAGE(schedule, actual, "Expected copy");
-	TEST_ASSERT_EQUAL_MESSAGE(schedule->handler, actual->handler, "Handler");
-	TEST_ASSERT_EQUAL_MESSAGE(schedule->state, actual->state, "State");
 }
 
 void test_nearSchedulerAdd_calledWithZeroTicksWhenNoPendingSchedules_expectNextTickCallsHandler(void)
@@ -384,25 +293,3 @@ void test_nearSchedulerAdd_calledWhenMultipleSchedulesAtDifferentTick_expectHand
 // TODO: TEST THAT NCO1IF IS CLEARED AFTER EACH TICK WITH PUBLISH
 // TODO: TEST MORE THAN MAX PENDING DOES NOT OVERWRITE PREVIOUS
 // TODO: TEST MORE THAN MAX ADDS DONE BUT SOME DISPATCHED - SHOULD ALL BE DISPATCHED (IE. NO MEMORY ERRORS, NO OVERWRITTEN ENTRIES, ETC.)
-
-void eventSubscribe(const struct EventSubscription *const subscription)
-{
-	TEST_ASSERT_NOT_NULL_MESSAGE(subscription, "Subscription");
-	TEST_ASSERT_NOT_NULL_MESSAGE(subscription->handler, "Handler");
-	TEST_ASSERT_EQUAL_MESSAGE(
-		WOKEN_FROM_SLEEP,
-		subscription->type,
-		"Unexpected type");
-
-	static const struct WokenFromSleep emptyEventArgs = { };
-	onWokenFromSleep = subscription;
-	wokenFromSleepEvent.type = subscription->type;
-	wokenFromSleepEvent.state = subscription->state;
-	wokenFromSleepEvent.args = &emptyEventArgs;
-}
-
-static void spyHandler(const struct NearSchedule *const schedule)
-{
-	numberOfHandlerCalls++;
-	*(handlerScheduleWrptr++) = schedule;
-}
