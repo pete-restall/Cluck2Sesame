@@ -17,34 +17,34 @@ void tearDown(void)
 {
 }
 
-void test_MS_TO_TICKS_calledWithUpToTenMilliseconds_ExpectOneTick(void)
+void test_MS_TO_TICKS_calledWithUpToFourMilliseconds_ExpectOneTick(void)
 {
-	for (uint8_t ms = 1; ms <= 10; ms++)
+	for (uint8_t ms = 1; ms <= 4; ms++)
 	{
 		TEST_ASSERT_EQUAL_UINT8(1, MS_TO_TICKS(ms));
 	}
 }
 
-void test_MS_TO_TICKS_calledWithExactMultiplesOfTenMilliseconds_ExpectNoRoundingIsPerformed(void)
+void test_MS_TO_TICKS_calledWithExactMultiplesOfFourMilliseconds_ExpectNoRoundingIsPerformed(void)
 {
 	uint16_t ms;
 	uint8_t ticks;
-	for (ms = 0, ticks = 0; ms <= 255 * 10; ms += 10, ticks++)
+	for (ms = 0, ticks = 0; ms <= 255 * 4; ms += 4, ticks++)
 	{
 		TEST_ASSERT_EQUAL_UINT8(ticks, MS_TO_TICKS(ms));
 	}
 }
 
-void test_MS_TO_TICKS_calledWithRemainderOfTenMillisecondMultiples_ExpectTicksRoundedUp(void)
+void test_MS_TO_TICKS_calledWithRemainderOfFourMillisecondMultiples_ExpectTicksRoundedUp(void)
 {
 	uint8_t ms = anyByte();
-	uint8_t roundedUpTicks = ms / 10 + 1;
-	uint8_t msMultipleOfTen = (ms / 10) * 10;
-	for (uint8_t remainder = 1; remainder <= 9; remainder++)
+	uint8_t roundedUpTicks = ms / 4 + 1;
+	uint8_t msMultipleOfFour = (ms / 4) * 4;
+	for (uint8_t remainder = 1; remainder <= 3; remainder++)
 	{
 		TEST_ASSERT_EQUAL_UINT8(
 			roundedUpTicks,
-			MS_TO_TICKS(msMultipleOfTen + remainder));
+			MS_TO_TICKS(msMultipleOfFour + remainder));
 	}
 }
 
@@ -83,9 +83,9 @@ void test_nearSchedulerInitialise_called_expectNcoClockSourceIsSecondaryOscillat
 	TEST_ASSERT_EQUAL_INT(0b0101, (NCO1CLK >> _NCO1CLK_N1CKS_POSITION) & 0b1111);
 }
 
-void test_nearSchedulerInitialise_called_expectNcoIncrementGivesOverflowPeriodOfTenMillisecondsWhenUsedWith32768HzCrystal(void)
+void test_nearSchedulerInitialise_called_expectNcoIncrementGivesOverflowPeriodOfFourMillisecondsWhenUsedWith32768HzCrystal(void)
 {
-	const uint16_t ncoIncrement = 3200;
+	const uint16_t ncoIncrement = 8000;
 	NCO1INCU = anyByte();
 	NCO1INCH = anyByte();
 	NCO1INCL = anyByte();

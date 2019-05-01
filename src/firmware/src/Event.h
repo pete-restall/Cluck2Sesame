@@ -16,7 +16,7 @@ struct Event
 {
 	EventType type;
 	void *state;
-	void const *args;
+	const void *args;
 };
 
 typedef void (*EventHandler)(const struct Event *event);

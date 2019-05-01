@@ -11,28 +11,28 @@ TEST_FILE("NearScheduler.c")
 
 static void tick(void);
 static void wokenFromSleep(void);
-static void assertNoEventsPublished(void);
-static void assertOneEventPublished(EventType type, const void *const args);
+static void assertNoHandlersCalled(void);
+static void assertHandlerCalledOnceWith(const struct NearSchedule *const schedule);
+static void spyHandler(const struct NearSchedule *const schedule);
 
 static const struct NearSchedule dummySchedule =
 {
 	.ticks = 0,
-	.eventType = 0,
-	.eventArgs = (const void *) 0
+	.handler = (NearScheduleHandler) 0,
+	.state = (void *) 0
 };
 
 static const struct EventSubscription *onWokenFromSleep;
 static struct Event wokenFromSleepEvent;
 
-static uint8_t numberOfEventsPublished;
-static EventType lastPublishedEventType;
-static const void *lastPublishedEventArgs;
+static uint8_t numberOfHandlerCalls;
+static const struct NearSchedule *lastHandlerSchedule;
 
 void setUp(void)
 {
 	onWokenFromSleep = (struct EventSubscription *) 0;
 	nearSchedulerInitialise();
-	numberOfEventsPublished = 0;
+	numberOfHandlerCalls = 0;
 
 	// HACK: Simulator does not respect NCO clock source, so NCO1ACC*
 	// manipulation does not produce the correct values if there is an
@@ -84,7 +84,7 @@ void test_nearSchedulerAdd_calledWhenPendingSchedules_expectNcoAccumulatorIsNotC
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(originalNco1accl, NCO1ACCL, "NCO1ACCL");
 }
 
-void test_nearSchedulerAdd_calledWhenNoPendingSchedulesAndInsufficientTicksElapsed_expectNoEventsPublished(void)
+void test_nearSchedulerAdd_calledWhenNoPendingSchedulesAndInsufficientTicksElapsed_expectNoHandlersCalled(void)
 {
 	struct NearSchedule schedule = { .ticks = anyByteExcept(0) };
 
@@ -92,7 +92,7 @@ void test_nearSchedulerAdd_calledWhenNoPendingSchedulesAndInsufficientTicksElaps
 	for (uint8_t i = 0; i < schedule.ticks - 1; i++)
 		tick();
 
-	assertNoEventsPublished();
+	assertNoHandlersCalled();
 }
 
 static void tick(void)
@@ -113,6 +113,11 @@ static void wokenFromSleep(void)
 	}
 }
 
+static void assertNoHandlersCalled(void)
+{
+	TEST_ASSERT_EQUAL_UINT8(0, numberOfHandlerCalls);
+}
+
 void test_nearSchedulerAdd_notCalledButNcoHasTicked_expectNcoInterruptFlagIsCleared(void)
 {
 	PIR7 = anyByteWithMaskClear(_PIR7_NCO1IF_MASK);
@@ -121,44 +126,58 @@ void test_nearSchedulerAdd_notCalledButNcoHasTicked_expectNcoInterruptFlagIsClea
 	TEST_ASSERT_EQUAL_UINT8(originalPir7, PIR7);
 }
 
-void test_nearSchedulerAdd_calledAndWokenFromSleepBecauseOfNonTickEvent_expectNoEventsArePublished(void)
+void test_nearSchedulerAdd_calledAndWokenFromSleepBecauseOfNonTickEvent_expectNoHandlersAreCalled(void)
 {
 	struct NearSchedule schedule = { .ticks = 1 };
 	nearSchedulerAdd(&schedule);
 
 	PIR7 = anyByteWithMaskClear(_PIR7_NCO1IF_MASK);
 	wokenFromSleep();
-	assertNoEventsPublished();
+	assertNoHandlersCalled();
 }
 
-void test_nearSchedulerAdd_calledWhenNoPendingSchedulesAndExactNumberOfTicksElapsed_expectEventIsPublished(void)
+void test_nearSchedulerAdd_calledWhenHandlerIsNull_expectNoHandlersAreCalled(void)
+{
+	struct NearSchedule schedule =
+	{
+		.ticks = 1,
+		.handler = (NearScheduleHandler) 0,
+		.state = (void *) ((int) anyWord())
+	};
+
+	nearSchedulerAdd(&schedule);
+	tick();
+	assertNoHandlersCalled();
+}
+
+void test_nearSchedulerAdd_calledWhenNoPendingSchedulesAndExactNumberOfTicksElapsed_expectHandlerIsCalled(void)
 {
 	struct NearSchedule schedule =
 	{
 		.ticks = anyByteExcept(0),
-		.eventType = anyByte(),
-		.eventArgs = (const void *) ((int) anyWord())
+		.handler = &spyHandler,
+		.state = (void *) ((int) anyWord())
 	};
 
 	nearSchedulerAdd(&schedule);
 	for (uint8_t i = 0; i < schedule.ticks; i++)
 		tick();
 
-	assertOneEventPublished(schedule.eventType, schedule.eventArgs);
+	assertHandlerCalledOnceWith(&schedule);
 }
 
-void test_nearSchedulerAdd_calledWithZeroTicksWhenNoPendingSchedules_expectNextTickPublishesEvent(void)
+void test_nearSchedulerAdd_calledWithZeroTicksWhenNoPendingSchedules_expectNextTickCallsHandler(void)
 {
 	struct NearSchedule schedule =
 	{
 		.ticks = 0,
-		.eventType = anyByte(),
-		.eventArgs = (const void *) ((int) anyWord())
+		.handler = &spyHandler,
+		.state = (void *) ((int) anyWord())
 	};
 
 	nearSchedulerAdd(&schedule);
 	tick();
-	assertOneEventPublished(schedule.eventType, schedule.eventArgs);
+	assertHandlerCalledOnceWith(&schedule);
 }
 
 // TODO: TEST FOR 0 TICKS AND PENDING - SHOULD BE SAME AS NONE PENDING
@@ -189,21 +208,17 @@ void eventSubscribe(const struct EventSubscription *const subscription)
 	wokenFromSleepEvent.args = &emptyEventArgs;
 }
 
-void eventPublish(EventType type, const void *const args)
+static void spyHandler(const struct NearSchedule *const schedule)
 {
-	numberOfEventsPublished++;
-	lastPublishedEventType = type;
-	lastPublishedEventArgs = args;
+	numberOfHandlerCalls++;
+	lastHandlerSchedule = schedule;
 }
 
-static void assertNoEventsPublished(void)
+static void assertHandlerCalledOnceWith(const struct NearSchedule *const schedule)
 {
-	TEST_ASSERT_EQUAL_UINT8(0, numberOfEventsPublished);
-}
-
-static void assertOneEventPublished(EventType type, const void *const args)
-{
-	TEST_ASSERT_EQUAL_MESSAGE(1, numberOfEventsPublished, "Times");
-	TEST_ASSERT_EQUAL_MESSAGE(type, lastPublishedEventType, "Type");
-	TEST_ASSERT_EQUAL_MESSAGE(args, lastPublishedEventArgs, "Args");
+	TEST_ASSERT_EQUAL_MESSAGE(1, numberOfHandlerCalls, "Times");
+	TEST_ASSERT_NOT_NULL_MESSAGE(lastHandlerSchedule, "Null schedule");
+	TEST_ASSERT_NOT_EQUAL_MESSAGE(schedule, lastHandlerSchedule, "Expected copy");
+	TEST_ASSERT_EQUAL_MESSAGE(schedule->handler, lastHandlerSchedule->handler, "Handler");
+	TEST_ASSERT_EQUAL_MESSAGE(schedule->state, lastHandlerSchedule->state, "State");
 }
