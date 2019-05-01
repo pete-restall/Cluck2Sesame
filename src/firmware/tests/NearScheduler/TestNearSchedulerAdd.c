@@ -13,6 +13,8 @@ static void tick(void);
 static void wokenFromSleep(void);
 static void assertNoHandlersCalled(void);
 static void assertHandlerCalledOnceWith(const struct NearSchedule *const schedule);
+static void assertHandlerCalledTimes(uint8_t times);
+static void assertHandlerCalledWith(const struct NearSchedule *const schedule);
 static void spyHandler(const struct NearSchedule *const schedule);
 static void dummyHandler(const struct NearSchedule *const schedule) { }
 
@@ -27,13 +29,17 @@ static const struct EventSubscription *onWokenFromSleep;
 static struct Event wokenFromSleepEvent;
 
 static uint8_t numberOfHandlerCalls;
-static const struct NearSchedule *lastHandlerSchedule;
+static const struct NearSchedule *handlerSchedules[16];
+static const struct NearSchedule **handlerScheduleWrptr;
+static const struct NearSchedule **handlerScheduleRdptr;
 
 void setUp(void)
 {
 	onWokenFromSleep = (struct EventSubscription *) 0;
 	nearSchedulerInitialise();
 	numberOfHandlerCalls = 0;
+	handlerScheduleWrptr = &handlerSchedules[0];
+	handlerScheduleRdptr = handlerScheduleWrptr;
 
 	// HACK: Simulator does not respect NCO clock source, so NCO1ACC*
 	// manipulation does not produce the correct values if there is an
@@ -167,6 +173,31 @@ void test_nearSchedulerAdd_calledWhenNoPendingSchedulesAndExactNumberOfTicksElap
 	assertHandlerCalledOnceWith(&schedule);
 }
 
+static void assertHandlerCalledOnceWith(const struct NearSchedule *const schedule)
+{
+	assertHandlerCalledTimes(1);
+	assertHandlerCalledWith(schedule);
+}
+
+static void assertHandlerCalledTimes(uint8_t times)
+{
+	TEST_ASSERT_EQUAL_UINT8(times, numberOfHandlerCalls);
+}
+
+static void assertHandlerCalledWith(const struct NearSchedule *const schedule)
+{
+	if (handlerScheduleRdptr == handlerScheduleWrptr)
+	{
+		TEST_FAIL_MESSAGE("Not enough calls");
+	}
+
+	const struct NearSchedule *actual = *(handlerScheduleRdptr++);
+	TEST_ASSERT_NOT_NULL_MESSAGE(actual, "Null schedule");
+	TEST_ASSERT_NOT_EQUAL_MESSAGE(schedule, actual, "Expected copy");
+	TEST_ASSERT_EQUAL_MESSAGE(schedule->handler, actual->handler, "Handler");
+	TEST_ASSERT_EQUAL_MESSAGE(schedule->state, actual->state, "State");
+}
+
 void test_nearSchedulerAdd_calledWithZeroTicksWhenNoPendingSchedules_expectNextTickCallsHandler(void)
 {
 	struct NearSchedule schedule =
@@ -289,9 +320,64 @@ void test_nearSchedulerAdd_calledWhenPendingSchedulesAndRequestedNumberOfTicksIs
 	assertHandlerCalledOnceWith(&schedule);
 }
 
-// TODO: TEST FOR 255 TICKS WHEN PENDING - DISPATCHED AT TICKS + 1 (ROLLOVER)
-// TODO: TEST FOR MULTIPLE SCHEDULED EVENTS AT SAME TICK - ALL SHOULD BE CALLED
-// TODO: TEST FOR MULTIPLE SCHEDULED EVENTS AT DIFFERENT TICK - ALL SHOULD BE CALLED, AT DIFFERENT TIMES
+void test_nearSchedulerAdd_calledWhenMultipleSchedulesAtSameTick_expectHandlerIsCalledForEachOfThem(void)
+{
+	struct NearSchedule pendingSchedule = { .handler = &dummyHandler };
+	nearSchedulerAdd(&pendingSchedule);
+
+	struct NearSchedule firstSchedule =
+	{
+		.ticks = 0,
+		.handler = &spyHandler,
+		.state = (void *) ((int) anyWord())
+	};
+
+	struct NearSchedule secondSchedule =
+	{
+		.ticks = 0,
+		.handler = &spyHandler,
+		.state = (void *) ((int) anyWord())
+	};
+
+	nearSchedulerAdd(&firstSchedule);
+	nearSchedulerAdd(&secondSchedule);
+	tick();
+
+	assertHandlerCalledTimes(2);
+	assertHandlerCalledWith(&firstSchedule);
+	assertHandlerCalledWith(&secondSchedule);
+}
+
+void test_nearSchedulerAdd_calledWhenMultipleSchedulesAtDifferentTick_expectHandlerIsCalledForEachOfThemInTurn(void)
+{
+	struct NearSchedule pendingSchedule = { .handler = &dummyHandler };
+	nearSchedulerAdd(&pendingSchedule);
+
+	struct NearSchedule firstSchedule =
+	{
+		.ticks = 0,
+		.handler = &spyHandler,
+		.state = (void *) ((int) anyWord())
+	};
+
+	struct NearSchedule secondSchedule =
+	{
+		.ticks = 1,
+		.handler = &spyHandler,
+		.state = (void *) ((int) anyWord())
+	};
+
+	nearSchedulerAdd(&firstSchedule);
+	nearSchedulerAdd(&secondSchedule);
+	tick();
+	assertHandlerCalledTimes(1);
+	assertHandlerCalledWith(&firstSchedule);
+
+	tick();
+	assertHandlerCalledTimes(2);
+	assertHandlerCalledWith(&secondSchedule);
+}
+
 // TODO: TEST FOR TICKS ROLLOVER - SHOULDN'T EXECUTE THE SCHEDULE HANDLER AGAIN
 // TODO: TEST THAT CHANGING TICKS BEFORE EVENT PUBLISHED DOES NOT ALTER ORIGINAL DISPATCH TIME
 // TODO: TEST THAT NCO1IF IS CLEARED AFTER EACH TICK WITHOUT PUBLISH
@@ -318,14 +404,5 @@ void eventSubscribe(const struct EventSubscription *const subscription)
 static void spyHandler(const struct NearSchedule *const schedule)
 {
 	numberOfHandlerCalls++;
-	lastHandlerSchedule = schedule;
-}
-
-static void assertHandlerCalledOnceWith(const struct NearSchedule *const schedule)
-{
-	TEST_ASSERT_EQUAL_MESSAGE(1, numberOfHandlerCalls, "Times");
-	TEST_ASSERT_NOT_NULL_MESSAGE(lastHandlerSchedule, "Null schedule");
-	TEST_ASSERT_NOT_EQUAL_MESSAGE(schedule, lastHandlerSchedule, "Expected copy");
-	TEST_ASSERT_EQUAL_MESSAGE(schedule->handler, lastHandlerSchedule->handler, "Handler");
-	TEST_ASSERT_EQUAL_MESSAGE(schedule->state, lastHandlerSchedule->state, "State");
+	*(handlerScheduleWrptr++) = schedule;
 }

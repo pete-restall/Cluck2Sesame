@@ -32,17 +32,30 @@ void nearSchedulerInitialise(void)
 	};
 
 	eventSubscribe(&onWokenFromSleepSubscription);
+
+	for (uint8_t i = 0; i < MAX_SCHEDULES; i++)
+		schedules[i].handler = (NearScheduleHandler) 0;
 }
 
 void nearSchedulerAdd(const struct NearSchedule *const schedule)
 {
-	schedules[0].handler = schedule->handler;
-	schedules[0].state = schedule->state;
+	struct NearSchedule *ptr = (struct NearSchedule *) 0;
+	for (uint8_t i = 0; i < MAX_SCHEDULES; i++)
+	{
+		if (!schedules[i].handler)
+		{
+			ptr = &schedules[i];
+			break;
+		}
+	}
+
+	// TODO: NULL CHECK, IE. NO SPACE LEFT FOR HANDLERS !
+
+	ptr->handler = schedule->handler;
+	ptr->state = schedule->state;
 	if (!NCO1CONbits.N1EN)
 	{
-		schedules[0].ticks =
-			ticks +
-			(schedule->ticks != 0 ? schedule->ticks : 1);
+		ptr->ticks = ticks + (schedule->ticks != 0 ? schedule->ticks : 1);
 
 		NCO1ACCU = 0;
 		NCO1ACCH = 0;
@@ -50,8 +63,7 @@ void nearSchedulerAdd(const struct NearSchedule *const schedule)
 		NCO1CONbits.N1EN = 1;
 	}
 	else
-		schedules[0].ticks =
-			ticks + (schedule->ticks != 0 ? schedule->ticks + 1 : 1);
+		ptr->ticks = ticks + (schedule->ticks != 0 ? schedule->ticks + 1 : 1);
 }
 
 static void onWokenFromSleep(const struct Event *const event)
@@ -60,6 +72,10 @@ static void onWokenFromSleep(const struct Event *const event)
 		return;
 
 	PIR7bits.NCO1IF = 0;
-	if (++ticks == schedules[0].ticks && schedules[0].handler)
-		schedules[0].handler(&schedules[0]);
+	ticks++;
+	for (uint8_t i = 0; i < MAX_SCHEDULES; i++)
+	{
+		if (schedules[i].handler && schedules[i].ticks == ticks)
+			schedules[i].handler(&schedules[i]);
+	}
 }
