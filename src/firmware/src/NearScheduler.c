@@ -13,6 +13,7 @@ static void onWokenFromSleep(const struct Event *const event);
 
 static uint8_t ticks;
 static struct NearSchedule schedules[MAX_SCHEDULES];
+static const struct NearSchedule *const noMoreSchedules = &schedules + MAX_SCHEDULES;
 
 void nearSchedulerInitialise(void)
 {
@@ -39,32 +40,29 @@ void nearSchedulerInitialise(void)
 
 void nearSchedulerAdd(const struct NearSchedule *const schedule)
 {
-	struct NearSchedule *ptr = (struct NearSchedule *) 0;
-	for (uint8_t i = 0; i < MAX_SCHEDULES; i++)
+	struct NearSchedule *ptr;
+	for (ptr = &schedules[0]; ptr != noMoreSchedules; ptr++)
 	{
-		if (!schedules[i].handler)
-		{
-			ptr = &schedules[i];
+		if (!ptr->handler)
 			break;
-		}
 	}
 
-	if (!ptr)
+	if (ptr == noMoreSchedules)
 		return;
 
+	ptr->ticks = ticks + schedule->ticks + 1;
 	ptr->handler = schedule->handler;
 	ptr->state = schedule->state;
 	if (!NCO1CONbits.N1EN)
 	{
-		ptr->ticks = ticks + (schedule->ticks != 0 ? schedule->ticks : 1);
+		if (schedule->ticks != 0)
+			ptr->ticks--;
 
 		NCO1ACCU = 0;
 		NCO1ACCH = 0;
 		NCO1ACCL = 0;
 		NCO1CONbits.N1EN = 1;
 	}
-	else
-		ptr->ticks = ticks + (schedule->ticks != 0 ? schedule->ticks + 1 : 1);
 }
 
 static void onWokenFromSleep(const struct Event *const event)
@@ -74,13 +72,13 @@ static void onWokenFromSleep(const struct Event *const event)
 
 	PIR7bits.NCO1IF = 0;
 	ticks++;
-	for (uint8_t i = 0; i < MAX_SCHEDULES; i++)
+	for (struct NearSchedule *ptr = &schedules[0]; ptr != noMoreSchedules; ptr++)
 	{
-		if (schedules[i].handler && schedules[i].ticks == ticks)
+		if (ptr->handler && ptr->ticks == ticks)
 		{
-			NearScheduleHandler handler = schedules[i].handler;
-			schedules[i].handler = (NearScheduleHandler) 0;
-			handler(schedules[i].state);
+			NearScheduleHandler handler = ptr->handler;
+			ptr->handler = (NearScheduleHandler) 0;
+			handler(ptr->state);
 		}
 	}
 }
