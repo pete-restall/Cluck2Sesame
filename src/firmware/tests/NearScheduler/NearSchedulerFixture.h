@@ -7,11 +7,11 @@
 extern void tick(void);
 extern void wokenFromSleep(void);
 extern void assertNoHandlersCalled(void);
-extern void assertHandlerCalledOnceWith(const struct NearSchedule *const schedule);
+extern void assertHandlerCalledOnceWith(const void *const state);
 extern void assertHandlerCalledTimes(uint8_t times);
-extern void assertHandlerCalledWith(const struct NearSchedule *const schedule);
-extern void spyHandler(const struct NearSchedule *const schedule);
-extern void dummyHandler(const struct NearSchedule *const schedule);
+extern void assertHandlerCalledWith(const void *const state);
+extern void spyHandler(const void *const state);
+extern void dummyHandler(const void *const state);
 
 extern const struct NearSchedule dummySchedule;
 

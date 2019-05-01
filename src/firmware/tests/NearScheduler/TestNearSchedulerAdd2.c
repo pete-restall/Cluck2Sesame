@@ -12,7 +12,8 @@
 TEST_FILE("NearScheduler.c")
 TEST_FILE("NearSchedulerFixture.c")
 
-static void assertNcoInterruptFlagIsClear(const struct NearSchedule *const schedule);
+static void assertNcoInterruptFlagIsClear(const void *const state);
+static void handlerAddingAnotherSchedule(const void *const state);
 
 void test_nearSchedulerAdd_called_expectHandlerIsNotCalledOnTickRollover(void)
 {
@@ -43,7 +44,7 @@ void test_nearSchedulerAdd_called_expectHandlerIsCalledWithClearedNcoInterruptFl
 	tick();
 }
 
-static void assertNcoInterruptFlagIsClear(const struct NearSchedule *const schedule)
+static void assertNcoInterruptFlagIsClear(const void *const state)
 {
 	TEST_ASSERT_FALSE(PIR7bits.NCO1IF);
 }
@@ -57,14 +58,50 @@ void test_nearSchedulerAdd_calledMoreThanBufferSize_expectExistingHandlersAreNot
 		schedules[i].handler = &spyHandler;
 		schedules[i].state = (void *) ((int) i);
 		nearSchedulerAdd(&schedules[i]);
-	};
+	}
 
 	tick();
 	assertHandlerCalledTimes(MAX_SCHEDULES);
 	for (uint8_t i = 0; i < MAX_SCHEDULES; i++)
-		assertHandlerCalledWith(&schedules[i]);
+		assertHandlerCalledWith(schedules[i].state);
+}
+
+void test_nearSchedulerAdd_calledWithHandlerThatAddsAnotherScheduleWhenBufferExceeded_expectNewHandlerIsInserted(void)
+{
+	struct NearSchedule schedule =
+	{
+		.ticks = 0,
+		.handler = &handlerAddingAnotherSchedule,
+		.state = (void *) ((int) anyWord())
+	};
+
+	nearSchedulerAdd(&schedule);
+
+	struct NearSchedule pendingSchedule =
+	{
+		.ticks = 3,
+		.handler = &dummyHandler
+	};
+
+	for (uint8_t i = 0; i < MAX_SCHEDULES - 1; i++)
+		nearSchedulerAdd(&pendingSchedule);
+
+	tick();
+	tick();
+	assertHandlerCalledOnceWith(schedule.state);
+}
+
+static void handlerAddingAnotherSchedule(const void *const state)
+{
+	struct NearSchedule anotherSchedule =
+	{
+		.ticks = 0,
+		.handler = &spyHandler,
+		.state = state
+	};
+
+	nearSchedulerAdd(&anotherSchedule);
 }
 
 // TODO: TEST MORE THAN MAX PENDING DOES NOT OVERWRITE PREVIOUS
 // TODO: TEST MORE THAN MAX ADDS DONE BUT SOME DISPATCHED - SHOULD ALL BE DISPATCHED (IE. NO MEMORY ERRORS, NO OVERWRITTEN ENTRIES, ETC.)
-// TODO: TEST THAT WHEN NO MORE SLOTS AND THE HANDLER ADDS A NEW HANDLER, IT WORKS (IE. THE HANDLER IS NULL WHEN CALLED; CAN PROBABLY THEN CHANGE THE SIGNATURE OF THE HANDLERS TO 'void handler(void *state)'.

@@ -4,8 +4,7 @@
 
 #define MS_TO_TICKS(x) ((uint8_t) (((x) + 3) / 4))
 
-struct NearSchedule;
-typedef void (*NearScheduleHandler)(const struct NearSchedule *schedule);
+typedef void (*NearScheduleHandler)(void *state);
 
 struct NearSchedule
 {

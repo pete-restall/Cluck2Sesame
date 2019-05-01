@@ -78,8 +78,9 @@ static void onWokenFromSleep(const struct Event *const event)
 	{
 		if (schedules[i].handler && schedules[i].ticks == ticks)
 		{
-			schedules[i].handler(&schedules[i]);
+			NearScheduleHandler handler = schedules[i].handler;
 			schedules[i].handler = (NearScheduleHandler) 0;
+			handler(schedules[i].state);
 		}
 	}
 }

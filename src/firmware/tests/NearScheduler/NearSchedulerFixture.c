@@ -18,17 +18,17 @@ static const struct EventSubscription *onWokenFromSleep;
 static struct Event wokenFromSleepEvent;
 
 static uint8_t numberOfHandlerCalls;
-static struct NearSchedule handlerSchedules[16];
-static struct NearSchedule *handlerScheduleWrptr;
-static const struct NearSchedule *handlerScheduleRdptr;
+static const void *handlerSchedules[16];
+static const void **handlerStateWrptr;
+static const void **handlerStateRdptr;
 
 void setUp(void)
 {
 	onWokenFromSleep = (struct EventSubscription *) 0;
 	nearSchedulerInitialise();
 	numberOfHandlerCalls = 0;
-	handlerScheduleWrptr = &handlerSchedules[0];
-	handlerScheduleRdptr = handlerScheduleWrptr;
+	handlerStateWrptr = &handlerSchedules[0];
+	handlerStateRdptr = handlerStateWrptr;
 
 	// HACK: Simulator does not respect NCO clock source, so NCO1ACC*
 	// manipulation does not produce the correct values if there is an
@@ -65,10 +65,10 @@ void assertNoHandlersCalled(void)
 	TEST_ASSERT_EQUAL_UINT8(0, numberOfHandlerCalls);
 }
 
-void assertHandlerCalledOnceWith(const struct NearSchedule *const schedule)
+void assertHandlerCalledOnceWith(const void *const state)
 {
 	assertHandlerCalledTimes(1);
-	assertHandlerCalledWith(schedule);
+	assertHandlerCalledWith(state);
 }
 
 void assertHandlerCalledTimes(uint8_t times)
@@ -76,18 +76,15 @@ void assertHandlerCalledTimes(uint8_t times)
 	TEST_ASSERT_EQUAL_UINT8(times, numberOfHandlerCalls);
 }
 
-void assertHandlerCalledWith(const struct NearSchedule *const schedule)
+void assertHandlerCalledWith(const void *const state)
 {
-	if (handlerScheduleRdptr == handlerScheduleWrptr)
+	if (handlerStateRdptr == handlerStateWrptr)
 	{
 		TEST_FAIL_MESSAGE("Not enough calls");
 	}
 
-	const struct NearSchedule *actual = handlerScheduleRdptr++;
-	TEST_ASSERT_NOT_NULL_MESSAGE(actual, "Null schedule");
-	TEST_ASSERT_NOT_EQUAL_MESSAGE(schedule, actual, "Expected copy");
-	TEST_ASSERT_EQUAL_MESSAGE(schedule->handler, actual->handler, "Handler");
-	TEST_ASSERT_EQUAL_MESSAGE(schedule->state, actual->state, "State");
+	const void *actual = *(handlerStateRdptr++);
+	TEST_ASSERT_EQUAL_PTR(state, actual);
 }
 
 void eventSubscribe(const struct EventSubscription *const subscription)
@@ -106,15 +103,12 @@ void eventSubscribe(const struct EventSubscription *const subscription)
 	wokenFromSleepEvent.args = &emptyEventArgs;
 }
 
-void spyHandler(const struct NearSchedule *const schedule)
+void spyHandler(const void *const state)
 {
 	numberOfHandlerCalls++;
-	handlerScheduleWrptr->ticks = schedule->ticks;
-	handlerScheduleWrptr->handler = schedule->handler;
-	handlerScheduleWrptr->state = schedule->state;
-	handlerScheduleWrptr++;
+	*(handlerStateWrptr++) = state;
 }
 
-void dummyHandler(const struct NearSchedule *const schedule)
+void dummyHandler(const void *const state)
 {
 }

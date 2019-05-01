@@ -113,7 +113,7 @@ void test_nearSchedulerAdd_calledWhenNoPendingSchedulesAndExactNumberOfTicksElap
 	for (uint8_t i = 0; i < schedule.ticks; i++)
 		tick();
 
-	assertHandlerCalledOnceWith(&schedule);
+	assertHandlerCalledOnceWith(schedule.state);
 }
 
 void test_nearSchedulerAdd_calledWithZeroTicksWhenNoPendingSchedules_expectNextTickCallsHandler(void)
@@ -127,7 +127,7 @@ void test_nearSchedulerAdd_calledWithZeroTicksWhenNoPendingSchedules_expectNextT
 
 	nearSchedulerAdd(&schedule);
 	tick();
-	assertHandlerCalledOnceWith(&schedule);
+	assertHandlerCalledOnceWith(schedule.state);
 }
 
 void test_nearSchedulerAdd_calledWithZeroTicksWhenPendingSchedules_expectNextTickCallsHandler(void)
@@ -150,7 +150,7 @@ void test_nearSchedulerAdd_calledWithZeroTicksWhenPendingSchedules_expectNextTic
 
 	nearSchedulerAdd(&schedule);
 	tick();
-	assertHandlerCalledOnceWith(&schedule);
+	assertHandlerCalledOnceWith(schedule.state);
 }
 
 void test_nearSchedulerAdd_calledWhenPendingSchedulesAndExactNumberOfTicksElapsed_expectHandlerIsNotCalled(void)
@@ -197,7 +197,7 @@ void test_nearSchedulerAdd_calledWhenPendingSchedulesAndRequestedNumberOfTicksPl
 	nearSchedulerAdd(&schedule);
 	tick();
 	tick();
-	assertHandlerCalledOnceWith(&schedule);
+	assertHandlerCalledOnceWith(schedule.state);
 }
 
 void test_nearSchedulerAdd_calledWhenPendingSchedulesAnd255Ticks_expectHandlerIsNotCalledAfter255Ticks(void)
@@ -235,7 +235,7 @@ void test_nearSchedulerAdd_calledWhenPendingSchedulesAndRequestedNumberOfTicksIs
 	for (uint16_t i = 0; i < 256; i++)
 		tick();
 
-	assertHandlerCalledOnceWith(&schedule);
+	assertHandlerCalledOnceWith(schedule.state);
 }
 
 void test_nearSchedulerAdd_calledWhenMultipleSchedulesAtSameTick_expectHandlerIsCalledForEachOfThem(void)
@@ -262,8 +262,8 @@ void test_nearSchedulerAdd_calledWhenMultipleSchedulesAtSameTick_expectHandlerIs
 	tick();
 
 	assertHandlerCalledTimes(2);
-	assertHandlerCalledWith(&firstSchedule);
-	assertHandlerCalledWith(&secondSchedule);
+	assertHandlerCalledWith(firstSchedule.state);
+	assertHandlerCalledWith(secondSchedule.state);
 }
 
 void test_nearSchedulerAdd_calledWhenMultipleSchedulesAtDifferentTick_expectHandlerIsCalledForEachOfThemInTurn(void)
@@ -289,9 +289,9 @@ void test_nearSchedulerAdd_calledWhenMultipleSchedulesAtDifferentTick_expectHand
 	nearSchedulerAdd(&secondSchedule);
 	tick();
 	assertHandlerCalledTimes(1);
-	assertHandlerCalledWith(&firstSchedule);
+	assertHandlerCalledWith(firstSchedule.state);
 
 	tick();
 	assertHandlerCalledTimes(2);
-	assertHandlerCalledWith(&secondSchedule);
+	assertHandlerCalledWith(secondSchedule.state);
 }
