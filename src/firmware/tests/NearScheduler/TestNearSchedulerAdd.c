@@ -14,11 +14,12 @@ static void wokenFromSleep(void);
 static void assertNoHandlersCalled(void);
 static void assertHandlerCalledOnceWith(const struct NearSchedule *const schedule);
 static void spyHandler(const struct NearSchedule *const schedule);
+static void dummyHandler(const struct NearSchedule *const schedule) { }
 
 static const struct NearSchedule dummySchedule =
 {
 	.ticks = 0,
-	.handler = (NearScheduleHandler) 0,
+	.handler = &dummyHandler,
 	.state = (void *) 0
 };
 
@@ -180,8 +181,114 @@ void test_nearSchedulerAdd_calledWithZeroTicksWhenNoPendingSchedules_expectNextT
 	assertHandlerCalledOnceWith(&schedule);
 }
 
-// TODO: TEST FOR 0 TICKS AND PENDING - SHOULD BE SAME AS NONE PENDING
-// TODO: TEST FOR PENDING SCHEDULES - DISPATCHED AT TICKS + 1
+void test_nearSchedulerAdd_calledWithZeroTicksWhenPendingSchedules_expectNextTickCallsHandler(void)
+{
+	struct NearSchedule pendingSchedule =
+	{
+		.ticks = 7,
+		.handler = &spyHandler,
+		.state = (void *) ((int) anyWord())
+	};
+
+	nearSchedulerAdd(&pendingSchedule);
+
+	struct NearSchedule schedule =
+	{
+		.ticks = 0,
+		.handler = &spyHandler,
+		.state = (void *) ((int) anyWord())
+	};
+
+	nearSchedulerAdd(&schedule);
+	tick();
+	assertHandlerCalledOnceWith(&schedule);
+}
+
+void test_nearSchedulerAdd_calledWhenPendingSchedulesAndExactNumberOfTicksElapsed_expectHandlerIsNotCalled(void)
+{
+	struct NearSchedule pendingSchedule =
+	{
+		.ticks = 7,
+		.handler = &spyHandler,
+		.state = (void *) ((int) anyWord())
+	};
+
+	nearSchedulerAdd(&pendingSchedule);
+
+	struct NearSchedule schedule =
+	{
+		.ticks = 1,
+		.handler = &spyHandler,
+		.state = (void *) ((int) anyWord())
+	};
+
+	nearSchedulerAdd(&schedule);
+	tick();
+	assertNoHandlersCalled();
+}
+
+void test_nearSchedulerAdd_calledWhenPendingSchedulesAndRequestedNumberOfTicksPlusOneElapsed_expectHandlerIsCalled(void)
+{
+	struct NearSchedule pendingSchedule =
+	{
+		.ticks = 7,
+		.handler = &spyHandler,
+		.state = (void *) ((int) anyWord())
+	};
+
+	nearSchedulerAdd(&pendingSchedule);
+
+	struct NearSchedule schedule =
+	{
+		.ticks = 1,
+		.handler = &spyHandler,
+		.state = (void *) ((int) anyWord())
+	};
+
+	nearSchedulerAdd(&schedule);
+	tick();
+	tick();
+	assertHandlerCalledOnceWith(&schedule);
+}
+
+void test_nearSchedulerAdd_calledWhenPendingSchedulesAnd255Ticks_expectHandlerIsNotCalledAfter255Ticks(void)
+{
+	struct NearSchedule pendingSchedule = { .handler = &dummyHandler };
+	nearSchedulerAdd(&pendingSchedule);
+
+	struct NearSchedule schedule =
+	{
+		.ticks = 255,
+		.handler = &spyHandler,
+		.state = (void *) ((int) anyWord())
+	};
+
+	nearSchedulerAdd(&schedule);
+	for (uint8_t i = 0; i < 255; i++)
+		tick();
+
+	assertNoHandlersCalled();
+}
+
+void test_nearSchedulerAdd_calledWhenPendingSchedulesAndRequestedNumberOfTicksIs255_expectHandlerIsCalledAfter256Ticks(void)
+{
+	struct NearSchedule pendingSchedule = { .handler = &dummyHandler };
+	nearSchedulerAdd(&pendingSchedule);
+
+	struct NearSchedule schedule =
+	{
+		.ticks = 255,
+		.handler = &spyHandler,
+		.state = (void *) ((int) anyWord())
+	};
+
+	nearSchedulerAdd(&schedule);
+	for (uint16_t i = 0; i < 256; i++)
+		tick();
+
+	assertHandlerCalledOnceWith(&schedule);
+}
+
 // TODO: TEST FOR 255 TICKS WHEN PENDING - DISPATCHED AT TICKS + 1 (ROLLOVER)
 // TODO: TEST FOR MULTIPLE SCHEDULED EVENTS AT SAME TICK - ALL SHOULD BE CALLED
 // TODO: TEST FOR MULTIPLE SCHEDULED EVENTS AT DIFFERENT TICK - ALL SHOULD BE CALLED, AT DIFFERENT TIMES

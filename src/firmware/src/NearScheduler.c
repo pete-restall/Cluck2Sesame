@@ -36,16 +36,22 @@ void nearSchedulerInitialise(void)
 
 void nearSchedulerAdd(const struct NearSchedule *const schedule)
 {
-	schedules[0].ticks = ticks + (schedule->ticks != 0 ? schedule->ticks : 1);
 	schedules[0].handler = schedule->handler;
 	schedules[0].state = schedule->state;
 	if (!NCO1CONbits.N1EN)
 	{
+		schedules[0].ticks =
+			ticks +
+			(schedule->ticks != 0 ? schedule->ticks : 1);
+
 		NCO1ACCU = 0;
 		NCO1ACCH = 0;
 		NCO1ACCL = 0;
 		NCO1CONbits.N1EN = 1;
 	}
+	else
+		schedules[0].ticks =
+			ticks + (schedule->ticks != 0 ? schedule->ticks + 1 : 1);
 }
 
 static void onWokenFromSleep(const struct Event *const event)
