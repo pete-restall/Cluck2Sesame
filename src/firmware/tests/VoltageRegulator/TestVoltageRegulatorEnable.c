@@ -9,6 +9,11 @@
 
 TEST_FILE("VoltageRegulator.c")
 
+static void assertEventPublishNotCalled(
+	EventType type,
+	const void *const args,
+	int numCalls);
+
 void setUp(void)
 {
 }
@@ -25,6 +30,34 @@ void test_voltageRegulatorEnable_calledOnce_expectEnablePinIsHigh(void)
 
 	voltageRegulatorEnable();
 	TEST_ASSERT_EQUAL_UINT8(originalLatb | _LATB_LATB2_MASK, LATB);
+}
+
+void test_voltageRegulatorEnable_calledOnce_expectNoEventsPublished(void)
+{
+	voltageRegulatorInitialise();
+	eventPublish_StubWithCallback(assertEventPublishNotCalled);
+	voltageRegulatorEnable();
+}
+
+static void assertEventPublishNotCalled(
+	EventType type,
+	const void *const args,
+	int numCalls)
+{
+	TEST_FAIL_MESSAGE("Expected eventPublish() not to be called");
+}
+
+void test_voltageRegulatorEnable_calledOnce_expectScheduleForRailStabilisationTime(void)
+{
+	voltageRegulatorInitialise();
+
+	static const struct NearSchedule schedule =
+	{
+		.ticks = MS_TO_TICKS(64)
+	};
+
+	nearSchedulerAdd_Expect(&schedule);
+	voltageRegulatorEnable();
 }
 
 // TODO: TEST FOLLOWING SCENARIOS:
