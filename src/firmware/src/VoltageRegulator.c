@@ -25,7 +25,6 @@ void voltageRegulatorEnable(void)
 	LATBbits.LATB2 = 1;
 	enableCount++;
 
-	// TODO: PUBLISH VOLTAGE_REGULATOR_ENABLED AFTER ABOUT 64ms, *IF* IT HAS NOT BEEN DISABLED IN THE MEANTIME.  IF THE VOLTAGE REGULATOR HAS ALREADY BEEN ENABLED THEN DO NOT PUBLISH ANOTHER VOLTAGE_REGULATOR_ENABLED.
 	static const struct NearSchedule waitForRegulatedVoltageRailToStabilise =
 	{
 		.ticks = MS_TO_TICKS(64),
@@ -50,6 +49,8 @@ static void onRegulatedVoltageRailStabilised(void *state)
 
 static void onMcuVoltageRailStabilised(void *state)
 {
+	static const struct VoltageRegulatorEnabled emptyEventArgs = { };
+	eventPublish(VOLTAGE_REGULATOR_ENABLED, &emptyEventArgs);
 }
 
 void voltageRegulatorDisable(void)
