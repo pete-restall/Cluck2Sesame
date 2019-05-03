@@ -6,6 +6,7 @@
 #include "NearScheduler.h"
 #include "PowerManagement.h"
 #include "VoltageRegulator.h"
+#include "PwmTimer.h"
 #include "Lcd.h"
 #include "SunEvents.h"
 
@@ -17,6 +18,7 @@ void initialise(void)
 	nearSchedulerInitialise();
 	powerManagementInitialise();
 	voltageRegulatorInitialise();
+	pwmTimerInitialise();
 	lcdInitialise();
 	sunEventsInitialise();
 	eventPublish(SYSTEM_INITIALISED, &emptyEventArgs);

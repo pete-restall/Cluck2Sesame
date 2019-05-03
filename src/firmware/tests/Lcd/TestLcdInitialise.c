@@ -8,11 +8,6 @@
 
 TEST_FILE("Lcd.c")
 
-const struct NvmSettings nvmSettings =
-{
-	.lcd = { .backlightBrightness = 0x32 }
-};
-
 void setUp(void)
 {
 }

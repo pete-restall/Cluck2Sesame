@@ -2,7 +2,7 @@
 
 #include "NvmSettings.h"
 
-__section("NvmSettings") const struct NvmSettings nvmSettings =
+__section("NvmSettings") const union NvmSettings nvmSettings =
 {
 	.lcd =
 	{

@@ -36,6 +36,7 @@
 
   :support:
     - +:src/ConfigurationWords.c
+    - +:src/NvmSettings.c
     - +:tests/unity_config.c
     - +:tests/NonDeterminism.c
 
@@ -113,7 +114,6 @@
       - -Wl,-Map="${3}"
       - -Wl,-AID=0x8006-0x8007
       - -Wl,-PID=ID
-      - --ROM=default,-1fe0-1fff
       - -Wl,-PNvmSettings=0x1fe0
       - --fill=0x3fff
       - -mserial=0000@8005
@@ -149,7 +149,6 @@
       - -Wl,-Map="${3}"
       - -Wl,-AID=0x8006-0x8007
       - -Wl,-PID=ID
-      - --ROM=default,-1fe0-1fff
       - -Wl,-PNvmSettings=0x1fe0
       - --fill=0x3fff
       - -mserial=0000@8005

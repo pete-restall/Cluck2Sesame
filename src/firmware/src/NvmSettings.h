@@ -2,14 +2,18 @@
 #define __CLUCK3SESAME_SRC_NVMSETTINGS_H
 #include <stdint.h>
 
-struct NvmSettings
+union NvmSettings
 {
+	uint8_t raw[32];
 	struct
 	{
-		uint8_t backlightBrightness;
-	} lcd;
+		struct
+		{
+			uint8_t backlightBrightness;
+		} lcd;
+	};
 };
 
-extern __section("NvmSettings") const struct NvmSettings nvmSettings;
+extern __section("NvmSettings") const union NvmSettings nvmSettings;
 
 #endif

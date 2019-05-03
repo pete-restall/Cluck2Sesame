@@ -29,8 +29,9 @@ static struct CallDetails clockInitialiseCalls;
 static struct CallDetails nearSchedulerInitialiseCalls;
 static struct CallDetails powerManagementInitialiseCalls;
 static struct CallDetails voltageRegulatorInitialiseCalls;
-static struct CallDetails sunEventsInitialiseCalls;
+static struct CallDetails pwmTimerInitialiseCalls;
 static struct CallDetails lcdInitialiseCalls;
+static struct CallDetails sunEventsInitialiseCalls;
 static struct CallDetails systemInitialisedEventPublishCalls;
 
 void setUp(void)
@@ -41,8 +42,9 @@ void setUp(void)
 	clearCallsFor(&nearSchedulerInitialiseCalls);
 	clearCallsFor(&powerManagementInitialiseCalls);
 	clearCallsFor(&voltageRegulatorInitialiseCalls);
-	clearCallsFor(&sunEventsInitialiseCalls);
+	clearCallsFor(&pwmTimerInitialiseCalls);
 	clearCallsFor(&lcdInitialiseCalls);
+	clearCallsFor(&sunEventsInitialiseCalls);
 	clearCallsFor(&systemInitialisedEventPublishCalls);
 
 	eventInitialise_StubWithCallback(&eventInitialiseCallback);
@@ -128,10 +130,21 @@ void voltageRegulatorInitialise(void)
 	registerCallFor(&voltageRegulatorInitialiseCalls);
 }
 
-void test_initialise_called_expectLcdIsInitialisedAfterVoltageRegulator(void)
+void test_initialise_called_expectPwmTimerIsInitialisedAfterVoltageRegulator(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&lcdInitialiseCalls, 6);
+	assertCalledOnceAtSequence(&pwmTimerInitialiseCalls, 6);
+}
+
+void pwmTimerInitialise(void)
+{
+	registerCallFor(&pwmTimerInitialiseCalls);
+}
+
+void test_initialise_called_expectLcdIsInitialisedAfterPwmTimer(void)
+{
+	initialise();
+	assertCalledOnceAtSequence(&lcdInitialiseCalls, 7);
 }
 
 void lcdInitialise(void)
@@ -142,7 +155,7 @@ void lcdInitialise(void)
 void test_initialise_called_expectSunEventsAreInitialisedAfterLcd(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&sunEventsInitialiseCalls, 7);
+	assertCalledOnceAtSequence(&sunEventsInitialiseCalls, 8);
 }
 
 void sunEventsInitialise(void)
