@@ -8,6 +8,7 @@ static void onRegulatedVoltageRailStabilised(void *state);
 static void onMcuVoltageRailStabilised(void *state);
 
 static uint8_t enableCount;
+static uint8_t fullyEnabled;
 
 void voltageRegulatorInitialise(void)
 {
@@ -18,12 +19,14 @@ void voltageRegulatorInitialise(void)
 	TRISBbits.TRISB0 = 0;
 	TRISBbits.TRISB2 = 0;
 	enableCount = 0;
+	fullyEnabled = 0;
 }
 
 void voltageRegulatorEnable(void)
 {
 	LATBbits.LATB2 = 1;
-	enableCount++;
+	if (++enableCount > 1)
+		return;
 
 	static const struct NearSchedule waitForRegulatedVoltageRailToStabilise =
 	{
@@ -36,6 +39,9 @@ void voltageRegulatorEnable(void)
 
 static void onRegulatedVoltageRailStabilised(void *state)
 {
+	if (!enableCount)
+		return;
+
 	LATBbits.LATB0 = 1;
 
 	static const struct NearSchedule waitForMcuVoltageRailToStabilise =
@@ -51,6 +57,7 @@ static void onMcuVoltageRailStabilised(void *state)
 {
 	static const struct VoltageRegulatorEnabled emptyEventArgs = { };
 	eventPublish(VOLTAGE_REGULATOR_ENABLED, &emptyEventArgs);
+	fullyEnabled = 1;
 }
 
 void voltageRegulatorDisable(void)
@@ -61,12 +68,14 @@ void voltageRegulatorDisable(void)
 		return;
 	}
 
-	if (enableCount == 1)
+	if (enableCount == 1 && fullyEnabled)
 	{
 		static const struct VoltageRegulatorDisabled eventArgs = { };
 		eventPublish(VOLTAGE_REGULATOR_DISABLED, &eventArgs);
+		fullyEnabled = 0;
 	}
 
+	LATBbits.LATB0 = 0;
 	LATBbits.LATB2 = 0;
 	enableCount = 0;
 }

@@ -2,42 +2,13 @@
 #include <unity.h>
 
 #include "Mock_Event.h"
-#include "Mock_NearScheduler.h"
 #include "VoltageRegulator.h"
 
 #include "NonDeterminism.h"
+#include "VoltageRegulatorFixture.h"
 
 TEST_FILE("VoltageRegulator.c")
-
-static void assertEventPublishNotCalled(
-	EventType type,
-	const void *const args,
-	int numCalls);
-
-void setUp(void)
-{
-}
-
-void tearDown(void)
-{
-}
-
-void test_voltageRegulatorDisable_calledAfterEnabledOnce_expectEnablePinIsLow(void)
-{
-	voltageRegulatorInitialise();
-	voltageRegulatorEnable();
-	voltageRegulatorDisable();
-	TEST_ASSERT_FALSE(LATBbits.LATB2);
-}
-
-void test_voltageRegulatorDisable_calledOnceAfterEnabledTwice_expectEnablePinIsHigh(void)
-{
-	voltageRegulatorInitialise();
-	voltageRegulatorEnable();
-	voltageRegulatorEnable();
-	voltageRegulatorDisable();
-	TEST_ASSERT_TRUE(LATBbits.LATB2);
-}
+TEST_FILE("VoltageRegulatorFixture.c")
 
 void test_voltageRegulatorDisable_calledMoreTimesThanEnable_expectEnableCountDoesNotGetOutOfSync(void)
 {
@@ -61,14 +32,6 @@ void test_voltageRegulatorDisable_calledWhenAlreadyDisabled_expectNoEventIsPubli
 	voltageRegulatorDisable();
 }
 
-static void assertEventPublishNotCalled(
-	EventType type,
-	const void *const args,
-	int numCalls)
-{
-	TEST_FAIL_MESSAGE("Expected eventPublish() not to be called");
-}
-
 void test_voltageRegulatorDisable_calledWhenStillEnabled_expectNoEventIsPublished(void)
 {
 	voltageRegulatorInitialise();
@@ -79,10 +42,31 @@ void test_voltageRegulatorDisable_calledWhenStillEnabled_expectNoEventIsPublishe
 	voltageRegulatorDisable();
 }
 
-void test_voltageRegulatorDisable_calledWhenDisabled_expectVoltageRegulatorDisabledEventIsPublished(void)
+void test_voltageRegulatorDisable_calledWhenNotEnabled_expectVoltageRegulatorDisabledEventIsNotPublished(void)
 {
 	voltageRegulatorInitialise();
 	voltageRegulatorEnable();
+
+	const struct VoltageRegulatorDisabled emptyArgs = { };
+	eventPublish_StubWithCallback(assertEventPublishNotCalled);
+	voltageRegulatorDisable();
+}
+
+void test_voltageRegulatorDisable_calledWhenVoltageRailHasStabilised_expectVoltageRegulatorDisabledEventIsNotPublished(void)
+{
+	voltageRegulatorInitialise();
+	voltageRegulatorEnable();
+	callScheduleHandlerAndForget();
+
+	const struct VoltageRegulatorDisabled emptyArgs = { };
+	eventPublish_StubWithCallback(assertEventPublishNotCalled);
+	voltageRegulatorDisable();
+}
+
+void test_voltageRegulatorDisable_calledWhenDisabled_expectVoltageRegulatorDisabledEventIsPublished(void)
+{
+	voltageRegulatorInitialise();
+	fullyEnableVoltageRegulator();
 
 	const struct VoltageRegulatorDisabled emptyArgs = { };
 	eventPublish_Expect(VOLTAGE_REGULATOR_DISABLED, &emptyArgs);

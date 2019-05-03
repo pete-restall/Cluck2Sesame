@@ -5,7 +5,7 @@
 #include "Mock_Event.h"
 #include "VoltageRegulator.h"
 
-#include "VoltageRegulatorEnableFixture.h"
+#include "VoltageRegulatorFixture.h"
 #include "NonDeterminism.h"
 
 static void ensureScheduleHandlerIsNotOmittedByTheCompiler(void);
@@ -46,4 +46,26 @@ void assertScheduleAddedWithHandler(void)
 void nearSchedulerAdd(const struct NearSchedule *const schedule)
 {
 	requestedSchedule = schedule;
+}
+
+void fullyEnableVoltageRegulator(void)
+{
+	voltageRegulatorEnable();
+	callScheduleHandlerAndForget();
+	callScheduleHandlerAndForget();
+}
+
+void callScheduleHandlerAndForget(void)
+{
+	assertScheduleAddedWithHandler();
+	callScheduleHandlerIfPresentAndForget();
+}
+
+void callScheduleHandlerIfPresentAndForget(void)
+{
+	void *state = requestedSchedule->state;
+	NearScheduleHandler handler = requestedSchedule->handler;
+	requestedSchedule = (const struct NearSchedule *) 0;
+	if (handler)
+		handler(state);
 }

@@ -5,53 +5,58 @@
 #include "Mock_Event.h"
 #include "VoltageRegulator.h"
 
-#include "VoltageRegulatorEnableFixture.h"
+#include "VoltageRegulatorFixture.h"
 #include "NonDeterminism.h"
 
 TEST_FILE("VoltageRegulator.c")
-TEST_FILE("VoltageRegulatorEnableFixture.c")
+TEST_FILE("VoltageRegulatorFixture.c")
 
 void test_voltageRegulatorEnable_calledOnce_expectVoltageRegulatorEnabledIsPublishedWhenMcuRailHasStabilised(void)
 {
 	voltageRegulatorInitialise();
 	voltageRegulatorEnable();
-	requestedSchedule->handler(requestedSchedule->state);
+	callScheduleHandlerAndForget();
 
 	static const struct VoltageRegulatorEnabled emptyArgs = { };
 	eventPublish_Expect(VOLTAGE_REGULATOR_ENABLED, &emptyArgs);
-	requestedSchedule->handler(requestedSchedule->state);
+	callScheduleHandlerAndForget();
 }
 
-// TODO: TEST FOLLOWING SCENARIOS:
-//
-//
-//     voltageRegulatorEnable();
-//     voltageRegulatorDisable();
-//     regulator startup time elapsed
-//     EXPECT VMCU_SEL (RB0) IS LOW
-//
-//     voltageRegulatorEnable();
-//     voltageRegulatorEnable();
-//     voltageRegulatorDisable();
-//     regulator startup time elapsed
-//     EXPECT VMCU_SEL (RB0) IS HIGH
-//
-//     voltageRegulatorEnable();
-//     regulator startup time elapsed
-//     voltageRegulatorDisable();
-//     EXPECT VMCU_SEL (RB0) IS LOW
-//
-//     voltageRegulatorEnable();
-//     regulator startup time elapsed
-//     voltageRegulatorEnable();
-//     voltageRegulatorDisable();
-//     EXPECT VMCU_SEL (RB0) IS HIGH
-//
-//     voltageRegulatorEnable();
-//     regulator startup time elapsed
-//     voltageRegulatorDisable();
-//     EXPECT NO VOLTAGE_REGULATOR_ENABLED EVENT PUBLISHED !
-//
-//     voltageRegulatorEnable();
-//     voltageRegulatorEnable();
-//     EXPECT ONLY SINGLE VOLTAGE_REGULATOR_ENABLED EVENT PUBLISHED
+void test_voltageRegulatorEnable_calledTwice_expectNoNewScheduleIsAdded(void)
+{
+	voltageRegulatorInitialise();
+	voltageRegulatorEnable();
+	requestedSchedule = (struct NearSchedule *) 0;
+	voltageRegulatorEnable();
+	TEST_ASSERT_NULL(requestedSchedule);
+}
+
+void test_voltageRegulatorEnable_calledAfterVoltageRailHasStabilised_expectNoNewScheduleIsAdded(void)
+{
+	voltageRegulatorInitialise();
+	voltageRegulatorEnable();
+	callScheduleHandlerAndForget();
+	requestedSchedule = (struct NearSchedule *) 0;
+	voltageRegulatorEnable();
+	TEST_ASSERT_NULL(requestedSchedule);
+}
+
+void test_voltageRegulatorEnable_calledAfterVoltageRailHasStabilised_expectOnlyOneEventIsPublished(void)
+{
+	static const struct VoltageRegulatorEnabled emptyArgs = { };
+	eventPublish_Expect(VOLTAGE_REGULATOR_ENABLED, &emptyArgs);
+
+	voltageRegulatorInitialise();
+	voltageRegulatorEnable();
+	callScheduleHandlerAndForget();
+	voltageRegulatorEnable();
+	callScheduleHandlerAndForget();
+}
+
+void test_voltageRegulatorEnable_calledAfterFullyEnabled_expectNoNewScheduleIsAdded(void)
+{
+	voltageRegulatorInitialise();
+	fullyEnableVoltageRegulator();
+	voltageRegulatorEnable();
+	TEST_ASSERT_NULL(requestedSchedule);
+}

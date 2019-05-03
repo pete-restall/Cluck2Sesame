@@ -5,11 +5,11 @@
 #include "Mock_Event.h"
 #include "VoltageRegulator.h"
 
-#include "VoltageRegulatorEnableFixture.h"
+#include "VoltageRegulatorFixture.h"
 #include "NonDeterminism.h"
 
 TEST_FILE("VoltageRegulator.c")
-TEST_FILE("VoltageRegulatorEnableFixture.c")
+TEST_FILE("VoltageRegulatorFixture.c")
 
 void test_voltageRegulatorEnable_calledOnceWhenEnablePinIsLow_expectEnablePinIsHigh(void)
 {
