@@ -30,6 +30,7 @@ static struct CallDetails nearSchedulerInitialiseCalls;
 static struct CallDetails powerManagementInitialiseCalls;
 static struct CallDetails voltageRegulatorInitialiseCalls;
 static struct CallDetails sunEventsInitialiseCalls;
+static struct CallDetails lcdInitialiseCalls;
 static struct CallDetails systemInitialisedEventPublishCalls;
 
 void setUp(void)
@@ -41,6 +42,7 @@ void setUp(void)
 	clearCallsFor(&powerManagementInitialiseCalls);
 	clearCallsFor(&voltageRegulatorInitialiseCalls);
 	clearCallsFor(&sunEventsInitialiseCalls);
+	clearCallsFor(&lcdInitialiseCalls);
 	clearCallsFor(&systemInitialisedEventPublishCalls);
 
 	eventInitialise_StubWithCallback(&eventInitialiseCallback);
@@ -126,10 +128,21 @@ void voltageRegulatorInitialise(void)
 	registerCallFor(&voltageRegulatorInitialiseCalls);
 }
 
-void test_initialise_called_expectSunEventsAreInitialisedAfterVoltageRegulator(void)
+void test_initialise_called_expectLcdIsInitialisedAfterVoltageRegulator(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&sunEventsInitialiseCalls, 6);
+	assertCalledOnceAtSequence(&lcdInitialiseCalls, 6);
+}
+
+void lcdInitialise(void)
+{
+	registerCallFor(&lcdInitialiseCalls);
+}
+
+void test_initialise_called_expectSunEventsAreInitialisedAfterLcd(void)
+{
+	initialise();
+	assertCalledOnceAtSequence(&sunEventsInitialiseCalls, 7);
 }
 
 void sunEventsInitialise(void)
