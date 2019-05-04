@@ -1,7 +1,9 @@
 #include <xc.h>
 #include <stdint.h>
 
+#include "Event.h"
 #include "NvmSettings.h"
+#include "VoltageRegulator.h"
 #include "Lcd.h"
 
 #define PORTA_PIN_MASK 0b00000011
@@ -28,4 +30,15 @@ void lcdInitialise(void)
 	PWM3DCH = nvmSettings.lcd.backlightBrightness;
 	PWM3DCL = 0;
 	RC5PPS = PPS_OUT_PWM3;
+
+	lcdEnableCount = 0;
+
+	static const struct EventSubscription onVoltageRegulatorEnabledSubscription =
+	{
+		.type = VOLTAGE_REGULATOR_ENABLED,
+		.handler = &onVoltageRegulatorEnabled,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onVoltageRegulatorEnabledSubscription);
 }

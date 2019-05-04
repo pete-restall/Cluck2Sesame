@@ -1,12 +1,17 @@
 #include <xc.h>
 #include <unity.h>
 
+#include "Event.h"
+#include "Mock_VoltageRegulator.h"
 #include "Mock_NvmSettings.h"
+#include "Mock_LcdInternals.h"
 #include "Lcd.h"
 
 #include "NonDeterminism.h"
 
+TEST_FILE("Event.c")
 TEST_FILE("Lcd/LcdInitialise.c")
+TEST_FILE("Lcd/LcdEnableDisable.c")
 
 void setUp(void)
 {
