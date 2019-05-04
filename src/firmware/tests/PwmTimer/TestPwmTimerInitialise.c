@@ -82,3 +82,19 @@ void test_pwmTimerInitialise_called_expectPeriodResultsIn62500HzPwm(void)
 	pwmTimerInitialise();
 	TEST_ASSERT_EQUAL_UINT8(63, PR2);
 }
+
+void test_pwmTimerInitialise_called_expectTimerInterruptFlagIsCleared(void)
+{
+	PIR4 = anyByteWithMaskSet(_PIR4_TMR2IF_MASK);
+	uint8_t originalPir4 = PIR4;
+	pwmTimerInitialise();
+	TEST_ASSERT_EQUAL_UINT8(originalPir4 & ~_PIR4_TMR2IF_MASK, PIR4);
+}
+
+void test_pwmTimerInitialise_called_expectTimerInterruptWakesDeviceFromSleep(void)
+{
+	PIR4 = anyByteWithMaskClear(_PIE4_TMR2IE_MASK);
+	uint8_t originalPie4 = PIE4;
+	pwmTimerInitialise();
+	TEST_ASSERT_EQUAL_UINT8(originalPie4 | _PIE4_TMR2IE_MASK, PIE4);
+}

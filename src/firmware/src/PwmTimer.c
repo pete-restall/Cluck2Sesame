@@ -25,4 +25,6 @@ void pwmTimerInitialise(void)
 		T2HLT_MODE_SOFTGATE;
 
 	PR2 = 63;
+	PIR4bits.TMR2IF = 0;
+	PIE4bits.TMR2IE = 1;
 }
