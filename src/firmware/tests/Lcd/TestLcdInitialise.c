@@ -6,7 +6,7 @@
 
 #include "NonDeterminism.h"
 
-TEST_FILE("Lcd.c")
+TEST_FILE("Lcd/LcdInitialise.c")
 
 void setUp(void)
 {
