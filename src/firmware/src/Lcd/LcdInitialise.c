@@ -8,6 +8,7 @@
 #define PORTC_PIN_MASK 0b11001111
 
 #define PPS_OUT_PWM3 0x0b
+#define PPS_OUT_PWM5 0x0d
 
 void lcdInitialise(void)
 {
@@ -17,9 +18,14 @@ void lcdInitialise(void)
 	LATC &= PORTC_PIN_MASK;
 	TRISA &= PORTA_PIN_MASK;
 	TRISC &= PORTC_PIN_MASK;
-	RC5PPS = PPS_OUT_PWM3;
+
+	PWM5CON = 0;
+	PWM5DCH = nvmSettings.lcd.contrast;
+	PWM5DCL = 0;
+	RA2PPS = PPS_OUT_PWM5;
 
 	PWM3CON = 0;
 	PWM3DCH = nvmSettings.lcd.backlightBrightness;
 	PWM3DCL = 0;
+	RC5PPS = PPS_OUT_PWM3;
 }

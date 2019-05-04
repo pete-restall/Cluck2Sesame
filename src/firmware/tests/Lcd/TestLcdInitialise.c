@@ -100,7 +100,38 @@ void test_lcdInitialise_called_expectLcdPortCPinsAreAllLow(void)
 	TEST_ASSERT_EQUAL_UINT8(originalLatc & ~usedPins, LATC);
 }
 
-void test_lcdInitialise_called_expectdBacklightPinIsPwm3Output(void)
+void test_lcdInitialise_called_expectContrastPinIsPwm5Output(void)
+{
+	const uint8_t pwm5 = 0x0d;
+	RA2PPS = anyByteExcept(pwm5);
+	lcdInitialise();
+	TEST_ASSERT_EQUAL_UINT8(pwm5, RA2PPS);
+}
+
+void test_lcdInitialise_called_expectContrastIsDefaultSetting(void)
+{
+	PWM5DCH = anyByte();
+	PWM5DCL = anyByte();
+	lcdInitialise();
+	TEST_ASSERT_EQUAL_UINT8(nvmSettings.lcd.contrast, PWM5DCH);
+	TEST_ASSERT_EQUAL_UINT8(0, PWM5DCL);
+}
+
+void test_lcdInitialise_called_expectContrastPwmIsDisabled(void)
+{
+	PWM5CON = anyByteWithMaskSet(_PWM5CON_PWM5EN_MASK);
+	lcdInitialise();
+	TEST_ASSERT_FALSE(PWM5CONbits.PWM5EN);
+}
+
+void test_lcdInitialise_called_expectContrastPwmIsActiveHigh(void)
+{
+	PWM5CON = anyByteWithMaskSet(_PWM5CON_PWM5POL_MASK);
+	lcdInitialise();
+	TEST_ASSERT_FALSE(PWM5CONbits.PWM5POL);
+}
+
+void test_lcdInitialise_called_expectBacklightPinIsPwm3Output(void)
 {
 	const uint8_t pwm3 = 0x0b;
 	RC5PPS = anyByteExcept(pwm3);

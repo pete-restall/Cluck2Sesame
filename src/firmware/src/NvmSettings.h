@@ -9,6 +9,7 @@ union NvmSettings
 	{
 		struct
 		{
+			uint8_t contrast;
 			uint8_t backlightBrightness;
 		} lcd;
 	};
