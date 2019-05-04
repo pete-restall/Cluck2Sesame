@@ -72,3 +72,14 @@ void test_voltageRegulatorDisable_calledWhenDisabled_expectVoltageRegulatorDisab
 	eventPublish_Expect(VOLTAGE_REGULATOR_DISABLED, &emptyArgs);
 	voltageRegulatorDisable();
 }
+
+void test_voltageRegulatorDisable_calledBeforeBeingFullyEnabled_expectNoEventPublished(void)
+{
+	voltageRegulatorInitialise();
+	voltageRegulatorEnable();
+	callScheduleHandlerAndForget();
+	voltageRegulatorDisable();
+
+	eventPublish_StubWithCallback(assertEventPublishNotCalled);
+	callScheduleHandlerAndForget();
+}

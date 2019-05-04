@@ -55,6 +55,9 @@ static void onRegulatedVoltageRailStabilised(void *state)
 
 static void onMcuVoltageRailStabilised(void *state)
 {
+	if (!enableCount)
+		return;
+
 	static const struct VoltageRegulatorEnabled emptyEventArgs = { };
 	eventPublish(VOLTAGE_REGULATOR_ENABLED, &emptyEventArgs);
 	fullyEnabled = 1;
@@ -78,4 +81,9 @@ void voltageRegulatorDisable(void)
 	LATBbits.LATB0 = 0;
 	LATBbits.LATB2 = 0;
 	enableCount = 0;
+}
+
+uint8_t voltageRegulatorIsEnabled(void)
+{
+	return fullyEnabled;
 }

@@ -11,6 +11,7 @@ extern void assertScheduleAddedWithHandler(void);
 extern void fullyEnableVoltageRegulator(void);
 extern void callScheduleHandlerAndForget(void);
 extern void callScheduleHandlerIfPresentAndForget(void);
+extern void fullyEnableVoltageRegulatorWithoutAssertions(void);
 
 extern const struct NearSchedule *requestedSchedule;
 

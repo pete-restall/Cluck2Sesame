@@ -10,6 +10,7 @@ struct VoltageRegulatorDisabled { EMPTY_EVENT_ARGS };
 
 extern void voltageRegulatorInitialise(void);
 extern void voltageRegulatorEnable(void);
+extern uint8_t voltageRegulatorIsEnabled(void);
 extern void voltageRegulatorDisable(void);
 
 #endif

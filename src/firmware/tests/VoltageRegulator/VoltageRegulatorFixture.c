@@ -63,9 +63,18 @@ void callScheduleHandlerAndForget(void)
 
 void callScheduleHandlerIfPresentAndForget(void)
 {
+	if (!requestedSchedule || !requestedSchedule->handler)
+		return;
+
 	void *state = requestedSchedule->state;
 	NearScheduleHandler handler = requestedSchedule->handler;
 	requestedSchedule = (const struct NearSchedule *) 0;
-	if (handler)
-		handler(state);
+	handler(state);
+}
+
+void fullyEnableVoltageRegulatorWithoutAssertions(void)
+{
+	voltageRegulatorEnable();
+	callScheduleHandlerIfPresentAndForget();
+	callScheduleHandlerIfPresentAndForget();
 }
