@@ -1,4 +1,5 @@
 #include <xc.h>
+#include <stdint.h>
 
 #include "PwmTimer.h"
 
@@ -12,6 +13,8 @@
 #define T2HLT_ON_SYNC _T2HLT_CKSYNC_MASK
 #define T2HLT_MODE_FREE 0
 #define T2HLT_MODE_SOFTGATE 0
+
+static uint8_t enableCount;
 
 void pwmTimerInitialise(void)
 {
@@ -27,4 +30,26 @@ void pwmTimerInitialise(void)
 	PR2 = 63;
 	PIR4bits.TMR2IF = 0;
 	PIE4bits.TMR2IE = 1;
+	enableCount = 0;
+}
+
+void pwmTimerEnable(void)
+{
+	if (enableCount++ > 0)
+		return;
+
+	PIR4bits.TMR2IF = 0;
+	T2CONbits.ON = 1;
+}
+
+void pwmTimerDisable(void)
+{
+	if (enableCount <= 1)
+	{
+		T2CONbits.ON = 0;
+		PIR4bits.TMR2IF = 0;
+		enableCount = 0;
+	}
+	else
+		--enableCount;
 }
