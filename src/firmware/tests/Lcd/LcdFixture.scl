@@ -1,0 +1,220 @@
+configuration for "PIC16F15355" is
+	shared variable fakeLcdSessionIndex;
+	shared variable fakeLcdIsSessionInvalid;
+	shared variable fakeLcdIsConfigured;
+	shared variable fakeLcdIsNybbleMode;
+	shared variable fakeLcdRs;
+	shared variable fakeLcdData;
+end configuration;
+
+testbench for "PIC16F15355" is
+begin
+	resetFixture: process is
+	begin
+		loop
+			wait on fakeLcdSessionIndex;
+			report("[FAKE LCD] Resetting fixture.");
+			fakeLcdIsSessionInvalid := 0;
+			fakeLcdIsConfigured := 0;
+			fakeLcdIsNybbleMode := 0;
+			fakeLcdRs := 0;
+			fakeLcdData := 0;
+		end loop;
+	end process;
+
+	lcdPinCapture: process is
+	begin
+		loop
+			wait on RA4;
+			if RA4 == '0' then
+				if RA3 == '0' then
+					fakeLcdRs := 0;
+				else
+					fakeLcdRs := 1;
+				end if;
+
+				fakeLcdData := 0;
+				if RC4 != '0' then
+					fakeLcdData := fakeLcdData + 128;
+				end if;
+				if RA6 != '0' then
+					fakeLcdData := fakeLcdData + 64;
+				end if;
+				if RA7 != '0' then
+					fakeLcdData := fakeLcdData + 32;
+				end if;
+				if RA5 != '0' then
+					fakeLcdData := fakeLcdData + 16;
+				end if;
+				report("[FAKE LCD] Received byte.");
+			end if;
+		end loop;
+	end process;
+
+	assertPowerOnToEnableIsMoreThan40Milliseconds: process is
+		variable powerOnTime : cycle;
+		variable cyclesIn40ms : cycle;
+		variable powerOnMonitoring : boolean;
+	begin
+		cyclesIn40ms := 320000 ic;
+		loop
+			report("[FAKE LCD] Waiting for Power Changes.");
+			wait on RB2;
+			if RB2 == '1' then
+				report("[FAKE LCD] Power On.");
+				powerOnTime := now();
+				powerOnMonitoring := true;
+				while powerOnMonitoring loop
+					if RA4 == '0' then
+						wait on RA4 for 1000 ic;
+						if (now() >= powerOnTime + cyclesIn40ms) then
+							powerOnMonitoring := false;
+						end if;
+					end if;
+
+					if RA4 == '1' then
+						powerOnMonitoring := false;
+					end if;
+				end loop;
+
+				if (now() < powerOnTime + cyclesIn40ms) then
+					fakeLcdIsSessionInvalid := 1;
+					report("[FAKE LCD ASSERT] EN should be low for 40ms after power on !");
+				else
+					report("[FAKE LCD] Power on monitoring succeeded.");
+				end if;
+			else
+				report("[FAKE LCD] Power Off.");
+			end if;
+		end loop;
+	end process;
+
+	assertRsOnlyChangesWhenEnableIsHigh: process is
+	begin
+		loop
+			wait on RA3;
+			if RA4 == '0' then
+				report("[FAKE LCD ASSERT] RS changed state while EN was low !");
+				fakeLcdIsSessionInvalid := 1;
+			end if;
+		end loop;
+	end process;
+
+	assertDb7OnlyChangesWhenEnableIsHigh: process is
+	begin
+		loop
+			wait on RC4;
+			if RA4 == '0' then
+				report("[FAKE LCD ASSERT] DB7 changed state while EN was low !");
+				fakeLcdIsSessionInvalid := 1;
+			end if;
+		end loop;
+	end process;
+
+	assertDb6OnlyChangesWhenEnableIsHigh: process is
+	begin
+		loop
+			wait on RA6;
+			if RA4 == '0' then
+				report("[FAKE LCD ASSERT] DB6 changed state while EN was low !");
+				fakeLcdIsSessionInvalid := 1;
+			end if;
+		end loop;
+	end process;
+
+	assertDb5OnlyChangesWhenEnableIsHigh: process is
+	begin
+		loop
+			wait on RA7;
+			if RA4 == '0' then
+				report("[FAKE LCD ASSERT] DB5 changed state while EN was low !");
+				fakeLcdIsSessionInvalid := 1;
+			end if;
+		end loop;
+	end process;
+
+	assertDb4OnlyChangesWhenEnableIsHigh: process is
+	begin
+		loop
+			wait on RA5;
+			if RA4 == '0' then
+				report("[FAKE LCD ASSERT] DB4 changed state while EN was low !");
+				fakeLcdIsSessionInvalid := 1;
+			end if;
+		end loop;
+	end process;
+
+	assertEnablePulsesDontViolateTimingConstraints: process is
+		variable lastEventTime : cycle;
+		variable lastRisingEdgeTime : cycle;
+		variable cyclesIn450ns : cycle;
+		variable cyclesIn2us : cycle;
+	begin
+		cyclesIn450ns := 4 ic;
+		cyclesIn2us := 16 ic;
+
+		lastEventTime := 0 ic;
+		lastRisingEdgeTime := 0 ic;
+		loop
+			wait on RA4;
+			if RA4 == '1' then
+				if (now() < lastEventTime + cyclesIn450ns) then
+					report("[FAKE LCD ASSERT] EN was not low for at least 450ns !");
+					fakeLcdIsSessionInvalid := 1;
+				end if;
+
+				if (now() < lastRisingEdgeTime + cyclesIn2us) then
+					report("[FAKE LCD ASSERT] EN cycle time needs to be at least 2us !");
+					fakeLcdIsSessionInvalid := 1;
+				end if;
+
+				lastRisingEdgeTime := now();
+			elsif RA4 == '0' then
+				if (now() < lastEventTime + cyclesIn450ns) then
+					report("[FAKE LCD ASSERT] EN was not high for at least 450ns !");
+					fakeLcdIsSessionInvalid := 1;
+				end if;
+			end if;
+			lastEventTime := now();
+		end loop;
+	end process;
+
+	crystal32768Hz: process is
+	begin
+		report("[FAKE LCD] Driving SOSC with 32.768kHz.");
+		OSCSTAT.SOR := '1';
+		loop
+			SOSCI <= '0';
+			wait for 15258 ns;
+			SOSCI <= '1';
+			wait for 15259 ns;
+		end loop;
+	end process;
+
+	ncoDriver: process is
+	begin
+		loop
+			wait on NCO1CON;
+			if NCO1CON.N1EN != '0' then
+				report("[FAKE LCD] Driving NCO with 4ms overflow.");
+				while NCO1CON.N1EN != '0' loop
+					wait on NCO1CON for 4 ms;
+					if NCO1CON.N1EN != '0' then
+						PIR7.NCO1IF := '1';
+					end if;
+				end loop;
+				report("[FAKE LCD] NCO disabled.");
+			end if;
+		end loop;
+	end process;
+
+	ncoPreventSimulatorFromDriving: process is
+	begin
+		loop
+			wait on NCO1INCL;
+			NCO1INCU := 0;
+			NCO1INCH := 0;
+			NCO1INCL := 0;
+		end loop;
+	end process;
+end testbench;

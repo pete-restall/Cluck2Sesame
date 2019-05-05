@@ -6,7 +6,7 @@ __section("NvmSettings") const union NvmSettings nvmSettings =
 {
 	.lcd =
 	{
-		.contrast = 0x36,
+		.contrast = 0x26,
 		.backlightBrightness = 0x80
 	}
 };

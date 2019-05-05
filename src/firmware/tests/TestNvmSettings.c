@@ -15,7 +15,7 @@ void tearDown(void)
 
 void test_nvmSettings_getLcdContrast_expectDefaultValue(void)
 {
-	TEST_ASSERT_EQUAL_UINT8(0x36, nvmSettings.lcd.contrast);
+	TEST_ASSERT_EQUAL_UINT8(0x26, nvmSettings.lcd.contrast);
 }
 
 void test_nvmSettings_getLcdBacklightBrightness_expectDefaultValue(void)
