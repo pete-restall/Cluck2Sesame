@@ -1,24 +1,43 @@
 configuration for "PIC16F15355" is
 	shared variable fakeLcdSessionIndex;
 	shared variable fakeLcdIsSessionInvalid;
+	shared variable fakeLcdInitialFunctionSetCount;
 	shared variable fakeLcdIsConfigured;
 	shared variable fakeLcdIsNybbleMode;
 	shared variable fakeLcdRs;
 	shared variable fakeLcdData;
+	shared variable fakeLcdClocked;
+	shared variable fakeLcdCommand;
+	shared variable fakeLcdBusyFlag;
+	shared variable fakeLcdCommandIndex;
 end configuration;
 
 testbench for "PIC16F15355" is
 begin
 	resetFixture: process is
 	begin
+		fakeLcdBusyFlag := 0;
 		loop
 			wait on fakeLcdSessionIndex;
 			report("[FAKE LCD] Resetting fixture.");
 			fakeLcdIsSessionInvalid := 0;
-			fakeLcdIsConfigured := 0;
+			fakeLcdInitialFunctionSetCount := 0;
 			fakeLcdIsNybbleMode := 0;
 			fakeLcdRs := 0;
 			fakeLcdData := 0;
+		end loop;
+	end process;
+
+	isConfiguredMonitor: process is
+	begin
+		loop
+			wait on fakeLcdInitialFunctionSetCount;
+			if fakeLcdInitialFunctionSetCount >= 3 then
+				report("[FAKE LCD] Unambiguously configured (8-bit mode)");
+				fakeLcdIsConfigured := 1;
+			else
+				fakeLcdIsConfigured := 0;
+			end if;
 		end loop;
 	end process;
 
@@ -46,7 +65,80 @@ begin
 				if RA5 != '0' then
 					fakeLcdData := fakeLcdData + 16;
 				end if;
+
+				if fakeLcdBusyFlag != 0 then
+					report("[FAKE LCD ASSERT] Busy flag must be clear before new bytes are sent !");
+					fakeLcdIsSessionInvalid := 1;
+				elsif fakeLcdClocked == 0 then
+					fakeLcdClocked := 1;
+				else
+					fakeLcdClocked := 0;
+				end if;
+
 				report("[FAKE LCD] Received byte.");
+			end if;
+		end loop;
+	end process;
+
+	lcdCommandCapture: process is
+		variable isHighNybble : boolean;
+	begin
+		isHighNybble := true;
+		loop
+			wait on fakeLcdClocked;
+			if fakeLcdIsNybbleMode != 0 then
+				if isHighNybble then
+					fakeLcdCommand := fakeLcdData;
+					isHighNybble := false;
+				else
+					fakeLcdCommand := fakeLcdCommand + fakeLcdData / 16;
+					fakeLcdCommandIndex := fakeLcdCommandIndex + 1;
+					isHighNybble := true;
+					fakeLcdBusyFlag := 1;
+				end if;
+			else
+				fakeLcdCommand := fakeLcdData;
+				fakeLcdCommandIndex := fakeLcdCommandIndex + 1;
+				isHighNybble := true;
+				fakeLcdBusyFlag := 1;
+			end if;
+		end loop;
+	end process;
+
+	lcdCommandFunctionSet: process is
+		variable lastInitialFunctionSetCommandIndex : integer;
+	begin
+		lastInitialFunctionSetCommandIndex := 0;
+		loop
+			wait on fakeLcdCommandIndex;
+			if fakeLcdRs == 0 then
+				if fakeLcdCommand / 16 == 2#0010# then
+					fakeLcdIsNybbleMode := 1;
+					if fakeLcdIsConfigured != 0 then
+						report("[FAKE LCD] FUNCTION SET TO NYBBLE MODE (40us)");
+						wait for 40 us;
+					else
+						report("[FAKE LCD] FUNCTION SET TO NYBBLE MODE (5ms)");
+						wait for 5 ms;
+					end if;
+					fakeLcdBusyFlag := 0;
+				elsif fakeLcdCommand / 16 == 2#0011# then
+					fakeLcdIsNybbleMode := 0;
+					if fakeLcdIsConfigured != 0 then
+						report("[FAKE LCD] FUNCTION SET TO BYTE MODE (40us)");
+						wait for 40 us;
+					else
+						report("[FAKE LCD] FUNCTION SET TO BYTE MODE (5ms)");
+						if fakeLcdCommandIndex == lastInitialFunctionSetCommandIndex + 1 then
+							fakeLcdInitialFunctionSetCount := fakeLcdInitialFunctionSetCount + 1;
+						else
+							fakeLcdInitialFunctionSetCount := 1;
+						end if;
+						lastInitialFunctionSetCommandIndex := fakeLcdCommandIndex;
+						wait for 5 ms;
+					end if;
+					fakeLcdBusyFlag := 0;
+				end if;
 			end if;
 		end loop;
 	end process;
@@ -81,7 +173,7 @@ begin
 					fakeLcdIsSessionInvalid := 1;
 					report("[FAKE LCD ASSERT] EN should be low for 40ms after power on !");
 				else
-					report("[FAKE LCD] Power on monitoring succeeded.");
+					report("[FAKE LCD] Power-On Monitoring Finished.");
 				end if;
 			else
 				report("[FAKE LCD] Power Off.");
@@ -93,9 +185,11 @@ begin
 	begin
 		loop
 			wait on RA3;
-			if RA4 == '0' then
-				report("[FAKE LCD ASSERT] RS changed state while EN was low !");
-				fakeLcdIsSessionInvalid := 1;
+			if RB2 == '1' then
+				if RA4 == '0' then
+					report("[FAKE LCD ASSERT] RS changed state while EN was low !");
+					fakeLcdIsSessionInvalid := 1;
+				end if;
 			end if;
 		end loop;
 	end process;
@@ -104,9 +198,11 @@ begin
 	begin
 		loop
 			wait on RC4;
-			if RA4 == '0' then
-				report("[FAKE LCD ASSERT] DB7 changed state while EN was low !");
-				fakeLcdIsSessionInvalid := 1;
+			if RB2 == '1' then
+				if RA4 == '0' then
+					report("[FAKE LCD ASSERT] DB7 changed state while EN was low !");
+					fakeLcdIsSessionInvalid := 1;
+				end if;
 			end if;
 		end loop;
 	end process;
@@ -115,9 +211,11 @@ begin
 	begin
 		loop
 			wait on RA6;
-			if RA4 == '0' then
-				report("[FAKE LCD ASSERT] DB6 changed state while EN was low !");
-				fakeLcdIsSessionInvalid := 1;
+			if RB2 == '1' then
+				if RA4 == '0' then
+					report("[FAKE LCD ASSERT] DB6 changed state while EN was low !");
+					fakeLcdIsSessionInvalid := 1;
+				end if;
 			end if;
 		end loop;
 	end process;
@@ -126,9 +224,11 @@ begin
 	begin
 		loop
 			wait on RA7;
-			if RA4 == '0' then
-				report("[FAKE LCD ASSERT] DB5 changed state while EN was low !");
-				fakeLcdIsSessionInvalid := 1;
+			if RB2 == '1' then
+				if RA4 == '0' then
+					report("[FAKE LCD ASSERT] DB5 changed state while EN was low !");
+					fakeLcdIsSessionInvalid := 1;
+				end if;
 			end if;
 		end loop;
 	end process;
@@ -137,9 +237,11 @@ begin
 	begin
 		loop
 			wait on RA5;
-			if RA4 == '0' then
-				report("[FAKE LCD ASSERT] DB4 changed state while EN was low !");
-				fakeLcdIsSessionInvalid := 1;
+			if RB2 == '1' then
+				if RA4 == '0' then
+					report("[FAKE LCD ASSERT] DB4 changed state while EN was low !");
+					fakeLcdIsSessionInvalid := 1;
+				end if;
 			end if;
 		end loop;
 	end process;
@@ -157,25 +259,27 @@ begin
 		lastRisingEdgeTime := 0 ic;
 		loop
 			wait on RA4;
-			if RA4 == '1' then
-				if (now() < lastEventTime + cyclesIn450ns) then
-					report("[FAKE LCD ASSERT] EN was not low for at least 450ns !");
-					fakeLcdIsSessionInvalid := 1;
-				end if;
+			if RB2 == '1' then
+				if RA4 == '1' then
+					if (now() < lastEventTime + cyclesIn450ns) then
+						report("[FAKE LCD ASSERT] EN was not low for at least 450ns !");
+						fakeLcdIsSessionInvalid := 1;
+					end if;
 
-				if (now() < lastRisingEdgeTime + cyclesIn2us) then
-					report("[FAKE LCD ASSERT] EN cycle time needs to be at least 2us !");
-					fakeLcdIsSessionInvalid := 1;
-				end if;
+					if (now() < lastRisingEdgeTime + cyclesIn2us) then
+						report("[FAKE LCD ASSERT] EN cycle time needs to be at least 2us !");
+						fakeLcdIsSessionInvalid := 1;
+					end if;
 
-				lastRisingEdgeTime := now();
-			elsif RA4 == '0' then
-				if (now() < lastEventTime + cyclesIn450ns) then
-					report("[FAKE LCD ASSERT] EN was not high for at least 450ns !");
-					fakeLcdIsSessionInvalid := 1;
+					lastRisingEdgeTime := now();
+				elsif RA4 == '0' then
+					if (now() < lastEventTime + cyclesIn450ns) then
+						report("[FAKE LCD ASSERT] EN was not high for at least 450ns !");
+						fakeLcdIsSessionInvalid := 1;
+					end if;
 				end if;
+				lastEventTime := now();
 			end if;
-			lastEventTime := now();
 		end loop;
 	end process;
 

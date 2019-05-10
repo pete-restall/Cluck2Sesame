@@ -9,6 +9,7 @@
 #define LCD_NYBBLE_DATA 0b10000000
 
 static void lcdConfigureAsNybbleMode(void *const state);
+static void lcdWriteNybble(uint8_t nybble);
 
 void lcdConfigure(void)
 {
@@ -21,6 +22,25 @@ void lcdConfigure(void)
 	nearSchedulerAdd(&waitForLcdToStabilise);
 }
 
+static void lcdConfigureAsNybbleMode(void *const state)
+{
+	struct NearSchedule waitForLcdToStabilise =
+	{
+		.ticks = MS_TO_TICKS(8),
+		.handler = lcdConfigureAsNybbleMode,
+		.state = (void *) (((int) state) + 1)
+	};
+
+	if ((int) state < 3)
+	{
+		lcdWriteNybble(LCD_NYBBLE_INSTRUCTION | 0b00000011);
+		nearSchedulerAdd(&waitForLcdToStabilise);
+	}
+//	// wait 8ms (after the three 0011 8-bit-set instructions)
+//	rs=0, db7-4=0010
+//	// wait 8ms
+}
+
 static void lcdWriteNybble(uint8_t nybble)
 {
 	LATAbits.LATA4 = 1;
@@ -30,18 +50,6 @@ static void lcdWriteNybble(uint8_t nybble)
 	LATAbits.LATA7 = (nybble & 0b00000010) ? 1 : 0;
 	LATAbits.LATA5 = (nybble & 0b00000001) ? 1 : 0;
 	LATAbits.LATA4 = 0;
-}
-
-static void lcdConfigureAsNybbleMode(void *const state)
-{
-	lcdWriteNybble(LCD_NYBBLE_INSTRUCTION | 0b00000011);
-//	// wait 8ms
-//	rs=0, db7-4=0011
-//	// wait 8ms
-//	rs=0, db7-4=0011
-//	// wait 8ms
-//	rs=0, db7-4=0010
-//	// wait 8ms
 }
 
 #if 0

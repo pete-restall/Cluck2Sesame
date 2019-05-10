@@ -18,8 +18,12 @@ TEST_FILE("Lcd/LcdEnableDisable.c")
 TEST_FILE("Lcd/LcdConfigure.c")
 
 extern void poll(void);
+
 static void voltageRegulatorInitialise(void);
+static void onLcdEnabled(const struct Event *event);
 void voltageRegulatorDisable(void);
+
+static uint8_t isLcdEnabled;
 
 void setUp(void)
 {
@@ -31,6 +35,15 @@ void setUp(void)
 	voltageRegulatorInitialise();
 	lcdInitialise();
 	fakeLcdInitialise();
+
+	isLcdEnabled = 0;
+}
+
+static void voltageRegulatorInitialise(void)
+{
+	ANSELBbits.ANSB2 = 0;
+	LATBbits.LATB2 = 0;
+	TRISBbits.TRISB2 = 0;
 }
 
 void tearDown(void)
@@ -48,22 +61,28 @@ void test_lcdConfigure_called_expectFirstByteSentToLcdIsFunctionSetForByteMode(v
 	TEST_ASSERT_FALSE_MESSAGE(fakeLcdRs, "RS");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0b00110000, fakeLcdData, "DATA");
 }
-/*
+
 void test_lcdConfigure_called_expectLcdIsConfiguredInNybbleMode(void)
 {
+	static const struct EventSubscription onLcdEnabledSubscription =
+	{
+		.type = LCD_ENABLED,
+		.handler = &onLcdEnabled,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onLcdEnabledSubscription);
+
 	lcdEnable();
-	while (!fakeLcdIsSessionInvalid && !fakeLcdIsConfigured)
+	while (!fakeLcdIsSessionInvalid && !isLcdEnabled)
 		poll();
 
 	TEST_ASSERT_TRUE(fakeLcdIsNybbleMode);
 }
-*/
 
-static void voltageRegulatorInitialise(void)
+static void onLcdEnabled(const struct Event *event)
 {
-	ANSELBbits.ANSB2 = 0;
-	LATBbits.LATB2 = 0;
-	TRISBbits.TRISB2 = 0;
+	isLcdEnabled = 1;
 }
 
 void voltageRegulatorEnable(void)
