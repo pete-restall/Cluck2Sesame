@@ -36,9 +36,26 @@ static void lcdConfigureAsNybbleMode(void *const state)
 		lcdWriteNybble(LCD_NYBBLE_INSTRUCTION | 0b00000011);
 		nearSchedulerAdd(&waitForLcdToStabilise);
 	}
-//	// wait 8ms (after the three 0011 8-bit-set instructions)
-//	rs=0, db7-4=0010
-//	// wait 8ms
+	else
+	{
+		lcdWriteNybble(LCD_NYBBLE_INSTRUCTION | 0b00000010);
+
+/*
+		static const uint8_t configuration[] =
+		{
+			LCD_CMD_FUNCTION | LCD_CMD_FUNCTION_TWOLINES | LCD_CMD_FUNCTION_FONT5X8,
+			LCD_CMD_DISPLAYOFF,
+			LCD_CMD_DISPLAYCLEAR,
+			LCD_CMD_ENTRYMODE | LCD_CMD_ENTRYMODE_INCREMENT | LCD_ENTRYMODE_NOSHIFT,
+			LCD_CMD_DONE
+		};
+
+		lcdSendCommands(configuration);
+*/
+
+		static const struct LcdEnabled emptyEventArgs = { };
+		eventPublish(LCD_ENABLED, &emptyEventArgs); // TODO: THE COMMANDS ABOVE NEED EXECUTING BEFORE THIS EVENT IT PUBLISHED
+	}
 }
 
 static void lcdWriteNybble(uint8_t nybble)
@@ -54,16 +71,6 @@ static void lcdWriteNybble(uint8_t nybble)
 
 #if 0
 /*
-	static const uint8_t configuration[] =
-	{
-		LCD_CMD_FUNCTION | LCD_CMD_FUNCTION_TWOLINES | LCD_CMD_FUNCTION_FONT5X8,
-		LCD_CMD_DISPLAYOFF,
-		LCD_CMD_DISPLAYCLEAR,
-		LCD_CMD_ENTRYMODE | LCD_CMD_ENTRYMODE_INCREMENT | LCD_ENTRYMODE_NOSHIFT,
-		LCD_CMD_DONE
-	};
-
-	lcdSendCommands(configuration);
 */
 }
 

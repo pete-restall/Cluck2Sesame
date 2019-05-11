@@ -113,7 +113,6 @@ begin
 			wait on fakeLcdCommandIndex;
 			if fakeLcdRs == 0 then
 				if fakeLcdCommand / 16 == 2#0010# then
-					fakeLcdIsNybbleMode := 1;
 					if fakeLcdIsConfigured != 0 then
 						report("[FAKE LCD] FUNCTION SET TO NYBBLE MODE (40us)");
 						wait for 40 us;
@@ -121,6 +120,7 @@ begin
 						report("[FAKE LCD] FUNCTION SET TO NYBBLE MODE (5ms)");
 						wait for 5 ms;
 					end if;
+					fakeLcdIsNybbleMode := 1;
 					fakeLcdBusyFlag := 0;
 				elsif fakeLcdCommand / 16 == 2#0011# then
 					fakeLcdIsNybbleMode := 0;
@@ -137,6 +137,7 @@ begin
 						lastInitialFunctionSetCommandIndex := fakeLcdCommandIndex;
 						wait for 5 ms;
 					end if;
+					fakeLcdIsNybbleMode := 0;
 					fakeLcdBusyFlag := 0;
 				end if;
 			end if;
