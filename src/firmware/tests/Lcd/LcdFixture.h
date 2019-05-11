@@ -4,6 +4,7 @@
 extern void fakeLcdInitialise(void);
 extern void fakeLcdShutdown(void);
 extern uint8_t fakeLcdIsInvalidState(void);
+extern void fakeLcdAssertFunctionSet(uint8_t value);
 
 extern volatile uint8_t fakeLcdIsSessionInvalid;
 extern volatile uint8_t fakeLcdRs;

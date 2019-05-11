@@ -5,41 +5,62 @@
 
 #include "Lcd.h"
 
-#define LCD_NYBBLE_INSTRUCTION 0b00000000
+#define LCD_NYBBLE_CMD 0b00000000
 #define LCD_NYBBLE_DATA 0b10000000
 
-static void lcdConfigureAsNybbleMode(void *const state);
+static void lcdConfigureStateMachine(void *const state);
 static void lcdWriteNybble(uint8_t nybble);
+static void lcdWriteCommand(uint8_t byte);
 
 void lcdConfigure(void)
 {
 	static const struct NearSchedule waitForLcdToStabilise =
 	{
 		.ticks = MS_TO_TICKS(48),
-		.handler = lcdConfigureAsNybbleMode
+		.handler = lcdConfigureStateMachine
 	};
 
 	nearSchedulerAdd(&waitForLcdToStabilise);
 	PWM5CONbits.PWM5EN = 1;
 }
 
-static void lcdConfigureAsNybbleMode(void *const state)
+static void lcdConfigureStateMachine(void *const state)
 {
-	struct NearSchedule waitForLcdToStabilise =
+	static const struct LcdEnabled emptyEventArgs = { };
+
+	struct NearSchedule waitForLcdCommand =
 	{
 		.ticks = MS_TO_TICKS(8),
-		.handler = lcdConfigureAsNybbleMode,
+		.handler = lcdConfigureStateMachine,
 		.state = (void *) (((int) state) + 1)
 	};
 
-	if ((int) state < 3)
+	switch ((int) state)
 	{
-		lcdWriteNybble(LCD_NYBBLE_INSTRUCTION | 0b00000011);
-		nearSchedulerAdd(&waitForLcdToStabilise);
+		case 0:
+		case 1:
+		case 2:
+			lcdWriteNybble(LCD_NYBBLE_CMD | 0b00000011);
+			break;
+
+		case 3:
+			lcdWriteNybble(LCD_NYBBLE_CMD | 0b00000010);
+			break;
+
+		case 4:
+			lcdWriteCommand(
+				LCD_CMD_FUNCTION |
+				LCD_CMD_FUNCTION_TWOLINES |
+				LCD_CMD_FUNCTION_FONT5X8);
+
+			break;
+
+		default:
+			eventPublish(LCD_ENABLED, &emptyEventArgs);
+			waitForLcdCommand.handler = (NearScheduleHandler) 0;
 	}
-	else
-	{
-		lcdWriteNybble(LCD_NYBBLE_INSTRUCTION | 0b00000010);
+
+	nearSchedulerAdd(&waitForLcdCommand);
 
 /*
 		static const uint8_t configuration[] =
@@ -51,12 +72,8 @@ static void lcdConfigureAsNybbleMode(void *const state)
 			LCD_CMD_DONE
 		};
 
-		lcdSendCommands(configuration);
+		lcdWriteCommands(configuration);
 */
-
-		static const struct LcdEnabled emptyEventArgs = { };
-		eventPublish(LCD_ENABLED, &emptyEventArgs); // TODO: THE COMMANDS ABOVE NEED EXECUTING BEFORE THIS EVENT IT PUBLISHED
-	}
 }
 
 static void lcdWriteNybble(uint8_t nybble)
@@ -70,11 +87,13 @@ static void lcdWriteNybble(uint8_t nybble)
 	LATAbits.LATA4 = 0;
 }
 
-#if 0
-/*
-*/
+static void lcdWriteCommand(uint8_t byte)
+{
+	lcdWriteNybble(LCD_NYBBLE_CMD | ((byte >> 4) & 0b00001111));
+	lcdWriteNybble(LCD_NYBBLE_CMD | ((byte >> 0) & 0b00001111));
 }
 
+#if 0
 /*
 #define LCD_CMD_MASK_FOR_SHORTDELAY 0b11111100
 

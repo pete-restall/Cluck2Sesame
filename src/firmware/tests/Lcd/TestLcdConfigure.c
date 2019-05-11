@@ -96,6 +96,12 @@ void test_lcdConfigure_called_expectLcdContrastPwmIsEnabled(void)
 	TEST_ASSERT_TRUE(PWM5CONbits.PWM5EN);
 }
 
+void test_lcdConfigure_called_expectFunctionSetForTwoLinesAnd5x8Font(void)
+{
+	enableLcdAndWaitUntilDone();
+	fakeLcdAssertFunctionSet(LCD_CMD_FUNCTION_TWOLINES | LCD_CMD_FUNCTION_FONT5X8);
+}
+
 void voltageRegulatorEnable(void)
 {
 	LATBbits.LATB2 = 1;

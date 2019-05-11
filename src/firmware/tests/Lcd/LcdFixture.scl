@@ -10,6 +10,7 @@ configuration for "PIC16F15355" is
 	shared variable fakeLcdCommand;
 	shared variable fakeLcdBusyFlag;
 	shared variable fakeLcdCommandIndex;
+	shared variable fakeLcdRegFunctionSet;
 end configuration;
 
 testbench for "PIC16F15355" is
@@ -25,6 +26,7 @@ begin
 			fakeLcdIsNybbleMode := 0;
 			fakeLcdRs := 0;
 			fakeLcdData := 0;
+			fakeLcdRegFunctionSet := 0;
 		end loop;
 	end process;
 
@@ -46,9 +48,12 @@ begin
 		loop
 			wait on RA4;
 			if RA4 == '0' then
+				report("[FAKE LCD] Received bus strobe:");
 				if RA3 == '0' then
+					report("[FAKE LCD]     RS=0 (command)");
 					fakeLcdRs := 0;
 				else
+					report("[FAKE LCD]     RS=1 (data)");
 					fakeLcdRs := 1;
 				end if;
 
@@ -74,34 +79,37 @@ begin
 				else
 					fakeLcdClocked := 0;
 				end if;
-
-				report("[FAKE LCD] Received byte.");
 			end if;
 		end loop;
 	end process;
 
 	lcdCommandCapture: process is
 		variable isHighNybble : boolean;
+		variable someRandomHackToStopIndexOutOfRange : integer;
 	begin
 		isHighNybble := true;
 		loop
 			wait on fakeLcdClocked;
 			if fakeLcdIsNybbleMode != 0 then
 				if isHighNybble then
+					report("[FAKE LCD]     State=HIGH NYBBLE");
 					fakeLcdCommand := fakeLcdData;
 					isHighNybble := false;
 				else
+					report("[FAKE LCD]     State=LOW NYBBLE");
 					fakeLcdCommand := fakeLcdCommand + fakeLcdData / 16;
 					fakeLcdCommandIndex := fakeLcdCommandIndex + 1;
 					isHighNybble := true;
 					fakeLcdBusyFlag := 1;
 				end if;
 			else
+				report("[FAKE LCD]     State=BYTE");
 				fakeLcdCommand := fakeLcdData;
 				fakeLcdCommandIndex := fakeLcdCommandIndex + 1;
 				isHighNybble := true;
 				fakeLcdBusyFlag := 1;
 			end if;
+			someRandomHackToStopIndexOutOfRange := 666;
 		end loop;
 	end process;
 
@@ -113,22 +121,27 @@ begin
 			wait on fakeLcdCommandIndex;
 			if fakeLcdRs == 0 then
 				if fakeLcdCommand / 16 == 2#0010# then
+					report("[FAKE LCD]     Command=FUNCTION SET");
+					report("[FAKE LCD]         Mode=NYBBLE");
 					if fakeLcdIsConfigured != 0 then
-						report("[FAKE LCD] FUNCTION SET TO NYBBLE MODE (40us)");
+						report("[FAKE LCD]         Busy time=40us");
 						wait for 40 us;
 					else
-						report("[FAKE LCD] FUNCTION SET TO NYBBLE MODE (5ms)");
+						report("[FAKE LCD]         Busy time=5ms");
 						wait for 5 ms;
 					end if;
 					fakeLcdIsNybbleMode := 1;
+					fakeLcdRegFunctionSet := fakeLcdCommand;
 					fakeLcdBusyFlag := 0;
 				elsif fakeLcdCommand / 16 == 2#0011# then
+					report("[FAKE LCD]     Command=FUNCTION SET");
+					report("[FAKE LCD]         Mode=BYTE");
 					fakeLcdIsNybbleMode := 0;
 					if fakeLcdIsConfigured != 0 then
-						report("[FAKE LCD] FUNCTION SET TO BYTE MODE (40us)");
+						report("[FAKE LCD]         Busy time=40us");
 						wait for 40 us;
 					else
-						report("[FAKE LCD] FUNCTION SET TO BYTE MODE (5ms)");
+						report("[FAKE LCD]         Busy time=5ms");
 						if fakeLcdCommandIndex == lastInitialFunctionSetCommandIndex + 1 then
 							fakeLcdInitialFunctionSetCount := fakeLcdInitialFunctionSetCount + 1;
 						else
@@ -138,6 +151,7 @@ begin
 						wait for 5 ms;
 					end if;
 					fakeLcdIsNybbleMode := 0;
+					fakeLcdRegFunctionSet := fakeLcdCommand;
 					fakeLcdBusyFlag := 0;
 				end if;
 			end if;

@@ -1,6 +1,8 @@
 #include <xc.h>
 #include <unity.h>
 
+#include "Lcd.h"
+
 #include "LcdFixture.h"
 #include "NonDeterminism.h"
 
@@ -17,6 +19,8 @@ volatile uint32_t fakeLcdCommandIndex;
 volatile uint8_t fakeLcdSessionIndex;
 volatile uint8_t fakeLcdIsSessionInvalid;
 
+volatile uint8_t fakeLcdRegFunctionSet;
+
 void fakeLcdInitialise(void)
 {
 	fakeLcdSessionIndex++;
@@ -25,4 +29,9 @@ void fakeLcdInitialise(void)
 void fakeLcdShutdown(void)
 {
 	TEST_ASSERT_FALSE_MESSAGE(fakeLcdIsSessionInvalid, "LCD violations !");
+}
+
+void fakeLcdAssertFunctionSet(uint8_t value)
+{
+	TEST_ASSERT_EQUAL_HEX8(LCD_CMD_FUNCTION | value, fakeLcdRegFunctionSet);
 }
