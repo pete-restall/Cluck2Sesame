@@ -52,7 +52,25 @@ static void lcdConfigureStateMachine(void *const state)
 				LCD_CMD_FUNCTION |
 				LCD_CMD_FUNCTION_TWOLINES |
 				LCD_CMD_FUNCTION_FONT5X8);
+			break;
 
+		case 5:
+			lcdWriteCommand(LCD_CMD_DISPLAY | LCD_CMD_DISPLAY_OFF);
+			break;
+
+		case 6:
+			lcdWriteCommand(LCD_CMD_DISPLAYCLEAR);
+			break;
+
+		case 7:
+			lcdWriteCommand(
+				LCD_CMD_ENTRYMODE |
+				LCD_CMD_ENTRYMODE_INCREMENT |
+				LCD_CMD_ENTRYMODE_NOSHIFT);
+			break;
+
+		case 8:
+			lcdWriteCommand(LCD_CMD_DISPLAY | LCD_CMD_DISPLAY_ON);
 			break;
 
 		default:
@@ -61,19 +79,6 @@ static void lcdConfigureStateMachine(void *const state)
 	}
 
 	nearSchedulerAdd(&waitForLcdCommand);
-
-/*
-		static const uint8_t configuration[] =
-		{
-			LCD_CMD_FUNCTION | LCD_CMD_FUNCTION_TWOLINES | LCD_CMD_FUNCTION_FONT5X8,
-			LCD_CMD_DISPLAYOFF,
-			LCD_CMD_DISPLAYCLEAR,
-			LCD_CMD_ENTRYMODE | LCD_CMD_ENTRYMODE_INCREMENT | LCD_ENTRYMODE_NOSHIFT,
-			LCD_CMD_DONE
-		};
-
-		lcdWriteCommands(configuration);
-*/
 }
 
 static void lcdWriteNybble(uint8_t nybble)
@@ -93,6 +98,7 @@ static void lcdWriteCommand(uint8_t byte)
 	lcdWriteNybble(LCD_NYBBLE_CMD | ((byte >> 0) & 0b00001111));
 }
 
+// TODO: IN lcdWriteCommand() WE PROBABLY WANT SOMETHING LIKE THIS...?
 #if 0
 /*
 #define LCD_CMD_MASK_FOR_SHORTDELAY 0b11111100

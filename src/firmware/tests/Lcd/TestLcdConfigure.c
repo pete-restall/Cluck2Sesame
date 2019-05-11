@@ -99,7 +99,36 @@ void test_lcdConfigure_called_expectLcdContrastPwmIsEnabled(void)
 void test_lcdConfigure_called_expectFunctionSetForTwoLinesAnd5x8Font(void)
 {
 	enableLcdAndWaitUntilDone();
-	fakeLcdAssertFunctionSet(LCD_CMD_FUNCTION_TWOLINES | LCD_CMD_FUNCTION_FONT5X8);
+	fakeLcdAssertFunctionRegister(
+		LCD_CMD_FUNCTION_TWOLINES | LCD_CMD_FUNCTION_FONT5X8);
+}
+
+void test_lcdConfigure_called_expectDisplayIsCleared(void)
+{
+	enableLcdAndWaitUntilDone();
+	for (uint8_t i = 0; i < 32; i++)
+	{
+		TEST_ASSERT_EQUAL_HEX8(' ', fakeLcdDram[i]);
+	}
+}
+
+void test_lcdConfigure_called_expectDdramAddressIsZero(void)
+{
+	enableLcdAndWaitUntilDone();
+	fakeLcdAssertDdramAddressRegisterIs(0);
+}
+
+void test_lcdConfigure_called_expectEntryModeSetForIncrementingAddressesAndNoShifting(void)
+{
+	enableLcdAndWaitUntilDone();
+	fakeLcdAssertEntryModeRegister(
+		LCD_CMD_ENTRYMODE_INCREMENT | LCD_CMD_ENTRYMODE_NOSHIFT);
+}
+
+void test_lcdConfigure_called_expectDisplayIsOnWithCursorAndBlinkingBothOff(void)
+{
+	enableLcdAndWaitUntilDone();
+	fakeLcdAssertDisplayRegister(LCD_CMD_DISPLAY_ON);
 }
 
 void voltageRegulatorEnable(void)

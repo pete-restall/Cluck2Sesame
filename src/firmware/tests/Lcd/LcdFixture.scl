@@ -1,3 +1,4 @@
+// TODO: ALL OF THE TIMINGS SHOULD BE +/- 5% TO COVER THE WORST-CASE HFINTOSC DRIFT
 configuration for "PIC16F15355" is
 	shared variable fakeLcdSessionIndex;
 	shared variable fakeLcdIsSessionInvalid;
@@ -10,7 +11,44 @@ configuration for "PIC16F15355" is
 	shared variable fakeLcdCommand;
 	shared variable fakeLcdBusyFlag;
 	shared variable fakeLcdCommandIndex;
-	shared variable fakeLcdRegFunctionSet;
+	shared variable fakeLcdRegFunction;
+	shared variable fakeLcdRegDisplay;
+	shared variable fakeLcdRegEntryMode;
+	shared variable fakeLcdRegDdramAddress;
+
+	shared variable fakeLcdDram0_0;
+	shared variable fakeLcdDram0_1;
+	shared variable fakeLcdDram0_2;
+	shared variable fakeLcdDram0_3;
+	shared variable fakeLcdDram0_4;
+	shared variable fakeLcdDram0_5;
+	shared variable fakeLcdDram0_6;
+	shared variable fakeLcdDram0_7;
+	shared variable fakeLcdDram0_8;
+	shared variable fakeLcdDram0_9;
+	shared variable fakeLcdDram0_10;
+	shared variable fakeLcdDram0_11;
+	shared variable fakeLcdDram0_12;
+	shared variable fakeLcdDram0_13;
+	shared variable fakeLcdDram0_14;
+	shared variable fakeLcdDram0_15;
+
+	shared variable fakeLcdDram1_0;
+	shared variable fakeLcdDram1_1;
+	shared variable fakeLcdDram1_2;
+	shared variable fakeLcdDram1_3;
+	shared variable fakeLcdDram1_4;
+	shared variable fakeLcdDram1_5;
+	shared variable fakeLcdDram1_6;
+	shared variable fakeLcdDram1_7;
+	shared variable fakeLcdDram1_8;
+	shared variable fakeLcdDram1_9;
+	shared variable fakeLcdDram1_10;
+	shared variable fakeLcdDram1_11;
+	shared variable fakeLcdDram1_12;
+	shared variable fakeLcdDram1_13;
+	shared variable fakeLcdDram1_14;
+	shared variable fakeLcdDram1_15;
 end configuration;
 
 testbench for "PIC16F15355" is
@@ -26,7 +64,9 @@ begin
 			fakeLcdIsNybbleMode := 0;
 			fakeLcdRs := 0;
 			fakeLcdData := 0;
-			fakeLcdRegFunctionSet := 0;
+			fakeLcdRegFunction := 0;
+			fakeLcdRegDisplay := 0;
+			fakeLcdRegEntryMode := 0;
 		end loop;
 	end process;
 
@@ -131,7 +171,7 @@ begin
 						wait for 5 ms;
 					end if;
 					fakeLcdIsNybbleMode := 1;
-					fakeLcdRegFunctionSet := fakeLcdCommand;
+					fakeLcdRegFunction := fakeLcdCommand;
 					fakeLcdBusyFlag := 0;
 				elsif fakeLcdCommand / 16 == 2#0011# then
 					report("[FAKE LCD]     Command=FUNCTION SET");
@@ -151,7 +191,127 @@ begin
 						wait for 5 ms;
 					end if;
 					fakeLcdIsNybbleMode := 0;
-					fakeLcdRegFunctionSet := fakeLcdCommand;
+					fakeLcdRegFunction := fakeLcdCommand;
+					fakeLcdBusyFlag := 0;
+				end if;
+			end if;
+		end loop;
+	end process;
+
+	lcdCommandDisplaySet: process is
+		variable displayFlags : integer;
+	begin
+		loop
+			wait on fakeLcdCommandIndex;
+			if fakeLcdRs == 0 then
+				if fakeLcdCommand / 8 == 2#00001# then
+					report("[FAKE LCD]     Command=DISPLAY SET");
+					report("[FAKE LCD]         Busy time=40us");
+
+					displayFlags := fakeLcdCommand - 8;
+					if displayFlags / 4 == 0 then
+						report("[FAKE LCD]         Display=OFF");
+					else
+						report("[FAKE LCD]         Display=ON");
+						displayFlags := displayFlags - 4;
+					end if;
+					if displayFlags / 2 == 0 then
+						report("[FAKE LCD]         Cursor=OFF");
+					else
+						report("[FAKE LCD]         Cursor=ON");
+						displayFlags := displayFlags - 2;
+					end if;
+					if displayFlags == 0 then
+						report("[FAKE LCD]         Blinking=OFF");
+					else
+						report("[FAKE LCD]         Blinking=ON");
+						displayFlags := displayFlags - 1;
+					end if;
+
+					wait for 40 us;
+					fakeLcdRegDisplay := fakeLcdCommand;
+					fakeLcdBusyFlag := 0;
+				end if;
+			end if;
+		end loop;
+	end process;
+
+	lcdCommandEntryModeSet: process is
+		variable entryModeFlags : integer;
+	begin
+		loop
+			wait on fakeLcdCommandIndex;
+			if fakeLcdRs == 0 then
+				if fakeLcdCommand / 4 == 2#00000001# then
+					report("[FAKE LCD]     Command=ENTRY MODE SET");
+					report("[FAKE LCD]         Busy time=40us");
+
+					entryModeFlags := fakeLcdCommand - 4;
+					if entryModeFlags / 2 == 0 then
+						report("[FAKE LCD]         Address=DECREMENT");
+					else
+						report("[FAKE LCD]         Address=INCREMENT");
+						entryModeFlags := entryModeFlags - 2;
+					end if;
+					if entryModeFlags == 0 then
+						report("[FAKE LCD]         Shift=OFF");
+					else
+						report("[FAKE LCD]         Shift=ON");
+						entryModeFlags := entryModeFlags - 1;
+					end if;
+
+					wait for 40 us;
+					fakeLcdRegEntryMode := fakeLcdCommand;
+					fakeLcdBusyFlag := 0;
+				end if;
+			end if;
+		end loop;
+	end process;
+
+	lcdCommandDisplayClear: process is
+	begin
+		loop
+			wait on fakeLcdCommandIndex;
+			if fakeLcdRs == 0 then
+				if fakeLcdCommand == 2#00000001# then
+					report("[FAKE LCD]     Command=DISPLAY CLEAR");
+					report("[FAKE LCD]         Busy time=2ms");
+					wait for 2 ms;
+					fakeLcdDram0_0 := 16#20#;
+					fakeLcdDram0_1 := 16#20#;
+					fakeLcdDram0_2 := 16#20#;
+					fakeLcdDram0_3 := 16#20#;
+					fakeLcdDram0_4 := 16#20#;
+					fakeLcdDram0_5 := 16#20#;
+					fakeLcdDram0_6 := 16#20#;
+					fakeLcdDram0_7 := 16#20#;
+					fakeLcdDram0_8 := 16#20#;
+					fakeLcdDram0_9 := 16#20#;
+					fakeLcdDram0_10 := 16#20#;
+					fakeLcdDram0_11 := 16#20#;
+					fakeLcdDram0_12 := 16#20#;
+					fakeLcdDram0_13 := 16#20#;
+					fakeLcdDram0_14 := 16#20#;
+					fakeLcdDram0_15 := 16#20#;
+
+					fakeLcdDram1_0 := 16#20#;
+					fakeLcdDram1_1 := 16#20#;
+					fakeLcdDram1_2 := 16#20#;
+					fakeLcdDram1_3 := 16#20#;
+					fakeLcdDram1_4 := 16#20#;
+					fakeLcdDram1_5 := 16#20#;
+					fakeLcdDram1_6 := 16#20#;
+					fakeLcdDram1_7 := 16#20#;
+					fakeLcdDram1_8 := 16#20#;
+					fakeLcdDram1_9 := 16#20#;
+					fakeLcdDram1_10 := 16#20#;
+					fakeLcdDram1_11 := 16#20#;
+					fakeLcdDram1_12 := 16#20#;
+					fakeLcdDram1_13 := 16#20#;
+					fakeLcdDram1_14 := 16#20#;
+					fakeLcdDram1_15 := 16#20#;
+
+					fakeLcdRegDdramAddress := 0;
 					fakeLcdBusyFlag := 0;
 				end if;
 			end if;
