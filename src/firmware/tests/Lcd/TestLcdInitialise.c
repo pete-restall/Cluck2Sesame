@@ -118,8 +118,11 @@ void test_lcdInitialise_called_expectContrastIsDefaultSetting(void)
 	PWM5DCH = anyByte();
 	PWM5DCL = anyByte();
 	lcdInitialise();
-	TEST_ASSERT_EQUAL_UINT8(nvmSettings.lcd.contrast, PWM5DCH);
-	TEST_ASSERT_EQUAL_UINT8(0, PWM5DCL);
+
+	uint8_t high = (nvmSettings.lcd.contrast >> 2) & 0b00111111;
+	uint8_t low = (nvmSettings.lcd.contrast << 6) & 0b11000000;
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(high, PWM5DCH, "H");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(low, PWM5DCL, "L");
 }
 
 void test_lcdInitialise_called_expectContrastPwmIsDisabled(void)
@@ -149,8 +152,11 @@ void test_lcdInitialise_called_expectBacklightBrightnessIsDefaultSetting(void)
 	PWM3DCH = anyByte();
 	PWM3DCL = anyByte();
 	lcdInitialise();
-	TEST_ASSERT_EQUAL_UINT8(nvmSettings.lcd.backlightBrightness, PWM3DCH);
-	TEST_ASSERT_EQUAL_UINT8(0, PWM3DCL);
+
+	uint8_t high = (nvmSettings.lcd.backlightBrightness >> 2) & 0b00111111;
+	uint8_t low = (nvmSettings.lcd.backlightBrightness << 6) & 0b11000000;
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(high, PWM3DCH, "H");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(low, PWM3DCL, "L");
 }
 
 void test_lcdInitialise_called_expectBacklightPwmIsDisabled(void)

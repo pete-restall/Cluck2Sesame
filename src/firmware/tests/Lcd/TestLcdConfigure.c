@@ -20,6 +20,7 @@ TEST_FILE("Lcd/LcdConfigure.c")
 extern void poll(void);
 
 static void voltageRegulatorInitialise(void);
+static void enableLcdAndWaitUntilDone(void);
 static void onLcdEnabled(const struct Event *event);
 void voltageRegulatorDisable(void);
 
@@ -64,6 +65,12 @@ void test_lcdConfigure_called_expectFirstByteSentToLcdIsFunctionSetForByteMode(v
 
 void test_lcdConfigure_called_expectLcdIsConfiguredInNybbleMode(void)
 {
+	enableLcdAndWaitUntilDone();
+	TEST_ASSERT_TRUE(fakeLcdIsNybbleMode);
+}
+
+static void enableLcdAndWaitUntilDone(void)
+{
 	static const struct EventSubscription onLcdEnabledSubscription =
 	{
 		.type = LCD_ENABLED,
@@ -76,13 +83,17 @@ void test_lcdConfigure_called_expectLcdIsConfiguredInNybbleMode(void)
 	lcdEnable();
 	while (!fakeLcdIsSessionInvalid && !isLcdEnabled)
 		poll();
-
-	TEST_ASSERT_TRUE(fakeLcdIsNybbleMode);
 }
 
 static void onLcdEnabled(const struct Event *event)
 {
 	isLcdEnabled = 1;
+}
+
+void test_lcdConfigure_called_expectLcdContrastPwmIsEnabled(void)
+{
+	enableLcdAndWaitUntilDone();
+	TEST_ASSERT_TRUE(PWM5CONbits.PWM5EN);
 }
 
 void voltageRegulatorEnable(void)

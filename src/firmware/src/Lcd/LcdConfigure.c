@@ -20,6 +20,7 @@ void lcdConfigure(void)
 	};
 
 	nearSchedulerAdd(&waitForLcdToStabilise);
+	PWM5CONbits.PWM5EN = 1;
 }
 
 static void lcdConfigureAsNybbleMode(void *const state)
