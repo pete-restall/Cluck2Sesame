@@ -1,2 +1,2 @@
-stim "${cwd}/LcdFixture.scl"
+stim "${cwd}/FakeLcd.scl"
 run

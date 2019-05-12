@@ -1,19 +1,8 @@
 #ifndef __CLUCK3SESAME_TESTS_LCD_LCDFIXTURE_H
 #define __CLUCK3SESAME_TESTS_LCD_LCDFIXTURE_H
 
-extern void fakeLcdInitialise(void);
-extern void fakeLcdShutdown(void);
-extern uint8_t fakeLcdIsInvalidState(void);
-extern void fakeLcdAssertFunctionRegister(uint8_t flags);
-extern void fakeLcdAssertDisplayRegister(uint8_t flags);
-extern void fakeLcdAssertEntryModeRegister(uint8_t flags);
-extern void fakeLcdAssertDdramAddressRegisterIs(uint8_t address);
-
-extern volatile uint8_t fakeLcdIsSessionInvalid;
-extern volatile uint8_t fakeLcdRs;
-extern volatile uint8_t fakeLcdData;
-extern volatile uint8_t fakeLcdIsConfigured;
-extern volatile uint8_t fakeLcdIsNybbleMode;
-extern volatile uint8_t fakeLcdDram[16 * 2];
+extern void lcdFixtureInitialise(void);
+extern void lcdFixtureShutdown(void);
+extern void enableLcdAndWaitUntilDone(void);
 
 #endif

@@ -1,94 +1,84 @@
 #include <xc.h>
 #include <unity.h>
 
+#include "Event.h"
+#include "Clock.h"
+#include "PowerManagement.h"
+#include "NearScheduler.h"
+#include "PwmTimer.h"
 #include "Lcd.h"
 
+#include "FakeLcd.h"
 #include "LcdFixture.h"
 #include "NonDeterminism.h"
 
-#define DRAM_ADDR(x) __at(0x23a0 + (x))
+extern void poll(void);
 
-volatile uint8_t fakeLcdRs;
-volatile uint8_t fakeLcdData;
-volatile uint8_t fakeLcdInitialFunctionSetCount;
-volatile uint8_t fakeLcdIsConfigured;
-volatile uint8_t fakeLcdIsNybbleMode;
-volatile uint8_t fakeLcdClocked;
-volatile uint8_t fakeLcdCommand;
-volatile uint8_t fakeLcdBusyFlag;
-volatile uint32_t fakeLcdCommandIndex;
+static void voltageRegulatorInitialise(void);
+static void onLcdEnabled(const struct Event *event);
+void voltageRegulatorDisable(void);
 
-volatile uint8_t fakeLcdSessionIndex;
-volatile uint8_t fakeLcdIsSessionInvalid;
+static uint8_t isLcdEnabled;
 
-volatile uint8_t fakeLcdRegFunction;
-volatile uint8_t fakeLcdRegDisplay;
-volatile uint8_t fakeLcdRegEntryMode;
-volatile uint8_t fakeLcdRegDdramAddress;
-
-volatile uint8_t fakeLcdDram[16 * 2] DRAM_ADDR(0);
-volatile uint8_t fakeLcdDram0_0 DRAM_ADDR(0);
-volatile uint8_t fakeLcdDram0_1 DRAM_ADDR(1);
-volatile uint8_t fakeLcdDram0_2 DRAM_ADDR(2);
-volatile uint8_t fakeLcdDram0_3 DRAM_ADDR(3);
-volatile uint8_t fakeLcdDram0_4 DRAM_ADDR(4);
-volatile uint8_t fakeLcdDram0_5 DRAM_ADDR(5);
-volatile uint8_t fakeLcdDram0_6 DRAM_ADDR(6);
-volatile uint8_t fakeLcdDram0_7 DRAM_ADDR(7);
-volatile uint8_t fakeLcdDram0_8 DRAM_ADDR(8);
-volatile uint8_t fakeLcdDram0_9 DRAM_ADDR(9);
-volatile uint8_t fakeLcdDram0_10 DRAM_ADDR(10);
-volatile uint8_t fakeLcdDram0_11 DRAM_ADDR(11);
-volatile uint8_t fakeLcdDram0_12 DRAM_ADDR(12);
-volatile uint8_t fakeLcdDram0_13 DRAM_ADDR(13);
-volatile uint8_t fakeLcdDram0_14 DRAM_ADDR(14);
-volatile uint8_t fakeLcdDram0_15 DRAM_ADDR(15);
-volatile uint8_t fakeLcdDram1_0 DRAM_ADDR(16);
-volatile uint8_t fakeLcdDram1_1 DRAM_ADDR(17);
-volatile uint8_t fakeLcdDram1_2 DRAM_ADDR(18);
-volatile uint8_t fakeLcdDram1_3 DRAM_ADDR(19);
-volatile uint8_t fakeLcdDram1_4 DRAM_ADDR(20);
-volatile uint8_t fakeLcdDram1_5 DRAM_ADDR(21);
-volatile uint8_t fakeLcdDram1_6 DRAM_ADDR(22);
-volatile uint8_t fakeLcdDram1_7 DRAM_ADDR(23);
-volatile uint8_t fakeLcdDram1_8 DRAM_ADDR(24);
-volatile uint8_t fakeLcdDram1_9 DRAM_ADDR(25);
-volatile uint8_t fakeLcdDram1_10 DRAM_ADDR(26);
-volatile uint8_t fakeLcdDram1_11 DRAM_ADDR(27);
-volatile uint8_t fakeLcdDram1_12 DRAM_ADDR(28);
-volatile uint8_t fakeLcdDram1_13 DRAM_ADDR(29);
-volatile uint8_t fakeLcdDram1_14 DRAM_ADDR(30);
-volatile uint8_t fakeLcdDram1_15 DRAM_ADDR(31);
-
-void fakeLcdInitialise(void)
+void lcdFixtureInitialise(void)
 {
-	for (uint8_t i = 0; i < sizeof(fakeLcdDram); i++)
-		fakeLcdDram[i] = i;
+	eventInitialise();
+	clockInitialise();
+	powerManagementInitialise();
+	nearSchedulerInitialise();
+	pwmTimerInitialise();
+	voltageRegulatorInitialise();
+	lcdInitialise();
+	fakeLcdInitialise();
 
-	fakeLcdSessionIndex++;
+	isLcdEnabled = 0;
 }
 
-void fakeLcdShutdown(void)
+static void voltageRegulatorInitialise(void)
 {
-	TEST_ASSERT_FALSE_MESSAGE(fakeLcdIsSessionInvalid, "LCD violations !");
+	ANSELBbits.ANSB2 = 0;
+	LATBbits.LATB2 = 0;
+	TRISBbits.TRISB2 = 0;
 }
 
-void fakeLcdAssertFunctionRegister(uint8_t flags)
+void lcdFixtureShutdown(void)
 {
-	TEST_ASSERT_EQUAL_HEX8(LCD_CMD_FUNCTION | flags, fakeLcdRegFunction);
+	fakeLcdShutdown();
+	voltageRegulatorDisable();
 }
 
-void fakeLcdAssertDisplayRegister(uint8_t flags)
+void enableLcdAndWaitUntilDone(void)
 {
-	TEST_ASSERT_EQUAL_HEX8(LCD_CMD_DISPLAY | flags, fakeLcdRegDisplay);
+	static const struct EventSubscription onLcdEnabledSubscription =
+	{
+		.type = LCD_ENABLED,
+		.handler = &onLcdEnabled,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onLcdEnabledSubscription);
+
+	lcdEnable();
+	while (!fakeLcdIsSessionInvalid && !isLcdEnabled)
+		poll();
 }
 
-void fakeLcdAssertEntryModeRegister(uint8_t flags)
+static void onLcdEnabled(const struct Event *event)
 {
-	TEST_ASSERT_EQUAL_HEX8(LCD_CMD_ENTRYMODE | flags, fakeLcdRegEntryMode);
+	isLcdEnabled = 1;
 }
 
-void fakeLcdAssertDdramAddressRegisterIs(uint8_t address)
+void voltageRegulatorEnable(void)
 {
-	TEST_ASSERT_EQUAL_HEX8(address, fakeLcdRegDdramAddress);
+	LATBbits.LATB2 = 1;
+}
+
+void voltageRegulatorDisable(void)
+{
+	LATBbits.LATB2 = 0;
+}
+
+uint8_t voltageRegulatorIsEnabled(void)
+{
+	return LATBbits.LATB2 != 0;
 }
