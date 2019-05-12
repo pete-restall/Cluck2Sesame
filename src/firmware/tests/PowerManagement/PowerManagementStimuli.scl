@@ -2,6 +2,7 @@ configuration for "PIC16F15355" is
 	shared variable sleepExecuted;
 	shared variable pie0BeforeSleep;
 	shared variable vregconBeforeSleep;
+	shared variable cpudozeBeforeSleep;
 end configuration;
 
 testbench for "PIC16F15355" is
@@ -23,6 +24,7 @@ begin
 			wait until STATUS.nPD == '0';
 			pie0BeforeSleep := PIE0;
 			vregconBeforeSleep := VREGCON;
+			cpudozeBeforeSleep := CPUDOZE;
 			sleepExecuted := 1;
 			wait for 1 us;
 			STATUS.nPD := '1';

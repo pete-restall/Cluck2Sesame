@@ -29,7 +29,7 @@ void pwmTimerInitialise(void)
 
 	PR2 = 63;
 	PIR4bits.TMR2IF = 0;
-	PIE4bits.TMR2IE = 1;
+	PIE4bits.TMR2IE = 0;
 	enableCount = 0;
 }
 

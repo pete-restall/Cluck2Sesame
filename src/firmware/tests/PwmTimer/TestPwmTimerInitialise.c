@@ -91,10 +91,10 @@ void test_pwmTimerInitialise_called_expectTimerInterruptFlagIsCleared(void)
 	TEST_ASSERT_EQUAL_UINT8(originalPir4 & ~_PIR4_TMR2IF_MASK, PIR4);
 }
 
-void test_pwmTimerInitialise_called_expectTimerInterruptWakesDeviceFromSleep(void)
+void test_pwmTimerInitialise_called_expectTimerInterruptDoesNotWakeDeviceFromSleep(void)
 {
-	PIR4 = anyByteWithMaskClear(_PIE4_TMR2IE_MASK);
+	PIR4 = anyByteWithMaskSet(_PIE4_TMR2IE_MASK);
 	uint8_t originalPie4 = PIE4;
 	pwmTimerInitialise();
-	TEST_ASSERT_EQUAL_UINT8(originalPie4 | _PIE4_TMR2IE_MASK, PIE4);
+	TEST_ASSERT_EQUAL_UINT8(originalPie4 & ~_PIE4_TMR2IE_MASK, PIE4);
 }

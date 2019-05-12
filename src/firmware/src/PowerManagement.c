@@ -25,7 +25,15 @@ static void onAllEventsDispatched(const struct Event *event)
 	static const struct WokenFromSleep noEventArgs = { };
 	eventPublish(WOKEN_FROM_SLEEP, &noEventArgs);
 
+	if (T2CONbits.ON)
+		CPUDOZEbits.IDLEN = 1;
+	else
+		CPUDOZEbits.IDLEN = 0;
+
+	CPUDOZEbits.DOZEN = 0;
+
 	VREGCONbits.VREGPM = 1;
+
 	asm("sleep");
 	asm("nop");
 }
