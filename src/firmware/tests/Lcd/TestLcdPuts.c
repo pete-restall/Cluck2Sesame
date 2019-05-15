@@ -21,16 +21,18 @@ TEST_FILE("Lcd/LcdPuts.c")
 
 extern void poll(void);
 
-static void sendScreenToLcdAndWaitUntilDone(void);
-static void onScreenDisplayed(void *const state);
+static void sendLineToLcdAndWaitUntilDone(void);
+static void onLineDisplayed(void *const state);
 
-static uint8_t screen[sizeof(fakeLcdDram)];
+static uint8_t oneLine[sizeof(fakeLcdDram) / 2 + 1];
 
 void setUp(void)
 {
 	lcdFixtureInitialise();
-	for (uint8_t i = 0; i < sizeof(screen); i++)
-		screen[i] = '\0';
+	for (uint8_t i = 0; i < sizeof(oneLine); i++)
+		oneLine[i] = anyByte();
+
+	oneLine[sizeof(oneLine) - 1] = '\0';
 }
 
 void tearDown(void)
@@ -38,29 +40,29 @@ void tearDown(void)
 	lcdFixtureShutdown();
 }
 
-void test_lcdPuts_calledWithOneCharacterAfterLcdEnabled_expectCorrectBuffer(void)
+void test_lcdPuts_calledWithOneCharacterAfterLcdEnabled_expectCorrectDramBuffer(void)
 {
 	enableLcdAndWaitUntilDone();
 
-	screen[0] = anyByteExcept('\0');
-	screen[1] = '\0';
-	sendScreenToLcdAndWaitUntilDone();
+	oneLine[0] = anyByteExcept('\0');
+	oneLine[1] = '\0';
+	sendLineToLcdAndWaitUntilDone();
 
-	TEST_ASSERT_EQUAL_UINT8(screen[0], fakeLcdDram[0]);
+	TEST_ASSERT_EQUAL_UINT8(oneLine[0], fakeLcdDram[0]);
 	for (uint8_t i = 1; i < sizeof(fakeLcdDram); i++)
 	{
 		TEST_ASSERT_EQUAL_UINT8(' ', fakeLcdDram[i]);
 	}
 }
 
-static void sendScreenToLcdAndWaitUntilDone(void)
+static void sendLineToLcdAndWaitUntilDone(void)
 {
 	static uint8_t lcdCallbackDone;
 
 	static const struct LcdPutsTransaction transaction =
 	{
-		.buffer = screen,
-		.callback = &onScreenDisplayed,
+		.buffer = oneLine,
+		.callback = &onLineDisplayed,
 		.state = (void *) &lcdCallbackDone
 	};
 
@@ -70,8 +72,41 @@ static void sendScreenToLcdAndWaitUntilDone(void)
 		poll();
 }
 
-static void onScreenDisplayed(void *const state)
+static void onLineDisplayed(void *const state)
 {
 	TEST_ASSERT_NOT_NULL(state);
 	*((uint8_t *) state) = 1;
+}
+
+void test_lcdPuts_calledWithTwoCharacterAfterLcdEnabled_expectCorrectDramBuffer(void)
+{
+	enableLcdAndWaitUntilDone();
+
+	oneLine[0] = anyByteExcept('\0');
+	oneLine[1] = anyByteExcept('\0');
+	oneLine[2] = '\0';
+	sendLineToLcdAndWaitUntilDone();
+
+	TEST_ASSERT_EQUAL_UINT8(oneLine[0], fakeLcdDram[0]);
+	TEST_ASSERT_EQUAL_UINT8(oneLine[1], fakeLcdDram[1]);
+	for (uint8_t i = 2; i < sizeof(fakeLcdDram); i++)
+	{
+		TEST_ASSERT_EQUAL_UINT8(' ', fakeLcdDram[i]);
+	}
+}
+
+void test_lcdPuts_calledWithEntireLineOfCharactersAfterLcdEnabled_expectCorrectDramBuffer(void)
+{
+	enableLcdAndWaitUntilDone();
+	sendLineToLcdAndWaitUntilDone();
+
+	for (uint8_t i = 0; i < sizeof(fakeLcdDram) / 2; i++)
+	{
+		TEST_ASSERT_EQUAL_UINT8(oneLine[i], fakeLcdDram[i]);
+	}
+
+	for (uint8_t i = sizeof(fakeLcdDram) / 2; i < sizeof(fakeLcdDram); i++)
+	{
+		TEST_ASSERT_EQUAL_UINT8(' ', fakeLcdDram[i]);
+	}
 }
