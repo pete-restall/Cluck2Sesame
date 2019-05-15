@@ -9,6 +9,14 @@
 #define NCO_32768HZ_4MS_INCREMENT 8000
 #define NCOCLK_SOURCE_SOSC (0b0101 << _NCO1CLK_N1CKS_POSITION)
 
+static void buggyCompilerWorkaround(void)
+{
+	static const struct NearSchedule dummy =
+	{
+		.state = _OMNITARGET
+	};
+}
+
 static void onWokenFromSleep(const struct Event *const event);
 
 static uint8_t ticks;

@@ -25,8 +25,18 @@ struct LcdEnabled { EMPTY_EVENT_ARGS };
 
 #define LCD_CMD_DONE 0
 
+typedef void (*LcdTransactionCallback)(void *state);
+
+struct LcdPutsTransaction
+{
+	const uint8_t *buffer;
+	LcdTransactionCallback callback;
+	void *state;
+};
+
 extern void lcdInitialise(void);
 extern void lcdEnable(void);
 extern void lcdDisable(void);
+extern void lcdPuts(const struct LcdPutsTransaction *const transaction);
 
 #endif

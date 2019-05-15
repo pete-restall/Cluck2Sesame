@@ -14,6 +14,7 @@ configuration for "PIC16F15355" is
 	shared variable fakeLcdRegDisplay;
 	shared variable fakeLcdRegEntryMode;
 	shared variable fakeLcdRegDdramAddress;
+	shared variable fakeLcdDdramAddressIncrement;
 
 	shared variable fakeLcdDram0_0;
 	shared variable fakeLcdDram0_1;
@@ -66,6 +67,7 @@ begin
 			fakeLcdRegFunction := 0;
 			fakeLcdRegDisplay := 0;
 			fakeLcdRegEntryMode := 0;
+			fakeLcdDdramAddressIncrement := 0;
 		end loop;
 	end process;
 
@@ -248,8 +250,10 @@ begin
 					entryModeFlags := fakeLcdCommand - 4;
 					if entryModeFlags / 2 == 0 then
 						report("[FAKE LCD]         Address=DECREMENT");
+						fakeLcdDdramAddressIncrement := -1;
 					else
 						report("[FAKE LCD]         Address=INCREMENT");
+						fakeLcdDdramAddressIncrement := 1;
 						entryModeFlags := entryModeFlags - 2;
 					end if;
 					if entryModeFlags == 0 then
@@ -313,6 +317,60 @@ begin
 					fakeLcdRegDdramAddress := 0;
 					fakeLcdBusyFlag := 0;
 				end if;
+			end if;
+		end loop;
+	end process;
+
+	lcdCommandWriteData: process is
+	begin
+		loop
+			wait on fakeLcdCommandIndex;
+			if fakeLcdRs == 1 then
+				report("[FAKE LCD]     Command=WRITE TO DDRAM");
+				report("[FAKE LCD]         Busy time=40us+10%");
+				wait for 44 us;
+
+				if fakeLcdRegDdramAddress == 0 then
+					fakeLcdDram0_0 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 1 then
+					fakeLcdDram0_1 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 2 then
+					fakeLcdDram0_2 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 3 then
+					fakeLcdDram0_3 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 4 then
+					fakeLcdDram0_4 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 5 then
+					fakeLcdDram0_5 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 6 then
+					fakeLcdDram0_6 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 7 then
+					fakeLcdDram0_7 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 8 then
+					fakeLcdDram0_8 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 9 then
+					fakeLcdDram0_9 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 10 then
+					fakeLcdDram0_10 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 11 then
+					fakeLcdDram0_11 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 12 then
+					fakeLcdDram0_12 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 13 then
+					fakeLcdDram0_13 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 14 then
+					fakeLcdDram0_14 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 15 then
+					fakeLcdDram0_15 := fakeLcdCommand;
+				else
+					fakeLcdIsSessionInvalid := 1;
+					report("[FAKE LCD ASSERT] Written to invalid DDRAM address !");
+				end if;
+
+				if fakeLcdIsSessionInvalid == 0 then
+					fakeLcdRegDdramAddress := fakeLcdRegDdramAddress + fakeLcdDdramAddressIncrement;
+				end if;
+				fakeLcdBusyFlag := 0;
 			end if;
 		end loop;
 	end process;

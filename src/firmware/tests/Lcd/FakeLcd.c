@@ -25,6 +25,7 @@ volatile uint8_t fakeLcdRegFunction;
 volatile uint8_t fakeLcdRegDisplay;
 volatile uint8_t fakeLcdRegEntryMode;
 volatile uint8_t fakeLcdRegDdramAddress;
+volatile uint8_t fakeLcdDdramAddressIncrement;
 
 volatile uint8_t fakeLcdDram[16 * 2] DRAM_ADDR(0);
 volatile uint8_t fakeLcdDram0_0 DRAM_ADDR(0);
