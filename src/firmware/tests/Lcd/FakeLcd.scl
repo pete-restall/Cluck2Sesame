@@ -280,6 +280,7 @@ begin
 					report("[FAKE LCD]     Command=DISPLAY CLEAR");
 					report("[FAKE LCD]         Busy time=2ms+10%");
 					wait for 2200 us;
+
 					fakeLcdDram0_0 := 16#20#;
 					fakeLcdDram0_1 := 16#20#;
 					fakeLcdDram0_2 := 16#20#;
@@ -315,6 +316,22 @@ begin
 					fakeLcdDram1_15 := 16#20#;
 
 					fakeLcdRegDdramAddress := 0;
+					fakeLcdBusyFlag := 0;
+				end if;
+			end if;
+		end loop;
+	end process;
+
+	lcdCommandSetDdramAddress: process is
+	begin
+		loop
+			wait on fakeLcdCommandIndex;
+			if fakeLcdRs == 0 then
+				if fakeLcdCommand > 2#10000000# then
+					report("[FAKE LCD]     Command=SET DDRAM ADDRESS");
+					report("[FAKE LCD]         Busy time=40us+10%");
+					wait for 44us;
+					fakeLcdRegDdramAddress := fakeLcdCommand - 128;
 					fakeLcdBusyFlag := 0;
 				end if;
 			end if;
@@ -362,6 +379,38 @@ begin
 					fakeLcdDram0_14 := fakeLcdCommand;
 				elsif fakeLcdRegDdramAddress == 15 then
 					fakeLcdDram0_15 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 64 then
+					fakeLcdDram1_0 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 65 then
+					fakeLcdDram1_1 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 66 then
+					fakeLcdDram1_2 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 67 then
+					fakeLcdDram1_3 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 68 then
+					fakeLcdDram1_4 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 69 then
+					fakeLcdDram1_5 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 70 then
+					fakeLcdDram1_6 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 71 then
+					fakeLcdDram1_7 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 72 then
+					fakeLcdDram1_8 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 73 then
+					fakeLcdDram1_9 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 74 then
+					fakeLcdDram1_10 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 75 then
+					fakeLcdDram1_11 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 76 then
+					fakeLcdDram1_12 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 77 then
+					fakeLcdDram1_13 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 78 then
+					fakeLcdDram1_14 := fakeLcdCommand;
+				elsif fakeLcdRegDdramAddress == 79 then
+					fakeLcdDram1_15 := fakeLcdCommand;
 				else
 					fakeLcdIsSessionInvalid := 1;
 					report("[FAKE LCD ASSERT] Written to invalid DDRAM address !");
@@ -379,6 +428,7 @@ begin
 		variable powerOnTime : cycle;
 		variable cyclesIn44ms : cycle;
 		variable powerOnMonitoring : boolean;
+		variable someRandomHackToStopIndexOutOfRange2 : integer;
 	begin
 		cyclesIn44ms := 352000 ic;
 		loop
@@ -410,6 +460,7 @@ begin
 			else
 				report("[FAKE LCD] Power Off.");
 			end if;
+			someRandomHackToStopIndexOutOfRange2 := 666;
 		end loop;
 	end process;
 

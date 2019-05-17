@@ -12,6 +12,20 @@
 #define PPS_OUT_PWM3 0x0b
 #define PPS_OUT_PWM5 0x0d
 
+struct LcdState lcdState;
+
+static void buggyCompilerWorkaround(void)
+{
+	static const struct LcdPutsTransaction dummy =
+	{
+		.buffer = _OMNITARGET,
+		.state = _OMNITARGET
+	};
+
+	lcdState.transaction.state = _OMNITARGET;
+}
+
+
 void lcdInitialise(void)
 {
 	ANSELA &= PORTA_PIN_MASK;
@@ -31,7 +45,9 @@ void lcdInitialise(void)
 	PWM3DCL = nvmSettings.lcd.backlightBrightness << 6;
 	RC5PPS = PPS_OUT_PWM3;
 
-	lcdEnableCount = 0;
+	lcdState.enableCount = 0;
+	lcdState.flags.all = 0;
+	lcdState.flags.busy = 1;
 
 	static const struct EventSubscription onVoltageRegulatorEnabledSubscription =
 	{
@@ -41,4 +57,10 @@ void lcdInitialise(void)
 	};
 
 	eventSubscribe(&onVoltageRegulatorEnabledSubscription);
+}
+
+void lcdTransactionCompleted(void)
+{
+	lcdState.flags.busy = 0;
+	lcdState.transaction.callback(lcdState.transaction.state);
 }

@@ -71,7 +71,17 @@ void fakeLcdInitialise(void)
 
 void fakeLcdShutdown(void)
 {
+	fakeLcdAssertStateIsValid();
+}
+
+void fakeLcdAssertStateIsValid(void)
+{
 	TEST_ASSERT_FALSE_MESSAGE(fakeLcdIsSessionInvalid, "LCD violations !");
+}
+
+void fakeLcdAssertNotBusy(void)
+{
+	TEST_ASSERT_FALSE(fakeLcdBusyFlag);
 }
 
 void fakeLcdAssertFunctionRegister(uint8_t flags)

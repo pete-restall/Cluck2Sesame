@@ -1,5 +1,6 @@
 #ifndef __CLUCK3SESAME_SRC_LCD_H
 #define __CLUCK3SESAME_SRC_LCD_H
+#include <stdint.h>
 #include "Event.h"
 
 #define LCD_ENABLED ((EventType) 0x30)
@@ -34,9 +35,17 @@ struct LcdPutsTransaction
 	void *state;
 };
 
+struct LcdSetAddressTransaction
+{
+	uint8_t address;
+	LcdTransactionCallback callback;
+	void *state;
+};
+
 extern void lcdInitialise(void);
 extern void lcdEnable(void);
 extern void lcdDisable(void);
 extern void lcdPuts(const struct LcdPutsTransaction *const transaction);
+extern void lcdSetDdramAddress(const struct LcdSetAddressTransaction *const transaction);
 
 #endif

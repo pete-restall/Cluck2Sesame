@@ -22,17 +22,18 @@ TEST_FILE("Lcd/LcdPuts.c")
 extern void poll(void);
 
 static void sendLineToLcdAndWaitUntilDone(void);
+static void sendOffsetLineToLcdAndWaitUntilDone(uint8_t offset);
 static void onLineDisplayed(void *const state);
 
-static uint8_t oneLine[sizeof(fakeLcdDram) / 2 + 1];
+static uint8_t screen[sizeof(fakeLcdDram) + 1];
 
 void setUp(void)
 {
 	lcdFixtureInitialise();
-	for (uint8_t i = 0; i < sizeof(oneLine); i++)
-		oneLine[i] = anyByte();
+	for (uint8_t i = 0; i < sizeof(screen); i++)
+		screen[i] = anyByteExcept('\0');
 
-	oneLine[sizeof(oneLine) - 1] = '\0';
+	screen[sizeof(screen) - 1] = '\0';
 }
 
 void tearDown(void)
@@ -44,11 +45,10 @@ void test_lcdPuts_calledWithOneCharacterAfterLcdEnabled_expectCorrectDramBuffer(
 {
 	enableLcdAndWaitUntilDone();
 
-	oneLine[0] = anyByteExcept('\0');
-	oneLine[1] = '\0';
+	screen[1] = '\0';
 	sendLineToLcdAndWaitUntilDone();
 
-	TEST_ASSERT_EQUAL_UINT8(oneLine[0], fakeLcdDram[0]);
+	TEST_ASSERT_EQUAL_UINT8(screen[0], fakeLcdDram[0]);
 	for (uint8_t i = 1; i < sizeof(fakeLcdDram); i++)
 	{
 		TEST_ASSERT_EQUAL_UINT8(' ', fakeLcdDram[i]);
@@ -57,11 +57,16 @@ void test_lcdPuts_calledWithOneCharacterAfterLcdEnabled_expectCorrectDramBuffer(
 
 static void sendLineToLcdAndWaitUntilDone(void)
 {
+	sendOffsetLineToLcdAndWaitUntilDone(0);
+}
+
+static void sendOffsetLineToLcdAndWaitUntilDone(uint8_t offset)
+{
 	static uint8_t lcdCallbackDone;
 
-	static const struct LcdPutsTransaction transaction =
+	struct LcdPutsTransaction transaction =
 	{
-		.buffer = oneLine,
+		.buffer = &screen[offset],
 		.callback = &onLineDisplayed,
 		.state = (void *) &lcdCallbackDone
 	};
@@ -82,13 +87,11 @@ void test_lcdPuts_calledWithTwoCharacterAfterLcdEnabled_expectCorrectDramBuffer(
 {
 	enableLcdAndWaitUntilDone();
 
-	oneLine[0] = anyByteExcept('\0');
-	oneLine[1] = anyByteExcept('\0');
-	oneLine[2] = '\0';
+	screen[2] = '\0';
 	sendLineToLcdAndWaitUntilDone();
 
-	TEST_ASSERT_EQUAL_UINT8(oneLine[0], fakeLcdDram[0]);
-	TEST_ASSERT_EQUAL_UINT8(oneLine[1], fakeLcdDram[1]);
+	TEST_ASSERT_EQUAL_UINT8(screen[0], fakeLcdDram[0]);
+	TEST_ASSERT_EQUAL_UINT8(screen[1], fakeLcdDram[1]);
 	for (uint8_t i = 2; i < sizeof(fakeLcdDram); i++)
 	{
 		TEST_ASSERT_EQUAL_UINT8(' ', fakeLcdDram[i]);
@@ -98,14 +101,41 @@ void test_lcdPuts_calledWithTwoCharacterAfterLcdEnabled_expectCorrectDramBuffer(
 void test_lcdPuts_calledWithEntireLineOfCharactersAfterLcdEnabled_expectCorrectDramBuffer(void)
 {
 	enableLcdAndWaitUntilDone();
+
+	screen[sizeof(fakeLcdDram) / 2] = '\0';
 	sendLineToLcdAndWaitUntilDone();
 
 	for (uint8_t i = 0; i < sizeof(fakeLcdDram) / 2; i++)
 	{
-		TEST_ASSERT_EQUAL_UINT8(oneLine[i], fakeLcdDram[i]);
+		TEST_ASSERT_EQUAL_UINT8(screen[i], fakeLcdDram[i]);
 	}
 
 	for (uint8_t i = sizeof(fakeLcdDram) / 2; i < sizeof(fakeLcdDram); i++)
+	{
+		TEST_ASSERT_EQUAL_UINT8(' ', fakeLcdDram[i]);
+	}
+}
+
+void test_lcdPuts_calledTwiceAfterLcdEnabled_expectConcatenatedCharactersInDramBuffer(void)
+{
+	enableLcdAndWaitUntilDone();
+
+	screen[5] = '\0';
+	sendOffsetLineToLcdAndWaitUntilDone(0);
+	screen[9] = '\0';
+	sendOffsetLineToLcdAndWaitUntilDone(6);
+
+	for (uint8_t i = 0; i < 5; i++)
+	{
+		TEST_ASSERT_EQUAL_UINT8(screen[i], fakeLcdDram[i]);
+	}
+
+	for (uint8_t i = 6; i < 9; i++)
+	{
+		TEST_ASSERT_EQUAL_UINT8(screen[i], fakeLcdDram[i - 1]);
+	}
+
+	for (uint8_t i = 8; i < sizeof(fakeLcdDram); i++)
 	{
 		TEST_ASSERT_EQUAL_UINT8(' ', fakeLcdDram[i]);
 	}

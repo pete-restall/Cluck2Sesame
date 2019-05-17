@@ -3,7 +3,8 @@
 
 extern void fakeLcdInitialise(void);
 extern void fakeLcdShutdown(void);
-extern uint8_t fakeLcdIsInvalidState(void);
+extern void fakeLcdAssertStateIsValid(void);
+extern void fakeLcdAssertNotBusy(void);
 extern void fakeLcdAssertFunctionRegister(uint8_t flags);
 extern void fakeLcdAssertDisplayRegister(uint8_t flags);
 extern void fakeLcdAssertEntryModeRegister(uint8_t flags);

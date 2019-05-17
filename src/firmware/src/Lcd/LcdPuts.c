@@ -20,7 +20,8 @@ void lcdPuts(const struct LcdPutsTransaction *const transaction)
 {
 	static struct LcdPutsTransaction state;
 
-	// TODO: MULTIPLE CALLS ?
+	// TODO: NULL TRANSACTION
+	// TODO: MULTIPLE CALLS ?  CALLS WHILE LCD IS BUSY...
 	state.buffer = transaction->buffer;
 	state.callback = transaction->callback;
 	state.state = transaction->state;

@@ -17,6 +17,7 @@ void lcdConfigure(void)
 
 	nearSchedulerAdd(&waitForLcdToStabilise);
 	PWM5CONbits.PWM5EN = 1;
+	lcdState.flags.busy = 1;
 }
 
 static void lcdConfigureStateMachine(void *const state)
@@ -69,6 +70,7 @@ static void lcdConfigureStateMachine(void *const state)
 			break;
 
 		default:
+			lcdState.flags.busy = 0;
 			eventPublish(LCD_ENABLED, &emptyEventArgs);
 			waitForLcdCommand.handler = (NearScheduleHandler) 0;
 	}
