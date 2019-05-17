@@ -18,33 +18,33 @@ static void lcdPutsStateMachine(void *const state);
 
 void lcdPuts(const struct LcdPutsTransaction *const transaction)
 {
-	static struct LcdPutsTransaction state;
+	if (!transaction || lcdState.flags.busy)
+		return;
 
-	// TODO: NULL TRANSACTION
-	// TODO: MULTIPLE CALLS ?  CALLS WHILE LCD IS BUSY...
-	state.buffer = transaction->buffer;
-	state.callback = transaction->callback;
-	state.state = transaction->state;
-	lcdPutsStateMachine(&state);
+	lcdState.transaction.callback = transaction->callback;
+	lcdState.transaction.state = transaction->state;
+	lcdState.flags.busy = 1;
+
+	lcdPutsStateMachine(transaction->buffer);
 }
 
 static void lcdPutsStateMachine(void *const state)
 {
-	struct LcdPutsTransaction *putsState = (struct LcdPutsTransaction *) state;
+	uint8_t *buffer = (uint8_t *) state;
 
-	struct NearSchedule waitForLcdCommand =
+	if (buffer && *buffer)
 	{
-		.ticks = MS_TO_TICKS(1),
-		.handler = &lcdPutsStateMachine,
-		.state = state
-	};
+		lcdWriteData(*buffer);
 
-	if (*putsState->buffer)
-	{
-		lcdWriteData(*putsState->buffer);
+		struct NearSchedule waitForLcdCommand =
+		{
+			.ticks = MS_TO_TICKS(1),
+			.handler = &lcdPutsStateMachine,
+			.state = buffer + 1
+		};
+
 		nearSchedulerAdd(&waitForLcdCommand);
-		putsState->buffer = putsState->buffer + 1;
 	}
 	else
-		putsState->callback(putsState->state);
+		lcdTransactionCompleted();
 }

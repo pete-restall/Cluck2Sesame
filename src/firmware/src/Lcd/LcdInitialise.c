@@ -62,5 +62,6 @@ void lcdInitialise(void)
 void lcdTransactionCompleted(void)
 {
 	lcdState.flags.busy = 0;
-	lcdState.transaction.callback(lcdState.transaction.state);
+	if (lcdState.transaction.callback)
+		lcdState.transaction.callback(lcdState.transaction.state);
 }

@@ -27,6 +27,8 @@ static void onLineDisplayed(void *const state);
 
 static uint8_t screen[sizeof(fakeLcdDram) + 1];
 
+static const struct LcdPutsTransaction dummyTransaction = { .buffer = "\0" };
+
 void setUp(void)
 {
 	lcdFixtureInitialise();
@@ -139,4 +141,103 @@ void test_lcdPuts_calledTwiceAfterLcdEnabled_expectConcatenatedCharactersInDramB
 	{
 		TEST_ASSERT_EQUAL_UINT8(' ', fakeLcdDram[i]);
 	}
+}
+
+void test_lcdPuts_calledWithNullTransaction_expectLcdIsNotSentCommand(void)
+{
+	enableLcdAndWaitUntilDone();
+	lcdPuts((const struct LcdPutsTransaction *) 0);
+	fakeLcdAssertNotBusy();
+}
+
+void test_lcdPuts_calledWithNullTransaction_expectNearSchedulerIsIdle(void)
+{
+	enableLcdAndWaitUntilDone();
+	lcdPuts((const struct LcdPutsTransaction *) 0);
+	TEST_ASSERT_FALSE(NCO1CONbits.N1EN);
+}
+
+void test_lcdPuts_calledWithNullBuffer_expectLcdIsNotSentCommand(void)
+{
+	enableLcdAndWaitUntilDone();
+
+	static const struct LcdPutsTransaction withNullBuffer =
+	{
+		.buffer = (const uint8_t *) 0
+	};
+
+	lcdPuts(&withNullBuffer);
+	fakeLcdAssertNotBusy();
+}
+
+void test_lcdPuts_calledWithNullBuffer_expectNearSchedulerIsIdle(void)
+{
+	enableLcdAndWaitUntilDone();
+
+	static const struct LcdPutsTransaction withNullBuffer =
+	{
+		.buffer = (const uint8_t *) 0
+	};
+
+	lcdPuts(&withNullBuffer);
+	TEST_ASSERT_FALSE(NCO1CONbits.N1EN);
+}
+
+void test_lcdPuts_calledWithNullBuffer_expectCallbackIsStillCalled(void)
+{
+	enableLcdAndWaitUntilDone();
+
+	static uint8_t callbackWasCalled = 0;
+	static const struct LcdPutsTransaction withNullBuffer =
+	{
+		.buffer = (const uint8_t *) 0,
+		.callback = &onLineDisplayed,
+		.state = &callbackWasCalled
+	};
+
+	lcdPuts(&withNullBuffer);
+	TEST_ASSERT_TRUE(callbackWasCalled);
+}
+
+void test_lcdPuts_calledBeforeLcdEnabled_expectLcdIsNotSentCommand(void)
+{
+	lcdPuts(&dummyTransaction);
+	fakeLcdAssertNotBusy();
+}
+
+void test_lcdPuts_calledBeforeLcdEnabled_expectNearSchedulerIsIdle(void)
+{
+	lcdPuts(&dummyTransaction);
+	TEST_ASSERT_FALSE(NCO1CONbits.N1EN);
+}
+
+void test_lcdPuts_calledBeforeLcdConfigured_expectLcdIsNotSentCommand(void)
+{
+	lcdEnable();
+	lcdPuts(&dummyTransaction);
+	fakeLcdAssertStateIsValid();
+}
+
+void test_lcdPuts_calledWhileBusy_expectLcdIsNotSentCommand(void)
+{
+	lcdEnable();
+	lcdPuts(&dummyTransaction);
+	lcdPuts(&dummyTransaction);
+	fakeLcdAssertStateIsValid();
+}
+
+void test_lcdPuts_calledAfterLcdDisabled_expectLcdIsNotSentCommand(void)
+{
+	enableLcdAndWaitUntilDone();
+	lcdDisable();
+	lcdPuts(&dummyTransaction);
+	fakeLcdAssertNotBusy();
+}
+
+void test_lcdPuts_calledAfterLcdDisabled_expectNearSchedulerIsIdle(void)
+{
+	enableLcdAndWaitUntilDone();
+	lcdDisable();
+	lcdPuts(&dummyTransaction);
+	TEST_ASSERT_FALSE(NCO1CONbits.N1EN);
 }
