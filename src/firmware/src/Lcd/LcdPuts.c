@@ -25,12 +25,12 @@ void lcdPuts(const struct LcdPutsTransaction *const transaction)
 	lcdState.transaction.state = transaction->state;
 	lcdState.flags.busy = 1;
 
-	lcdPutsStateMachine(transaction->buffer);
+	lcdPutsStateMachine((void *) transaction->buffer);
 }
 
 static void lcdPutsStateMachine(void *const state)
 {
-	uint8_t *buffer = (uint8_t *) state;
+	const uint8_t *buffer = (const uint8_t *) state;
 
 	if (buffer && *buffer)
 	{
@@ -40,11 +40,11 @@ static void lcdPutsStateMachine(void *const state)
 		{
 			.ticks = MS_TO_TICKS(1),
 			.handler = &lcdPutsStateMachine,
-			.state = buffer + 1
+			.state = (void *) (buffer + 1)
 		};
 
 		nearSchedulerAdd(&waitForLcdCommand);
 	}
 	else
-		lcdTransactionCompleted();
+		lcdTransactionCompleted((void *) 0);
 }

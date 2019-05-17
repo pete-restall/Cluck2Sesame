@@ -59,7 +59,7 @@ void lcdInitialise(void)
 	eventSubscribe(&onVoltageRegulatorEnabledSubscription);
 }
 
-void lcdTransactionCompleted(void)
+void lcdTransactionCompleted(void *const unused)
 {
 	lcdState.flags.busy = 0;
 	if (lcdState.transaction.callback)
