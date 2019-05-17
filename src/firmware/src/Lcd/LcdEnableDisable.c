@@ -42,7 +42,7 @@ void lcdDisable(void)
 		return;
 
 	if (--lcdState.enableCount == 0)
-		lcdState.flags.busy = 1;
+		lcdState.flags.isBusy = 1;
 		// TRISAbits.TRISA2 = 1; // TODO: NEEDS TESTING.  SAVES 6mA THOUGH !
 
 	pwmTimerDisable();

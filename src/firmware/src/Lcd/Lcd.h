@@ -14,7 +14,7 @@ struct LcdState
 		uint8_t all;
 		struct
 		{
-			unsigned int busy : 1;
+			unsigned int isBusy : 1;
 		};
 	} flags;
 

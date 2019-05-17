@@ -46,7 +46,7 @@ void lcdInitialise(void)
 
 	lcdState.enableCount = 0;
 	lcdState.flags.all = 0;
-	lcdState.flags.busy = 1;
+	lcdState.flags.isBusy = 1;
 
 	static const struct EventSubscription onVoltageRegulatorEnabledSubscription =
 	{

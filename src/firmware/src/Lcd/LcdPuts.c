@@ -18,12 +18,12 @@ static void __reentrant lcdPutsStateMachine(void *const state);
 
 void lcdPuts(const struct LcdPutsTransaction *const transaction)
 {
-	if (!transaction || lcdState.flags.busy)
+	if (!transaction || lcdState.flags.isBusy)
 		return;
 
 	lcdState.transaction.callback = transaction->callback;
 	lcdState.transaction.state = transaction->state;
-	lcdState.flags.busy = 1;
+	lcdState.flags.isBusy = 1;
 
 	lcdPutsStateMachine((void *) transaction->buffer);
 }

@@ -15,7 +15,7 @@ static void buggyCompilerWorkaround(void)
 
 void lcdSetDdramAddress(const struct LcdSetAddressTransaction *const transaction)
 {
-	if (!transaction || lcdState.flags.busy)
+	if (!transaction || lcdState.flags.isBusy)
 		return;
 
 	lcdState.transaction.callback = transaction->callback;
@@ -29,5 +29,5 @@ void lcdSetDdramAddress(const struct LcdSetAddressTransaction *const transaction
 
 	lcdWriteCommand(LCD_CMD_SETDDRAMADDRESS | transaction->address);
 	nearSchedulerAdd(&waitForLcdCommand);
-	lcdState.flags.busy = 1;
+	lcdState.flags.isBusy = 1;
 }
