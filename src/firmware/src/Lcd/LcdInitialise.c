@@ -25,7 +25,6 @@ static void buggyCompilerWorkaround(void)
 	lcdState.transaction.state = _OMNITARGET;
 }
 
-
 void lcdInitialise(void)
 {
 	ANSELA &= PORTA_PIN_MASK;
@@ -57,11 +56,4 @@ void lcdInitialise(void)
 	};
 
 	eventSubscribe(&onVoltageRegulatorEnabledSubscription);
-}
-
-void lcdTransactionCompleted(void *const unused)
-{
-	lcdState.flags.busy = 0;
-	if (lcdState.transaction.callback)
-		lcdState.transaction.callback(lcdState.transaction.state);
 }

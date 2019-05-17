@@ -16,6 +16,7 @@ TEST_FILE("Clock/ClockInitialise.c")
 TEST_FILE("Lcd/LcdInitialise.c")
 TEST_FILE("Lcd/LcdEnableDisable.c")
 TEST_FILE("Lcd/LcdConfigure.c")
+TEST_FILE("Lcd/LcdTransaction.c")
 TEST_FILE("Lcd/LcdWrite.c")
 TEST_FILE("Lcd/LcdSetDdramAddress.c")
 
