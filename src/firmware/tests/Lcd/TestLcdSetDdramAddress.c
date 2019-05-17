@@ -67,14 +67,14 @@ static void onAddressSet(void *const state)
 void test_lcdSetDdramAddress_calledWithNullTransaction_expectLcdIsNotSentCommand(void)
 {
 	enableLcdAndWaitUntilDone();
-	lcdSetDdramAddress((const struct LcdSetDdramAddress *const) 0);
+	lcdSetDdramAddress((const struct LcdSetDdramAddressTransaction *) 0);
 	fakeLcdAssertNotBusy();
 }
 
 void test_lcdSetDdramAddress_calledWithNullTransaction_expectNearSchedulerIsIdle(void)
 {
 	enableLcdAndWaitUntilDone();
-	lcdSetDdramAddress((const struct LcdSetDdramAddress *const) 0);
+	lcdSetDdramAddress((const struct LcdSetDdramAddressTransaction *) 0);
 	TEST_ASSERT_FALSE(NCO1CONbits.N1EN);
 }
 
