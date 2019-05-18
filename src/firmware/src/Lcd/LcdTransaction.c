@@ -4,7 +4,7 @@
 
 void lcdTransactionCompleted(void *const unused)
 {
-	lcdState.flags.busy = 0;
+	lcdState.flags.isBusy = 0;
 	if (lcdState.transaction.callback)
 		lcdState.transaction.callback(lcdState.transaction.state);
 }
