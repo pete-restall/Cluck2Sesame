@@ -3,18 +3,12 @@
 #include <stdint.h>
 #include "Event.h"
 
-struct Date;
+struct DateWithFlags;
 
 #define DATE_CHANGED ((EventType) 0x10)
 struct DateChanged
 {
-	const struct Date *const today;
-};
-
-struct DateFlags
-{
-	unsigned int isLeapYear : 1;
-	unsigned int isDaylightSavings : 1;
+	const struct DateWithFlags *const today;
 };
 
 struct Date
@@ -22,8 +16,24 @@ struct Date
 	uint8_t day;
 	uint8_t month;
 	uint8_t year;
+};
+
+struct DateWithFlags
+{
+	uint8_t day;
+	uint8_t month;
+	uint8_t year;
 	uint16_t dayOfYear;
-	struct DateFlags flags;
+
+	union
+	{
+		uint8_t all;
+		struct
+		{
+			unsigned int isLeapYear : 1;
+			unsigned int isDaylightSavings : 1;
+		};
+	} flags;
 };
 
 struct Time
@@ -33,12 +43,21 @@ struct Time
 	uint8_t hour;
 };
 
-struct DateAndTime
+struct DateAndTimeSet
 {
 	struct Time time;
 	struct Date date;
 };
 
+struct DateAndTimeGet
+{
+	struct Time time;
+	struct DateWithFlags date;
+};
+
 extern void clockInitialise(void);
+extern void clockGetNowGmt(struct DateAndTimeGet *const now);
+extern void clockSetNowGmt(const struct DateAndTimeSet *const now);
+extern void clockAdjustForGmt(struct DateAndTimeSet *const dateTime);
 
 #endif

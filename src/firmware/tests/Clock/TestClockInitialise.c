@@ -1,14 +1,18 @@
 #include <xc.h>
+#include <stdint.h>
 #include <unity.h>
+
+#include "Event.h"
+#include "Clock.h"
 
 #include "../NonDeterminism.h"
 
-#include "Clock.h"
-
 TEST_FILE("Clock/ClockInitialise.c")
+TEST_FILE("Clock/ClockGetSetNow.c")
 
 void setUp(void)
 {
+	eventInitialise();
 }
 
 void tearDown(void)
@@ -69,13 +73,13 @@ void test_clockInitialise_called_expectTimerIsConfiguredAs8BitMode(void)
 	TEST_ASSERT_FALSE(T0CON0bits.T016BIT);
 }
 
-void test_clockInitialise_called_expectTimerPostscalerIs15Seconds(void)
+void test_clockInitialise_called_expectTimerPostscalerIs1Second(void)
 {
 	T0CON0 = anyByte();
 	clockInitialise();
 
 	int postscale = (T0CON0 & _T0CON0_T0OUTPS_MASK) >> _T0CON0_T0OUTPS_POSITION;
-	TEST_ASSERT_EQUAL_INT(14, postscale & 0b1111);
+	TEST_ASSERT_EQUAL_INT(0, postscale & 0b1111);
 }
 
 void test_clockInitialise_called_expectTimerInterruptFlagIsClear(void)
@@ -103,9 +107,52 @@ void test_clockInitialise_called_expectTimerIsZero(void)
 	TEST_ASSERT_EQUAL_UINT8(0, TMR0L);
 }
 
-void test_clockInitialise_called_expectTimerComparisonIs15Seconds(void)
+void test_clockInitialise_called_expectTimerComparisonIs256Seconds(void)
 {
-	TMR0H = anyByteExcept(1);
+	TMR0H = anyByteExcept(0);
 	clockInitialise();
-	TEST_ASSERT_EQUAL_UINT8(1, TMR0H);
+	TEST_ASSERT_EQUAL_UINT8(0, TMR0H);
+}
+
+void test_clockInitialise_called_expectNowDateIsInitialisedAsEpoch(void)
+{
+	clockInitialise();
+	struct DateAndTimeGet now =
+	{
+		.date =
+		{
+			.year = anyByte(),
+			.month = anyByte(),
+			.day = anyByte(),
+			.dayOfYear = anyWord(),
+			.flags = { .all = anyByte() }
+		}
+	};
+
+	clockGetNowGmt(&now);
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.date.year, "Year");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, now.date.month, "Month");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, now.date.day, "Day");
+	TEST_ASSERT_EQUAL_UINT16_MESSAGE(0, now.date.dayOfYear, "Day-of-Year");
+	TEST_ASSERT_TRUE_MESSAGE(now.date.flags.isLeapYear, "Leap");
+	TEST_ASSERT_FALSE_MESSAGE(now.date.flags.isDaylightSavings, "DST");
+}
+
+void test_clockInitialise_called_expectNowTimeIsInitialisedAsMidnight(void)
+{
+	clockInitialise();
+	struct DateAndTimeGet now =
+	{
+		.time =
+		{
+			.hour = anyByte(),
+			.minute = anyByte(),
+			.second = anyByte()
+		}
+	};
+
+	clockGetNowGmt(&now);
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.time.hour, "Hour");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.time.minute, "Minute");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.time.second, "Second");
 }

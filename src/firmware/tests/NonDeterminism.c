@@ -47,6 +47,11 @@ uint8_t anyByteWithMaskClear(uint8_t mask)
 	return anyByte() & ~mask;
 }
 
+uint8_t anyByteLessThan(uint8_t value)
+{
+	return anyByte() % value;
+}
+
 uint16_t anyWord(void)
 {
 	uint16_t word = 0;
