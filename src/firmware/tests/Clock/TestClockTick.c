@@ -58,7 +58,7 @@ static void publishWokenFromSleep(void)
 
 void test_tick_onWokenFromSleepWhenTimerInterruptFlagIsSet_expectTimeIsIncremented(void)
 {
-	stubAnyDateTimeWithMinute(anyByteLessThan(59));
+	stubAnyDateTimeWithHourAndMinute(anyByteLessThan(23), anyByteLessThan(59));
 	struct DateAndTimeGet before;
 	clockGetNowGmt(&before);
 

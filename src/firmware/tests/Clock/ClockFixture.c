@@ -7,16 +7,11 @@
 #include "ClockFixture.h"
 #include "../NonDeterminism.h"
 
-void stubAnyDateTimeWithMinute(uint8_t minute)
-{
-	stubAnyDateTimeWithHourAndMinute(anyByteLessThan(24), minute);
-}
-
 void stubAnyDateTimeWithHourAndMinute(uint8_t hour, uint8_t minute)
 {
 	stubAnyDateTimeWithDayAndHourAndMinute(
 		1 + anyByteLessThan(28),
-		anyByteLessThan(24),
+		hour,
 		minute);
 }
 

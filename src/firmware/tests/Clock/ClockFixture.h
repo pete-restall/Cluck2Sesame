@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include "Clock.h"
 
-extern void stubAnyDateTimeWithMinute(uint8_t minute);
 extern void stubAnyDateTimeWithHourAndMinute(uint8_t hour, uint8_t minute);
 extern void stubAnyDateTimeWithDayAndHourAndMinute(
 	uint8_t day,

@@ -60,7 +60,7 @@ static void publishWokenFromSleep(void)
 void test_clockGetNowGmt_calledWhenClockLessThan59MinutesTicks_expectNewMinute(void)
 {
 	TMR0L = anyByte();
-	stubAnyDateTimeWithMinute(anyByteLessThan(59));
+	stubAnyDateTimeWithHourAndMinute(anyByteLessThan(23), anyByteLessThan(59));
 
 	struct DateAndTimeGet before;
 	clockGetNowGmt(&before);
