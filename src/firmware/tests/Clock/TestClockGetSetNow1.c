@@ -7,6 +7,7 @@
 #include "Clock.h"
 
 #include "ClockFixture.h"
+#include "ClockGetSetNowFixture.h"
 
 #include "../NonDeterminism.h"
 
@@ -15,21 +16,14 @@ TEST_FILE("Clock/ClockGetSetNow.c")
 TEST_FILE("Clock/ClockDateFromDiscrete.c")
 TEST_FILE("Clock/ClockTimeFromDiscrete.c")
 
-static void tick(void);
-static void publishWokenFromSleep(void);
-
 void setUp(void)
 {
-	eventInitialise();
-	clockInitialise();
-	T0CON0bits.T0EN = 0;
-	T0CON1bits.T0CKPS = 0;
-
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(59, TMR0H, "60-second timebase required !");
+	clockGetSetNowFixtureSetUp();
 }
 
 void tearDown(void)
 {
+	clockGetSetNowFixtureTearDown();
 }
 
 void test_clockGetNowGmt_called_expectSecondsIsTmr0l(void)
@@ -41,20 +35,6 @@ void test_clockGetNowGmt_called_expectSecondsIsTmr0l(void)
 	clockGetNowGmt(&now);
 
 	TEST_ASSERT_EQUAL_UINT8(TMR0L, now.time.second);
-}
-
-static void tick(void)
-{
-	PIR0bits.TMR0IF = 1;
-	publishWokenFromSleep();
-	while (eventDispatchNext())
-		;;
-}
-
-static void publishWokenFromSleep(void)
-{
-	static const struct WokenFromSleep emptyArgs = { };
-	eventPublish(WOKEN_FROM_SLEEP, &emptyArgs);
 }
 
 void test_clockGetNowGmt_calledWhenClockLessThan59MinutesTicks_expectNewMinute(void)
@@ -126,17 +106,14 @@ void test_clockGetNowGmt_calledWhenClockOfLastDayOfNonLeapYearMonthTicks_expectN
 		{
 			.date =
 			{
-				.year = anyByteLessThan(99),
+				.year = anyNonLeapYearLessThan(99),
 				.month = 1 + month,
 				.day = daysInMonth[month]
 			},
 			.time = { .hour = 23, .minute = 59, .second = anyByteLessThan(60) }
 		};
 
-		if (before.date.year % 4 == 0)
-			before.date.year++;
-
-		clockSetNowGmt(&before);
+		clockSetNowGmt((const struct DateAndTimeSet *) &before);
 		clockGetNowGmt(&before);
 
 		tick();
@@ -152,23 +129,47 @@ void test_clockGetNowGmt_calledWhenClockOfLastDayOfNonLeapYearMonthTicks_expectN
 	}
 }
 
-void test_clockGetNowGmt_calledWhenClockOfLastDayOfNonLeapYearDecemberTicks_expectNewYearAndAndFirstMonthAndDayAndZeroHoursAndMinutes(void)
+void test_clockGetNowGmt_calledWhenClockOf28FebruaryInLeapYearTicks_expectLastDayOfFebruaryAndZeroHoursAndMinutes(void)
 {
 	struct DateAndTimeGet before =
 	{
 		.date =
 		{
-			.year = anyByteLessThan(99),
-			.month = 12,
-			.day = 31
+			.year = anyLeapYear(),
+			.month = 2,
+			.day = 28
 		},
 		.time = { .hour = 23, .minute = 59, .second = anyByteLessThan(60) }
 	};
 
-	if (before.date.year % 4 == 0)
-		before.date.year++;
+	clockSetNowGmt((const struct DateAndTimeSet *) &before);
+	clockGetNowGmt(&before);
 
-	clockSetNowGmt(&before);
+	tick();
+	struct DateAndTimeGet now;
+	clockGetNowGmt(&now);
+
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.time.minute, "MM");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.time.hour, "HH");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(29, now.date.day, "D");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(before.date.dayOfYear + 1, now.date.dayOfYear, "DoY");
+	assertEqualDateTimeExceptDayAndHourAndMinute(&before, &now);
+}
+
+void test_clockGetNowGmt_calledWhenClockOfLastDayOfFebruaryInLeapYearMonthTicks_expectNewMonthAndFirstDayAndZeroHoursAndMinutes(void)
+{
+	struct DateAndTimeGet before =
+	{
+		.date =
+		{
+			.year = anyLeapYear(),
+			.month = 2,
+			.day = 29
+		},
+		.time = { .hour = 23, .minute = 59, .second = anyByteLessThan(60) }
+	};
+
+	clockSetNowGmt((const struct DateAndTimeSet *) &before);
 	clockGetNowGmt(&before);
 
 	tick();
@@ -178,17 +179,7 @@ void test_clockGetNowGmt_calledWhenClockOfLastDayOfNonLeapYearDecemberTicks_expe
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.time.minute, "MM");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.time.hour, "HH");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, now.date.day, "D");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.date.dayOfYear, "DoY");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, now.date.month, "M");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(before.date.year + 1, now.date.year, "Y");
-	assertEqualDateTimeExceptYearAndMonthAndDayAndHourAndMinute(&before, &now);
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(before.date.dayOfYear + 1, now.date.dayOfYear, "DoY");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(before.date.month + 1, now.date.month, "M");
+	assertEqualDateTimeExceptMonthAndDayAndHourAndMinute(&before, &now);
 }
-
-// void test_clockGetNowGmt_calledWhenClockOfLastDayOfLeapYearDecemberTicks_expectNewYearAndAndFirstMonthAndDayAndZeroHoursAndMinutes(void)
-
-// void test_clockGetNowGmt_calledWhenClockOfLastDayOfCenturyDecemberTicks_expectZeroYearAndAndFirstMonthAndDayAndZeroHoursAndMinutes(void)
-
-// TODO: CLOCK GET WHEN TMR0IF IS SET - MAKE SURE IT'S CLEARED AND MINUTES ARE UPDATED
-
-
-// TODO: CLOCK SET WHEN TMR0IF IS SET - MAKE SURE IT'S CLEARED AND MINUTES NOT UPDATED

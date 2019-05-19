@@ -31,18 +31,26 @@ void clockTicked(void)
 		if (++clockNow.time.hour == 24)
 		{
 			uint8_t mask30Days = (clockNow.date.month & 0b1001);
-			uint8_t daysInMonth =
-				clockNow.date.month == 2
-					? 28
-					: (mask30Days == 0b1001 || mask30Days == 0b0000)
-						? 30
-						: 31;
+			uint8_t daysInMonth;
+			if (clockNow.date.month == 2)
+			{
+				if (clockNow.date.year & 3) // TODO: REFACTOR TO USE isLeapYear FLAG, WHEN THAT FUNCTIONALITY IS WRITTEN
+					daysInMonth = 28;
+				else
+					daysInMonth = 29;
+			}
+			else if (mask30Days == 0b1001 || mask30Days == 0b0000)
+				daysInMonth = 30;
+			else
+				daysInMonth = 31;
 
 			if (clockNow.date.day == daysInMonth)
 			{
 				if (clockNow.date.month++ == 12)
 				{
-					clockNow.date.year++;
+					if (++clockNow.date.year == 100)
+						clockNow.date.year = 0;
+
 					clockNow.date.month = 1;
 					clockNow.date.dayOfYear = UINT16_MAX;
 				}
