@@ -26,5 +26,36 @@ void clockSetNowGmt(const struct DateAndTimeSet *const now)
 
 void clockTicked(void)
 {
-	clockNow.time.minute++;
+	if (++clockNow.time.minute == 60)
+	{
+		if (++clockNow.time.hour == 24)
+		{
+			uint8_t mask30Days = (clockNow.date.month & 0b1001);
+			uint8_t daysInMonth =
+				clockNow.date.month == 2
+					? 28
+					: (mask30Days == 0b1001 || mask30Days == 0b0000)
+						? 30
+						: 31;
+
+			if (clockNow.date.day == daysInMonth)
+			{
+				if (clockNow.date.month++ == 12)
+				{
+					clockNow.date.year++;
+					clockNow.date.month = 1;
+					clockNow.date.dayOfYear = UINT16_MAX;
+				}
+
+				clockNow.date.day = 1;
+			}
+			else
+				clockNow.date.day++;
+
+			clockNow.date.dayOfYear++;
+			clockNow.time.hour = 0;
+		}
+
+		clockNow.time.minute = 0;
+	}
 }

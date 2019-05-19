@@ -7,17 +7,31 @@
 #include "ClockFixture.h"
 #include "../NonDeterminism.h"
 
-static void assertEqualDateTimeExceptMinuteAndSecond(
-	const struct DateAndTimeGet *const expected,
-	const struct DateAndTimeGet *const actual);
+void stubAnyDateTimeWithMinute(uint8_t minute)
+{
+	stubAnyDateTimeWithHourAndMinute(anyByteLessThan(24), minute);
+}
 
-void stubAnyDateTimeWithMinutes(uint8_t minutes)
+void stubAnyDateTimeWithHourAndMinute(uint8_t hour, uint8_t minute)
+{
+	stubAnyDateTimeWithDayAndHourAndMinute(
+		1 + anyByteLessThan(28),
+		anyByteLessThan(24),
+		minute);
+}
+
+void stubAnyDateTimeWithDayAndHourAndMinute(
+	uint8_t day,
+	uint8_t hour,
+	uint8_t minute)
 {
 	stubAnyDateTime();
 
 	struct DateAndTimeGet now;
 	clockGetNowGmt(&now);
-	now.time.minute = minutes;
+	now.date.day = day;
+	now.time.hour = hour;
+	now.time.minute = minute;
 	clockSetNowGmt((const struct DateAndTimeSet *) &now);
 }
 
@@ -57,31 +71,52 @@ void assertEqualDateTimeExceptMinute(
 	const struct DateAndTimeGet *const expected,
 	const struct DateAndTimeGet *const actual)
 {
-	assertEqualDateTimeExceptMinuteAndSecond(expected, actual);
+	assertEqualDateTimeExceptHourAndMinute(expected, actual);
 
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(
-		expected->time.second, actual->time.second, "SS");
+		expected->time.hour, actual->time.hour, "HH");
 }
 
-static void assertEqualDateTimeExceptMinuteAndSecond(
+void assertEqualDateTimeExceptHourAndMinute(
 	const struct DateAndTimeGet *const expected,
 	const struct DateAndTimeGet *const actual)
 {
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(
-		expected->date.year, actual->date.year, "Y");
+	assertEqualDateTimeExceptDayAndHourAndMinute(expected, actual);
 
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(
-		expected->date.month, actual->date.month, "M");
-
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(
-		expected->date.day, actual->date.day, "D");
+		expected->date.day, actual->date.day, "DD");
 
 	TEST_ASSERT_EQUAL_UINT16_MESSAGE(
 		expected->date.dayOfYear, actual->date.dayOfYear, "DoY");
+}
 
+void assertEqualDateTimeExceptDayAndHourAndMinute(
+	const struct DateAndTimeGet *const expected,
+	const struct DateAndTimeGet *const actual)
+{
+	assertEqualDateTimeExceptMonthAndDayAndHourAndMinute(expected, actual);
+
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(
+		expected->date.month, actual->date.month, "M");
+}
+
+void assertEqualDateTimeExceptMonthAndDayAndHourAndMinute(
+	const struct DateAndTimeGet *const expected,
+	const struct DateAndTimeGet *const actual)
+{
+	assertEqualDateTimeExceptYearAndMonthAndDayAndHourAndMinute(expected, actual);
+
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(
+		expected->date.year, actual->date.year, "Y");
+}
+
+void assertEqualDateTimeExceptYearAndMonthAndDayAndHourAndMinute(
+	const struct DateAndTimeGet *const expected,
+	const struct DateAndTimeGet *const actual)
+{
 	TEST_ASSERT_EQUAL_HEX8_MESSAGE(
 		expected->date.flags.all, actual->date.flags.all, "F");
 
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(
-		expected->time.hour, actual->time.hour, "HH");
+		expected->time.second, actual->time.second, "SS");
 }
