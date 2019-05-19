@@ -49,7 +49,7 @@ void test_onDateChanged_ExpectSunEventsChangedIsPublishedWithCalculatedSunEventT
 	static struct Location location;
 	static const struct LocationChanged locationArgs = { .location = &location };
 
-	static struct Date today;
+	static struct DateWithFlags today;
 	static const struct DateChanged dateArgs = { .today = &today };
 
 	sunEventsInitialise();
@@ -149,7 +149,7 @@ void test_onLocationChanged_ExpectSunEventsChangedIsPublishedWithCalculatedSunEv
 	static struct Location location;
 	static const struct LocationChanged locationArgs = { .location = &location };
 
-	static struct Date today;
+	static struct DateWithFlags today;
 	static const struct DateChanged dateArgs = { .today = &today };
 
 	sunEventsInitialise();
