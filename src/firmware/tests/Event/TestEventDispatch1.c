@@ -59,7 +59,7 @@ void test_eventDispatchNext_calledWhenOneEventPublished_expectHandlerIsCalledWit
 	struct Event event =
 	{
 		.type = subscription.type,
-		.args = (void *) anyByte(),
+		.args = (void *) (int) anyByte(),
 		.state = subscription.state
 	};
 
@@ -75,14 +75,14 @@ void test_eventDispatchNext_calledWhenMoreThanOneEventPublished_expectHandlerIsC
 	struct Event event =
 	{
 		.type = subscription.type,
-		.args = (void *) anyByte(),
+		.args = (void *) (int) anyByte(),
 		.state = subscription.state
 	};
 
 	struct Event anotherEvent =
 	{
 		.type = anotherSubscription.type,
-		.args = (void *) anyByte(),
+		.args = (void *) (int) anyByte(),
 		.state = anotherSubscription.state
 	};
 
@@ -101,14 +101,14 @@ void test_eventDispatchNext_calledTwiceWhenTwoEventsPublished_expectBothHandlers
 	struct Event event =
 	{
 		.type = subscription.type,
-		.args = (void *) anyByte(),
+		.args = (void *) (int) anyByte(),
 		.state = subscription.state
 	};
 
 	struct Event anotherEvent =
 	{
 		.type = anotherSubscription.type,
-		.args = (void *) anyByte(),
+		.args = (void *) (int) anyByte(),
 		.state = anotherSubscription.state
 	};
 
@@ -128,7 +128,7 @@ void test_eventDispatchNext_calledWhenMoreThanOneSubscriberForSameType_expectEac
 	struct Event event =
 	{
 		.type = subscription.type,
-		.args = (void *) anyByte(),
+		.args = (void *) (int) anyByte(),
 		.state = subscription.state
 	};
 
@@ -151,7 +151,7 @@ void test_eventDispatchNext_calledWhenMoreThanOneSubscriberForSameType_expectEac
 
 void test_eventDispatchNext_calledWhenNullHandlerAtSubscription_expectNothingHappens(void)
 {
-	subscription.handler = (EventHandler *) 0;
+	subscription.handler = (EventHandler) 0;
 	eventSubscribe(&subscription);
 	eventPublish(subscription.type, NULL);
 	eventDispatchNext();
@@ -160,7 +160,7 @@ void test_eventDispatchNext_calledWhenNullHandlerAtSubscription_expectNothingHap
 void test_eventDispatchNext_calledWhenNullHandlerAfterSubscription_expectNothingHappens(void)
 {
 	eventSubscribe(&subscription);
-	subscription.handler = (EventHandler *) 0;
+	subscription.handler = (EventHandler) 0;
 	eventPublish(subscription.type, NULL);
 	eventDispatchNext();
 }

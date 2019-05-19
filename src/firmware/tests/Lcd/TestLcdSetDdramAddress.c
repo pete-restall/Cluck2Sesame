@@ -13,6 +13,7 @@ TEST_FILE("NearScheduler.c")
 TEST_FILE("PowerManagement.c")
 TEST_FILE("PwmTimer.c")
 TEST_FILE("Clock/ClockInitialise.c")
+TEST_FILE("Clock/ClockGetSetNow.c")
 TEST_FILE("Lcd/LcdInitialise.c")
 TEST_FILE("Lcd/LcdEnableDisable.c")
 TEST_FILE("Lcd/LcdConfigure.c")
@@ -68,14 +69,14 @@ static void onAddressSet(void *const state)
 void test_lcdSetDdramAddress_calledWithNullTransaction_expectLcdIsNotSentCommand(void)
 {
 	enableLcdAndWaitUntilDone();
-	lcdSetDdramAddress((const struct LcdSetDdramAddressTransaction *) 0);
+	lcdSetDdramAddress((const struct LcdSetAddressTransaction *) 0);
 	fakeLcdAssertNotBusy();
 }
 
 void test_lcdSetDdramAddress_calledWithNullTransaction_expectNearSchedulerIsIdle(void)
 {
 	enableLcdAndWaitUntilDone();
-	lcdSetDdramAddress((const struct LcdSetDdramAddressTransaction *) 0);
+	lcdSetDdramAddress((const struct LcdSetAddressTransaction *) 0);
 	TEST_ASSERT_FALSE(NCO1CONbits.N1EN);
 }
 
