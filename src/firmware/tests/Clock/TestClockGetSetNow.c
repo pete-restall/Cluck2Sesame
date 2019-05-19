@@ -24,27 +24,23 @@ void setUp(void)
 	clockInitialise();
 	T0CON0bits.T0EN = 0;
 	T0CON1bits.T0CKPS = 0;
+
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(59, TMR0H, "60-second timebase required !");
 }
 
 void tearDown(void)
 {
 }
 
-void test_clockGetNowGmt_calledWhenClockTicks_expectSecondsIncrementedByTmr0h(void)
+void test_clockGetNowGmt_called_expectSecondsIsTmr0l(void)
 {
-	TMR0H = anyByteLessThan(60);
-	TMR0L = 0;
-	stubAnyDateTimeWithSeconds(0);
+	stubAnyDateTime();
+	TMR0L = anyByte();
 
-	struct DateAndTimeGet before;
-	clockGetNowGmt(&before);
-
-	tick();
 	struct DateAndTimeGet now;
 	clockGetNowGmt(&now);
 
-	TEST_ASSERT_EQUAL_UINT8(TMR0H, now.time.second);
-	assertEqualDateTimeExceptSecond(&before, &now);
+	TEST_ASSERT_EQUAL_UINT8(TMR0L, now.time.second);
 }
 
 static void tick(void)
@@ -61,11 +57,10 @@ static void publishWokenFromSleep(void)
 	eventPublish(WOKEN_FROM_SLEEP, &emptyArgs);
 }
 
-void test_clockGetNowGmt_calledWhenClockTicks0To60_expectNewMinute(void)
+void test_clockGetNowGmt_calledWhenClockLessThan59MinutesTicks_expectNewMinute(void)
 {
-	TMR0H = 60;
-	TMR0L = 0;
-	stubAnyDateTimeWithMinutesAndSeconds(anyByteLessThan(59), 0);
+	TMR0L = anyByte();
+	stubAnyDateTimeWithMinutes(anyByteLessThan(59));
 
 	struct DateAndTimeGet before;
 	clockGetNowGmt(&before);
@@ -74,97 +69,10 @@ void test_clockGetNowGmt_calledWhenClockTicks0To60_expectNewMinute(void)
 	struct DateAndTimeGet now;
 	clockGetNowGmt(&now);
 
-	TEST_ASSERT_EQUAL_UINT8(0, now.time.second);
-	TEST_ASSERT_EQUAL_UINT8(before.time.minute + 1, now.time.minute);
-	assertEqualDateTimeExceptMinuteAndSecond(&before, &now);
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(TMR0L, now.time.second, "SS");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(before.time.minute + 1, now.time.minute, "MM");
+	assertEqualDateTimeExceptMinute(&before, &now);
 }
 
-void test_clockGetNowGmt_calledWhenClockTicks0To61_expectNewMinuteWithResidualSeconds(void)
-{
-	TMR0H = 61;
-	TMR0L = 0;
-	stubAnyDateTimeWithMinutesAndSeconds(anyByteLessThan(59), 0);
-
-	struct DateAndTimeGet before;
-	clockGetNowGmt(&before);
-
-	tick();
-	struct DateAndTimeGet now;
-	clockGetNowGmt(&now);
-
-	TEST_ASSERT_EQUAL_UINT8(1, now.time.second);
-	TEST_ASSERT_EQUAL_UINT8(before.time.minute + 1, now.time.minute);
-	assertEqualDateTimeExceptMinuteAndSecond(&before, &now);
-}
-
-void test_clockGetNowGmt_calledWhenClockTicks59To62_expectNewMinuteWithResidualSeconds(void)
-{
-	TMR0H = 3;
-	TMR0L = 0;
-	stubAnyDateTimeWithMinutesAndSeconds(anyByteLessThan(59), 59);
-
-	struct DateAndTimeGet before;
-	clockGetNowGmt(&before);
-
-	tick();
-	struct DateAndTimeGet now;
-	clockGetNowGmt(&now);
-
-	TEST_ASSERT_EQUAL_UINT8(2, now.time.second);
-	TEST_ASSERT_EQUAL_UINT8(before.time.minute + 1, now.time.minute);
-	assertEqualDateTimeExceptMinuteAndSecond(&before, &now);
-}
-
-void test_clockGetNowGmt_calledWhenClockTicks0To255_expectNewMinuteWithResidualSeconds(void)
-{
-	TMR0H = 255;
-	TMR0L = 0;
-	stubAnyDateTimeWithMinutesAndSeconds(anyByteLessThan(56), 0);
-
-	struct DateAndTimeGet before;
-	clockGetNowGmt(&before);
-
-	tick();
-	struct DateAndTimeGet now;
-	clockGetNowGmt(&now);
-
-	TEST_ASSERT_EQUAL_UINT8(15, now.time.second);
-	TEST_ASSERT_EQUAL_UINT8(before.time.minute + 4, now.time.minute);
-	assertEqualDateTimeExceptMinuteAndSecond(&before, &now);
-}
-
-void test_clockGetNowGmt_calledWhenClockTicks0To256_expectNewMinuteWithResidualSeconds(void)
-{
-	TMR0H = 0;
-	TMR0L = 0;
-	stubAnyDateTimeWithMinutesAndSeconds(anyByteLessThan(56), 0);
-
-	struct DateAndTimeGet before;
-	clockGetNowGmt(&before);
-
-	tick();
-	struct DateAndTimeGet now;
-	clockGetNowGmt(&now);
-
-	TEST_ASSERT_EQUAL_UINT8(16, now.time.second);
-	TEST_ASSERT_EQUAL_UINT8(before.time.minute + 4, now.time.minute);
-	assertEqualDateTimeExceptMinuteAndSecond(&before, &now);
-}
-
-void test_clockGetNowGmt_calledWhenClockTicks7To263_expectNewMinuteWithResidualSeconds(void)
-{
-	TMR0H = 0;
-	TMR0L = 0;
-	stubAnyDateTimeWithMinutesAndSeconds(anyByteLessThan(56), 7);
-
-	struct DateAndTimeGet before;
-	clockGetNowGmt(&before);
-
-	tick();
-	struct DateAndTimeGet now;
-	clockGetNowGmt(&now);
-
-	TEST_ASSERT_EQUAL_UINT8(23, now.time.second);
-	TEST_ASSERT_EQUAL_UINT8(before.time.minute + 4, now.time.minute);
-	assertEqualDateTimeExceptMinuteAndSecond(&before, &now);
-}
+// TODO: CLOCK SET WHEN TMR0IF IS SET - MAKE SURE IT'S CLEARED AND MINUTES NOT UPDATED
+// TODO: CLOCK GET WHEN TMR0IF IS SET - MAKE SURE IT'S CLEARED AND MINUTES ARE UPDATED

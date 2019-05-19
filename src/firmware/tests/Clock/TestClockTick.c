@@ -31,7 +31,7 @@ void test_tick_onWokenFromSleepWhenTimerInterruptFlagIsClear_expectTimeIsNotIncr
 {
 	TMR0H = 1;
 
-	stubAnyDateTimeWithSeconds(0);
+	stubAnyDateTime();
 	struct DateAndTimeGet before;
 	clockGetNowGmt(&before);
 
@@ -58,9 +58,7 @@ static void publishWokenFromSleep(void)
 
 void test_tick_onWokenFromSleepWhenTimerInterruptFlagIsSet_expectTimeIsIncremented(void)
 {
-	TMR0H = 1;
-
-	stubAnyDateTimeWithSeconds(0);
+	stubAnyDateTimeWithMinutes(anyByteLessThan(59));
 	struct DateAndTimeGet before;
 	clockGetNowGmt(&before);
 
@@ -69,8 +67,8 @@ void test_tick_onWokenFromSleepWhenTimerInterruptFlagIsSet_expectTimeIsIncrement
 	struct DateAndTimeGet now;
 	clockGetNowGmt(&now);
 
-	assertEqualDateTimeExceptSecond(&before, &now);
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(TMR0H, now.time.second, "SS");
+	assertEqualDateTimeExceptMinute(&before, &now);
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(before.time.minute + 1, now.time.minute, "MM");
 }
 
 void test_tick_onWokenFromSleepWhenTimerInterruptFlagIsSet_expectTimerInterruptFlagIsCleared(void)

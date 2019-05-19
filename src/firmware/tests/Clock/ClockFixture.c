@@ -7,21 +7,17 @@
 #include "ClockFixture.h"
 #include "../NonDeterminism.h"
 
-void stubAnyDateTimeWithSeconds(uint8_t seconds)
-{
-	stubAnyDateTimeWithMinutesAndSeconds(
-		anyByteLessThan(60),
-		seconds);
-}
+static void assertEqualDateTimeExceptMinuteAndSecond(
+	const struct DateAndTimeGet *const expected,
+	const struct DateAndTimeGet *const actual);
 
-void stubAnyDateTimeWithMinutesAndSeconds(uint8_t minutes, uint8_t seconds)
+void stubAnyDateTimeWithMinutes(uint8_t minutes)
 {
 	stubAnyDateTime();
 
 	struct DateAndTimeGet now;
 	clockGetNowGmt(&now);
 	now.time.minute = minutes;
-	now.time.second = seconds;
 	clockSetNowGmt((const struct DateAndTimeSet *) &now);
 }
 
@@ -51,23 +47,23 @@ void assertEqualDateTime(
 	const struct DateAndTimeGet *const expected,
 	const struct DateAndTimeGet *const actual)
 {
-	assertEqualDateTimeExceptSecond(expected, actual);
+	assertEqualDateTimeExceptMinute(expected, actual);
 
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(
-		expected->time.second, actual->time.second, "SS");
+		expected->time.minute, actual->time.minute, "MM");
 }
 
-void assertEqualDateTimeExceptSecond(
+void assertEqualDateTimeExceptMinute(
 	const struct DateAndTimeGet *const expected,
 	const struct DateAndTimeGet *const actual)
 {
 	assertEqualDateTimeExceptMinuteAndSecond(expected, actual);
 
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(
-		expected->time.minute, actual->time.minute, "MM");
+		expected->time.second, actual->time.second, "SS");
 }
 
-void assertEqualDateTimeExceptMinuteAndSecond(
+static void assertEqualDateTimeExceptMinuteAndSecond(
 	const struct DateAndTimeGet *const expected,
 	const struct DateAndTimeGet *const actual)
 {

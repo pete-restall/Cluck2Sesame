@@ -27,7 +27,7 @@ void clockInitialise(void)
 	while (!OSCSTATbits.SOR)
 		;;
 
-	TMR0H = 0;
+	TMR0H = 59;
 	TMR0L = 0;
 	PIR0bits.TMR0IF = 0;
 	PIE0bits.TMR0IE = 1;

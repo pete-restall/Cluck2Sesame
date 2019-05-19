@@ -107,11 +107,11 @@ void test_clockInitialise_called_expectTimerIsZero(void)
 	TEST_ASSERT_EQUAL_UINT8(0, TMR0L);
 }
 
-void test_clockInitialise_called_expectTimerComparisonIs256Seconds(void)
+void test_clockInitialise_called_expectTimerComparisonIs60Seconds(void)
 {
-	TMR0H = anyByteExcept(0);
+	TMR0H = anyByteExcept(59);
 	clockInitialise();
-	TEST_ASSERT_EQUAL_UINT8(0, TMR0H);
+	TEST_ASSERT_EQUAL_UINT8(59, TMR0H);
 }
 
 void test_clockInitialise_called_expectNowDateIsInitialisedAsEpoch(void)
