@@ -17,6 +17,13 @@ void clockGetNowGmt(struct DateAndTimeGet *const now)
 	// HOUR IS UNCHANGED)
 	clockNow.date.flags.isLeapYear = (clockNow.date.year & 3) == 0;
 	clockNow.time.second = TMR0L;
+	//if (TMR0IF)
+	//{
+	//	TMR0IF = 0;
+	//	clockNow.time.second = TMR0L;
+	//	clockTicked();
+	//}
+
 	memcpy(now, &clockNow, sizeof(struct DateAndTimeGet));
 }
 
@@ -26,6 +33,7 @@ void clockSetNowGmt(const struct DateAndTimeSet *const now)
 	clockNow.date.flags.all = 0;
 	clockNow.date.flags.isLeapYear = 1;
 	TMR0L = clockNow.time.second;
+	// TODO: TMR0IF NEEDS TO BE CLEARED HERE, SINCE WE'VE JUST FORCED TMR0L
 	// TODO: SET isDaylightSavings, isLeapYear, dayOfYear CORRECTLY, ETC.
 	// TODO: SET TMR0L WITH SECONDS
 	// TODO: PUBLISH DATE_CHANGED EVENT, IF APPLICABLE (BEFORE TIME_CHANGED)
