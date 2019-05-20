@@ -13,8 +13,6 @@
 
 TEST_FILE("Clock/ClockInitialise.c")
 TEST_FILE("Clock/ClockGetSetNow.c")
-TEST_FILE("Clock/ClockDateFromDiscrete.c")
-TEST_FILE("Clock/ClockTimeFromDiscrete.c")
 
 static void clockGetNowGmt_called_expectDayOfYearIsValidForEachMonth(
 	struct DateAndTimeSet *const monthPrototype,
@@ -404,7 +402,3 @@ void test_clockGetNowGmt_calledWhenLeapYear_expectDayOfYearIsValidForEachMonthEn
 		&monthEnd,
 		&expectedDayOfYear);
 }
-
-// TODO: CLOCK GET WHEN TMR0IF IS SET - MAKE SURE IT'S CLEARED AND MINUTES ARE UPDATED
-
-// TODO: CLOCK SET WHEN TMR0IF IS SET - MAKE SURE IT'S CLEARED AND MINUTES NOT UPDATED

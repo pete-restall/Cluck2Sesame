@@ -13,8 +13,6 @@
 
 TEST_FILE("Clock/ClockInitialise.c")
 TEST_FILE("Clock/ClockGetSetNow.c")
-TEST_FILE("Clock/ClockDateFromDiscrete.c")
-TEST_FILE("Clock/ClockTimeFromDiscrete.c")
 
 void setUp(void)
 {

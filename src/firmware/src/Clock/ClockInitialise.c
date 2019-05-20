@@ -14,10 +14,8 @@ static void onWokenFromSleep(const struct Event *const event);
 
 static void buggyCompilerWorkaround(void)
 {
-	static const struct DateChanged dummy =
-	{
-		.today = _OMNITARGET
-	};
+	static const struct DateChanged dummy1 = { .today = _OMNITARGET };
+	static const struct TimeChanged dummy2 = { .now = _OMNITARGET };
 }
 
 void clockInitialise(void)

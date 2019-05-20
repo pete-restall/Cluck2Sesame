@@ -4,11 +4,18 @@
 #include "Event.h"
 
 struct DateWithFlags;
+struct Time;
 
 #define DATE_CHANGED ((EventType) 0x10)
 struct DateChanged
 {
-	const struct DateWithFlags *const today;
+	const struct DateWithFlags *today;
+};
+
+#define TIME_CHANGED ((EventType) 0x11)
+struct TimeChanged
+{
+	const struct Time *now;
 };
 
 struct Date
