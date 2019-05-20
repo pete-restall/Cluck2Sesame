@@ -11,6 +11,10 @@ static struct DateAndTimeGet clockNow;
 
 void clockGetNowGmt(struct DateAndTimeGet *const now)
 {
+	// TODO: IF THERE IS A TMR0IF SOMEWHERE IN HERE THEN WE RISK GETTING A
+	// CORRUPTED DATE / TIME (IE. 23:59 TICKS OVER TO THE NEXT DAY, OR TIME
+	// APPEARING TO GO BACKWARDS IF JUST THE 59TH MINUTE TICKS OVER AND THE
+	// HOUR IS UNCHANGED)
 	clockNow.date.flags.isLeapYear = (clockNow.date.year & 3) == 0;
 	clockNow.time.second = TMR0L;
 	memcpy(now, &clockNow, sizeof(struct DateAndTimeGet));
@@ -24,7 +28,8 @@ void clockSetNowGmt(const struct DateAndTimeSet *const now)
 	TMR0L = clockNow.time.second;
 	// TODO: SET isDaylightSavings, isLeapYear, dayOfYear CORRECTLY, ETC.
 	// TODO: SET TMR0L WITH SECONDS
-	// TODO: PUBLISH DATE_CHANGED EVENT
+	// TODO: PUBLISH DATE_CHANGED EVENT, IF APPLICABLE (BEFORE TIME_CHANGED)
+	// TODO: PUBLISH TIME_CHANGED EVENT (AFTER DATE_CHANGED)
 
 	clockNow.date.dayOfYear = clockNow.date.day - 1;
 	uint8_t month = clockNow.date.month;
@@ -80,4 +85,6 @@ void clockTicked(void)
 
 		clockNow.time.minute = 0;
 	}
+	// TODO: PUBLISH DATE CHANGED (IF APPLICABLE).  MAKE SURE IT'S BEFORE TIME_CHANGED
+	// TODO: PUBLISH TIME_CHANGED.  MAKE SURE IT'S AFTER DATE_CHANGED
 }
