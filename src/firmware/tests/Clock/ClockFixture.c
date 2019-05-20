@@ -109,9 +109,6 @@ void assertEqualDateTimeExceptYearAndMonthAndDayAndHourAndMinute(
 	const struct DateAndTimeGet *const expected,
 	const struct DateAndTimeGet *const actual)
 {
-	TEST_ASSERT_EQUAL_HEX8_MESSAGE(
-		expected->date.flags.all, actual->date.flags.all, "F");
-
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(
 		expected->time.second, actual->time.second, "SS");
 }

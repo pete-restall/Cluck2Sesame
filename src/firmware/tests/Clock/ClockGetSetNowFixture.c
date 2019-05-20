@@ -7,6 +7,7 @@
 #include "Clock.h"
 
 #include "ClockFixture.h"
+#include "ClockGetSetNowFixture.h"
 
 #include "../NonDeterminism.h"
 
@@ -40,13 +41,19 @@ static void publishWokenFromSleep(void)
 	eventPublish(WOKEN_FROM_SLEEP, &emptyArgs);
 }
 
+uint8_t anyNonLeapYear(void)
+{
+	return anyNonLeapYearLessThan(100);
+}
+
 uint8_t anyNonLeapYearLessThan(uint8_t value)
 {
-	uint8_t year = anyByteLessThan(value);
-	if ((year & 3) == 0)
-		return year | 1;
-
-	return year;
+	while (1)
+	{
+		uint8_t year = anyByteLessThan(value);
+		if (year & 3)
+			return year;
+	};
 }
 
 uint8_t anyLeapYear(void)
