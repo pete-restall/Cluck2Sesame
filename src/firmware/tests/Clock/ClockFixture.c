@@ -2,10 +2,35 @@
 #include <stdint.h>
 #include <unity.h>
 
+#include "PowerManagement.h"
+#include "Event.h"
 #include "Clock.h"
 
 #include "ClockFixture.h"
 #include "../NonDeterminism.h"
+
+static uint8_t stubCallSequence;
+
+const struct DateChanged *dateChanged;
+uint8_t dateChangedCalls;
+uint8_t dateChangedSequence;
+
+const struct TimeChanged *timeChanged;
+uint8_t timeChangedCalls;
+uint8_t timeChangedSequence;
+
+void clockFixtureSetUp(void)
+{
+	stubCallSequence = 1;
+	dateChanged = (const struct DateChanged *) 0;
+	dateChangedCalls = dateChangedSequence = 0;
+	timeChanged = (const struct TimeChanged *) 0;
+	timeChangedCalls = timeChangedSequence = 0;
+}
+
+void clockFixtureTearDown(void)
+{
+}
 
 void stubAnyDateTimeWithHourAndMinute(uint8_t hour, uint8_t minute)
 {
@@ -111,4 +136,52 @@ void assertEqualDateTimeExceptYearAndMonthAndDayAndHourAndMinute(
 {
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(
 		expected->time.second, actual->time.second, "SS");
+}
+
+void publishWokenFromSleep(void)
+{
+	static const struct WokenFromSleep emptyArgs = { };
+	eventPublish(WOKEN_FROM_SLEEP, &emptyArgs);
+}
+
+void dispatchAllEvents(void)
+{
+	while (eventDispatchNext())
+		;;
+}
+
+void mockOnDateChanged(void)
+{
+	static const struct EventSubscription onDateChangedSubscription =
+	{
+		.type = DATE_CHANGED,
+		.handler = &onDateChanged
+	};
+
+	eventSubscribe(&onDateChangedSubscription);
+}
+
+void onDateChanged(const struct Event *const event)
+{
+	dateChanged = (const struct DateChanged *) event->args;
+	dateChangedCalls++;
+	dateChangedSequence = stubCallSequence++;
+}
+
+void mockOnTimeChanged(void)
+{
+	static const struct EventSubscription onTimeChangedSubscription =
+	{
+		.type = TIME_CHANGED,
+		.handler = &onTimeChanged
+	};
+
+	eventSubscribe(&onTimeChangedSubscription);
+}
+
+void onTimeChanged(const struct Event *const event)
+{
+	timeChanged = (const struct TimeChanged *) event->args;
+	timeChangedCalls++;
+	timeChangedSequence = stubCallSequence++;
 }

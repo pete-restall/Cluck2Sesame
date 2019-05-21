@@ -20,12 +20,14 @@ static void clockGetNowGmt_called_expectDayOfYearIsValidForEachMonth(
 
 void setUp(void)
 {
+	clockFixtureSetUp();
 	clockGetSetNowFixtureSetUp();
 }
 
 void tearDown(void)
 {
 	clockGetSetNowFixtureTearDown();
+	clockFixtureTearDown();
 }
 
 void test_clockGetNowGmt_calledWhenClockOfLastDayOfNonLeapYearDecemberTicks_expectNewYearAndAndFirstMonthAndDayAndZeroHoursAndMinutes(void)

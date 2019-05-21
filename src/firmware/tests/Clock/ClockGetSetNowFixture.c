@@ -11,8 +11,6 @@
 
 #include "../NonDeterminism.h"
 
-static void publishWokenFromSleep(void);
-
 void clockGetSetNowFixtureSetUp(void)
 {
 	eventInitialise();
@@ -31,14 +29,7 @@ void tick(void)
 {
 	PIR0bits.TMR0IF = 1;
 	publishWokenFromSleep();
-	while (eventDispatchNext())
-		;;
-}
-
-static void publishWokenFromSleep(void)
-{
-	static const struct WokenFromSleep emptyArgs = { };
-	eventPublish(WOKEN_FROM_SLEEP, &emptyArgs);
+	dispatchAllEvents();
 }
 
 uint8_t anyNonLeapYear(void)

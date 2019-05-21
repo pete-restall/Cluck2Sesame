@@ -16,12 +16,14 @@ TEST_FILE("Clock/ClockGetSetNow.c")
 
 void setUp(void)
 {
+	clockFixtureSetUp();
 	clockGetSetNowFixtureSetUp();
 }
 
 void tearDown(void)
 {
 	clockGetSetNowFixtureTearDown();
+	clockFixtureTearDown();
 }
 
 void test_clockGetNowGmt_called_expectSecondsIsTmr0l(void)

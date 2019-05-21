@@ -96,18 +96,18 @@ static uint8_t daysInMonth(uint8_t month, uint8_t year)
 void clockSetNowGmt(const struct DateAndTimeSet *const now)
 {
 	memcpy(&clockNow, now, sizeof(struct DateAndTimeSet));
+	// TODO: SET isDaylightSavings, isLeapYear, dayOfYear CORRECTLY, ETC.
 	clockNow.date.flags.all = 0;
 	clockNow.date.flags.isLeapYear = 1;
+	TMR0H = 59;
 	TMR0L = clockNow.time.second;
-	// TODO: TMR0IF NEEDS TO BE CLEARED HERE, SINCE WE'VE JUST FORCED TMR0L
-	// TODO: TMR0H SHOULD BE RESET TO 59 IN HERE.  THIS ALLOWS US TO COMPENSATE FOR DRIFT BY SETTING TMR0H TO 59 OR 61 (FOR EXAMPLE) AND THEN FORGET ABOUT IT
-	// TODO: SET isDaylightSavings, isLeapYear, dayOfYear CORRECTLY, ETC.
-	// TODO: SET TMR0L WITH SECONDS
-	// TODO: PUBLISH DATE_CHANGED EVENT, IF APPLICABLE (BEFORE TIME_CHANGED)
-	// TODO: PUBLISH TIME_CHANGED EVENT (AFTER DATE_CHANGED)
+	PIR0bits.TMR0IF = 0;
 
 	clockNow.date.dayOfYear = clockNow.date.day - 1;
 	uint8_t month = clockNow.date.month;
 	while (--month != 0)
 		clockNow.date.dayOfYear += daysInMonth(month, clockNow.date.year);
+
+	// TODO: PUBLISH DATE_CHANGED EVENT, IF APPLICABLE (BEFORE TIME_CHANGED)
+	// TODO: PUBLISH TIME_CHANGED EVENT (AFTER DATE_CHANGED)
 }

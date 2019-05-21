@@ -1,7 +1,11 @@
 #ifndef __CLUCK3SESAME_TESTS_CLOCK_CLOCKFIXTURE_H
 #define __CLUCK3SESAME_TESTS_CLOCK_CLOCKFIXTURE_H
 #include <stdint.h>
+#include "Event.h"
 #include "Clock.h"
+
+extern void clockFixtureSetUp(void);
+extern void clockFixtureTearDown(void);
 
 extern void stubAnyDateTimeWithHourAndMinute(uint8_t hour, uint8_t minute);
 extern void stubAnyDateTimeWithDayAndHourAndMinute(
@@ -34,5 +38,20 @@ extern void assertEqualDateTimeExceptMonthAndDayAndHourAndMinute(
 extern void assertEqualDateTimeExceptYearAndMonthAndDayAndHourAndMinute(
 	const struct DateAndTimeGet *const expected,
 	const struct DateAndTimeGet *const actual);
+
+extern void publishWokenFromSleep(void);
+extern void dispatchAllEvents(void);
+extern void mockOnTimeChanged(void);
+extern void onTimeChanged(const struct Event *const event);
+extern void mockOnDateChanged(void);
+extern void onDateChanged(const struct Event *const event);
+
+extern const struct DateChanged *dateChanged;
+extern uint8_t dateChangedCalls;
+extern uint8_t dateChangedSequence;
+
+extern const struct TimeChanged *timeChanged;
+extern uint8_t timeChangedCalls;
+extern uint8_t timeChangedSequence;
 
 #endif
