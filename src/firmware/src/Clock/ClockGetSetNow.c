@@ -28,8 +28,6 @@ void clockGetNowGmt(struct DateAndTimeGet *const now)
 	{
 		TMR0IF = 0;
 		clockTicked();
-	// TODO: TEST FOR PUBLISH OF DATE_CHANGED EVENT, IF APPLICABLE (BEFORE TIME_CHANGED)
-	// TODO: TEST FOR PUBLISH OF TIME_CHANGED EVENT (AFTER DATE_CHANGED)
 	}
 
 	memcpy(now, &clockNow, sizeof(struct DateAndTimeGet));
