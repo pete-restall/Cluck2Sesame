@@ -7,20 +7,19 @@
 #include "Clock.h"
 
 #include "ClockFixture.h"
+#include "ClockGetSetNowFixture.h"
+
 #include "../NonDeterminism.h"
 
 TEST_FILE("Clock/ClockInitialise.c")
 TEST_FILE("Clock/ClockGetSetNow.c")
 
-static void tick(void);
+static void tickWithoutSettingInterruptFlag(void);
 
 void setUp(void)
 {
 	clockFixtureSetUp();
-	eventInitialise();
-	clockInitialise();
-	T0CON0bits.T0EN = 0;
-	T0CON1bits.T0CKPS = 0;
+	clockGetSetNowFixtureSetUp();
 }
 
 void tearDown(void)
@@ -33,16 +32,17 @@ void test_tick_onWokenFromSleepWhenTimerInterruptFlagIsClear_expectTimeIsNotIncr
 	stubAnyDateTime();
 	struct DateAndTimeGet before;
 	clockGetNowGmt(&before);
+	dispatchAllEvents();
 
 	PIR0bits.TMR0IF = 0;
-	tick();
+	tickWithoutSettingInterruptFlag();
 	struct DateAndTimeGet now;
 	clockGetNowGmt(&now);
 
 	assertEqualDateTime(&before, &now);
 }
 
-static void tick(void)
+static void tickWithoutSettingInterruptFlag(void)
 {
 	publishWokenFromSleep();
 	dispatchAllEvents();
@@ -53,9 +53,10 @@ void test_tick_onWokenFromSleepWhenTimerInterruptFlagIsSet_expectTimeIsIncrement
 	stubAnyDateTimeWithHourAndMinute(anyByteLessThan(23), anyByteLessThan(59));
 	struct DateAndTimeGet before;
 	clockGetNowGmt(&before);
+	dispatchAllEvents();
 
 	PIR0bits.TMR0IF = 1;
-	tick();
+	tickWithoutSettingInterruptFlag();
 	struct DateAndTimeGet now;
 	clockGetNowGmt(&now);
 
@@ -67,23 +68,22 @@ void test_tick_onWokenFromSleepWhenTimerInterruptFlagIsSet_expectTimerInterruptF
 {
 	PIR0 = anyByteWithMaskSet(_PIR0_TMR0IF_MASK);
 	uint8_t originalPir0 = PIR0;
-	tick();
+	tickWithoutSettingInterruptFlag();
 	TEST_ASSERT_EQUAL_UINT8(originalPir0 & ~_PIR0_TMR0IF_MASK, PIR0);
 }
 
-void test_tick_calledWhenTmr0hIsNotOneMinute_expectTmr0hIsResetToOneMinute(void)
+void test_tick_happensWhenTmr0hIsNotOneMinute_expectTmr0hIsResetToOneMinute(void)
 {
 	TMR0H = anyByteExcept(59);
-	PIR0bits.TMR0IF = 1;
 	tick();
 	TEST_ASSERT_EQUAL_UINT8(59, TMR0H);
 }
 
-void test_tick_called_expectTimeChangedEventIsPublished(void)
+void test_tick_happens_expectTimeChangedEventIsPublished(void)
 {
 	stubAnyDateTime();
+	dispatchAllEvents();
 	mockOnTimeChanged();
-	PIR0bits.TMR0IF = 1;
 	tick();
 
 	struct DateAndTimeGet now;
@@ -98,11 +98,11 @@ void test_tick_called_expectTimeChangedEventIsPublished(void)
 		"Time");
 }
 
-void test_tick_calledWhenTicksToNextDay_expectDateChangedEventIsPublished(void)
+void test_tick_happensWhenTicksToNextDay_expectDateChangedEventIsPublished(void)
 {
 	stubAnyDateTimeWithHourAndMinute(23, 59);
+	dispatchAllEvents();
 	mockOnDateChanged();
-	PIR0bits.TMR0IF = 1;
 	tick();
 
 	struct DateAndTimeGet now;
@@ -117,21 +117,73 @@ void test_tick_calledWhenTicksToNextDay_expectDateChangedEventIsPublished(void)
 		"Date");
 }
 
-void test_tick_calledWhenDoesNotTickToNextDay_expectNoDateChangedEventIsPublished(void)
+void test_tick_happensWhenDoesNotTickToNextDay_expectNoDateChangedEventIsPublished(void)
 {
 	stubAnyDateTimeWithHourAndMinute(23, anyByteLessThan(59));
+	dispatchAllEvents();
 	mockOnDateChanged();
-	PIR0bits.TMR0IF = 1;
 	tick();
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, dateChangedCalls, "Num Events");
 }
 
-void test_tick_calledWhenTicksToNextDay_expectDateChangedEventIsPublishedBeforeTimeChanged(void)
+void test_tick_happensWhenTicksToNextDay_expectDateChangedEventIsPublishedBeforeTimeChanged(void)
 {
 	stubAnyDateTimeWithHourAndMinute(23, 59);
+	dispatchAllEvents();
 	mockOnDateChanged();
 	mockOnTimeChanged();
-	PIR0bits.TMR0IF = 1;
 	tick();
 	TEST_ASSERT_TRUE(dateChangedSequence < timeChangedSequence);
+}
+
+void test_tick_happensWhenLeapYearTicksToNextYear_expectIsLeapYearFlagIsClear(void)
+{
+	struct DateAndTimeSet now =
+	{
+		.date =
+		{
+			.year = anyLeapYear(),
+			.month = 12,
+			.day = 31
+		},
+		.time =
+		{
+			.hour = 23,
+			.minute = 59
+		}
+	};
+
+	clockSetNowGmt(&now);
+	dispatchAllEvents();
+
+	mockOnDateChanged();
+	tick();
+	TEST_ASSERT_NOT_NULL(dateChanged);
+	TEST_ASSERT_FALSE(dateChanged->today->flags.isLeapYear);
+}
+
+void test_tick_happensWhenNonLeapYearTicksToNextYear_expectIsLeapYearFlagIsSet(void)
+{
+	struct DateAndTimeSet now =
+	{
+		.date =
+		{
+			.year = anyLeapYear() + 3,
+			.month = 12,
+			.day = 31
+		},
+		.time =
+		{
+			.hour = 23,
+			.minute = 59
+		}
+	};
+
+	clockSetNowGmt(&now);
+	dispatchAllEvents();
+
+	mockOnDateChanged();
+	tick();
+	TEST_ASSERT_NOT_NULL(dateChanged);
+	TEST_ASSERT_TRUE(dateChanged->today->flags.isLeapYear);
 }

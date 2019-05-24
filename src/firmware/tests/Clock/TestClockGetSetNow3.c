@@ -18,6 +18,7 @@ void setUp(void)
 {
 	clockFixtureSetUp();
 	clockGetSetNowFixtureSetUp();
+	dispatchAllEvents();
 }
 
 void tearDown(void)
@@ -85,8 +86,112 @@ void test_clockSetNowGmt_calledWhenTmr0hIsNotOneMinute_expectTmr0hIsResetToOneMi
 	TEST_ASSERT_EQUAL_UINT8(59, TMR0H);
 }
 
-// TODO: TEST SETNOW TO MAKE SURE DATE_CHANGED HAS LEAP-YEAR FLAG SET / CLEAR
-// TODO: TEST SETNOW TO MAKE SURE DATE_CHANGED HAS LEAP-YEAR FLAG SET / CLEAR
+void test_clockSetNowGmt_calledWhenLeapYear_expectIsLeapYearFlagIsSet(void)
+{
+	struct DateAndTimeSet now =
+	{
+		.date =
+		{
+			.year = anyLeapYear(),
+			.month = 1 + anyByteLessThan(12),
+			.day = 1 + anyByteLessThan(29)
+		}
+	};
+
+	mockOnDateChanged();
+	clockSetNowGmt(&now);
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, dateChangedCalls, "Calls");
+	TEST_ASSERT_NOT_NULL_MESSAGE(dateChanged, "Args");
+	TEST_ASSERT_TRUE_MESSAGE(dateChanged->today->flags.isLeapYear, "Flag");
+}
+
+void test_clockSetNowGmt_calledWhenNotLeapYear_expectIsLeapYearFlagIsClear(void)
+{
+	struct DateAndTimeSet now =
+	{
+		.date =
+		{
+			.year = anyNonLeapYear(),
+			.month = 1 + anyByteLessThan(12),
+			.day = 1 + anyByteLessThan(28)
+		}
+	};
+
+	mockOnDateChanged();
+	clockSetNowGmt(&now);
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, dateChangedCalls, "Calls");
+	TEST_ASSERT_NOT_NULL_MESSAGE(dateChanged, "Args");
+	TEST_ASSERT_FALSE_MESSAGE(dateChanged->today->flags.isLeapYear, "Flag");
+}
+
+void test_clockSetNowGmt_called_expectDateChangedIsPublishedWithCorrectDate(void)
+{
+	struct DateAndTimeSet now =
+	{
+		.date =
+		{
+			.year = anyByteLessThan(100),
+			.month = 1 + anyByteLessThan(12),
+			.day = 1 + anyByteLessThan(28)
+		}
+	};
+
+	mockOnDateChanged();
+	clockSetNowGmt(&now);
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, dateChangedCalls, "Calls");
+	TEST_ASSERT_NOT_NULL_MESSAGE(dateChanged, "Args");
+	assertEqualDate(&now.date, dateChanged->today);
+}
+
+void test_clockSetNowGmt_called_expectTimeChangedIsPublishedAfterDateChanged(void)
+{
+	struct DateAndTimeSet now =
+	{
+		.date =
+		{
+			.year = anyNonLeapYear(),
+			.month = 1 + anyByteLessThan(12),
+			.day = 1 + anyByteLessThan(28)
+		},
+		.time =
+		{
+			.hour = anyByteLessThan(24),
+			.minute = anyByteLessThan(60),
+			.second = anyByteLessThan(60)
+		}
+	};
+
+	mockOnDateChanged();
+	mockOnTimeChanged();
+	clockSetNowGmt(&now);
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, dateChangedCalls, "Calls (D)");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, timeChangedCalls, "Calls (T)");
+	TEST_ASSERT_TRUE_MESSAGE(dateChangedSequence < timeChangedSequence, "Sequence");
+}
+
+void test_clockSetNowGmt_called_expectTimeChangedIsPublishedWithCorrectTime(void)
+{
+	struct DateAndTimeSet now =
+	{
+		.time =
+		{
+			.hour = anyByteLessThan(24),
+			.minute = anyByteLessThan(60),
+			.second = anyByteLessThan(60)
+		}
+	};
+
+	mockOnDateChanged();
+	mockOnTimeChanged();
+	clockSetNowGmt(&now);
+	dispatchAllEvents();
+	TEST_ASSERT_NOT_NULL(timeChanged);
+	assertEqualDate(&now.time, timeChanged->now);
+}
+
 // TODO: TEST SETNOW TO MAKE SURE DATE_CHANGED HAS DST FLAG SET / CLEAR
 // TODO: TEST GETNOW TO MAKE SURE DATE_CHANGED HAS DST FLAG SET / CLEAR
-// TODO: TESTS TO MAKE SURE THE TIME_CHANGED EVENT IS FIRED AFTER THE DATE_CHANGED EVENT...

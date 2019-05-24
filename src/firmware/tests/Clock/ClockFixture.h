@@ -39,6 +39,14 @@ extern void assertEqualDateTimeExceptYearAndMonthAndDayAndHourAndMinute(
 	const struct DateAndTimeGet *const expected,
 	const struct DateAndTimeGet *const actual);
 
+extern void assertEqualDate(
+	const struct Date *const expected,
+	const struct Date *const actual);
+
+extern void assertEqualTime(
+	const struct Time *const expected,
+	const struct Time *const actual);
+
 extern void publishWokenFromSleep(void);
 extern void dispatchAllEvents(void);
 extern void mockOnTimeChanged(void);

@@ -22,10 +22,14 @@ uint8_t timeChangedSequence;
 void clockFixtureSetUp(void)
 {
 	stubCallSequence = 1;
+
 	dateChanged = (const struct DateChanged *) 0;
-	dateChangedCalls = dateChangedSequence = 0;
+	dateChangedCalls = 0;
+	dateChangedSequence = 0;
+
 	timeChanged = (const struct TimeChanged *) 0;
-	timeChangedCalls = timeChangedSequence = 0;
+	timeChangedCalls = 0;
+	timeChangedSequence = 0;
 }
 
 void clockFixtureTearDown(void)
@@ -136,6 +140,20 @@ void assertEqualDateTimeExceptYearAndMonthAndDayAndHourAndMinute(
 {
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(
 		expected->time.second, actual->time.second, "SS");
+}
+
+void assertEqualDate(
+	const struct Date *const expected,
+	const struct Date *const actual)
+{
+	TEST_ASSERT_EQUAL_UINT8_ARRAY(expected, actual, sizeof(struct Date));
+}
+
+void assertEqualTime(
+	const struct Time *const expected,
+	const struct Time *const actual)
+{
+	TEST_ASSERT_EQUAL_UINT8_ARRAY(expected, actual, sizeof(struct Time));
 }
 
 void publishWokenFromSleep(void)

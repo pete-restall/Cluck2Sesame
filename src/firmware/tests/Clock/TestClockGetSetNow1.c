@@ -18,6 +18,7 @@ void setUp(void)
 {
 	clockFixtureSetUp();
 	clockGetSetNowFixtureSetUp();
+	dispatchAllEvents();
 }
 
 void tearDown(void)

@@ -10,6 +10,16 @@ static uint8_t daysInMonth(uint8_t month, uint8_t year);
 
 static struct DateAndTimeGet clockNow;
 
+static const struct DateChanged dateChangedEventArgs =
+{
+	.today = &clockNow.date
+};
+
+static const struct TimeChanged timeChangedEventArgs =
+{
+	.now = &clockNow.time
+};
+
 void clockGetNowGmt(struct DateAndTimeGet *const now)
 {
 	clockNow.date.flags.isLeapYear = (clockNow.date.year & 3) == 0;
@@ -46,6 +56,9 @@ void clockTicked(void)
 					if (++clockNow.date.year == 100)
 						clockNow.date.year = 0;
 
+					clockNow.date.flags.isLeapYear =
+						(clockNow.date.year & 3) == 0;
+
 					clockNow.date.month = 1;
 					clockNow.date.dayOfYear = UINT16_MAX;
 				}
@@ -63,17 +76,9 @@ void clockTicked(void)
 	}
 
 	if (dateChanged)
-	{
-		static const struct DateChanged dateChanged =
-		{
-			.today = &clockNow.date
-		};
+		eventPublish(DATE_CHANGED, &dateChangedEventArgs);
 
-		eventPublish(DATE_CHANGED, &dateChanged);
-	}
-
-	static const struct TimeChanged timeChanged = { .now = &clockNow.time };
-	eventPublish(TIME_CHANGED, &timeChanged);
+	eventPublish(TIME_CHANGED, &timeChangedEventArgs);
 }
 
 static uint8_t daysInMonth(uint8_t month, uint8_t year)
@@ -96,9 +101,8 @@ static uint8_t daysInMonth(uint8_t month, uint8_t year)
 void clockSetNowGmt(const struct DateAndTimeSet *const now)
 {
 	memcpy(&clockNow, now, sizeof(struct DateAndTimeSet));
-	// TODO: SET isDaylightSavings, isLeapYear, dayOfYear CORRECTLY, ETC.
 	clockNow.date.flags.all = 0;
-	clockNow.date.flags.isLeapYear = 1;
+	clockNow.date.flags.isLeapYear = (clockNow.date.year & 3) == 0;
 	TMR0H = 59;
 	TMR0L = clockNow.time.second;
 	PIR0bits.TMR0IF = 0;
@@ -108,6 +112,6 @@ void clockSetNowGmt(const struct DateAndTimeSet *const now)
 	while (--month != 0)
 		clockNow.date.dayOfYear += daysInMonth(month, clockNow.date.year);
 
-	// TODO: PUBLISH DATE_CHANGED EVENT, IF APPLICABLE (BEFORE TIME_CHANGED)
-	// TODO: PUBLISH TIME_CHANGED EVENT (AFTER DATE_CHANGED)
+	eventPublish(DATE_CHANGED, &dateChangedEventArgs);
+	eventPublish(TIME_CHANGED, &timeChangedEventArgs);
 }
