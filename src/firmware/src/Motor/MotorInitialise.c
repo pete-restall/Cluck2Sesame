@@ -1,0 +1,17 @@
+#include <xc.h>
+
+#include "Motor.h"
+
+void motorInitialise(void)
+{
+	LATC &= 0b00110011;
+	ANSELC &= 0b00110011;
+	TRISC &= 0b00110011;
+
+	LATBbits.LATB1 = 0;
+	ANSELBbits.ANSB1 = 0;
+	TRISBbits.TRISB1 = 0;
+}
+
+// TODO: ON VOLTAGE REGULATOR ENABLED, RB1(A), RC2(D), RC3(D) NEED TO BE INPUTS
+// TODO: ON VOLTAGE REGULATOR DISABLED, RB1(A), RC2(D), RC3(D) NEED TO BE OUTPUTS
