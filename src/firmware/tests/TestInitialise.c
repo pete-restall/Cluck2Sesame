@@ -31,6 +31,7 @@ static struct CallDetails powerManagementInitialiseCalls;
 static struct CallDetails voltageRegulatorInitialiseCalls;
 static struct CallDetails pwmTimerInitialiseCalls;
 static struct CallDetails lcdInitialiseCalls;
+static struct CallDetails motorInitialiseCalls;
 static struct CallDetails sunEventsInitialiseCalls;
 static struct CallDetails systemInitialisedEventPublishCalls;
 
@@ -44,6 +45,7 @@ void setUp(void)
 	clearCallsFor(&voltageRegulatorInitialiseCalls);
 	clearCallsFor(&pwmTimerInitialiseCalls);
 	clearCallsFor(&lcdInitialiseCalls);
+	clearCallsFor(&motorInitialiseCalls);
 	clearCallsFor(&sunEventsInitialiseCalls);
 	clearCallsFor(&systemInitialisedEventPublishCalls);
 
@@ -152,10 +154,21 @@ void lcdInitialise(void)
 	registerCallFor(&lcdInitialiseCalls);
 }
 
-void test_initialise_called_expectSunEventsAreInitialisedAfterLcd(void)
+void test_initialise_called_expectMotorIsInitialisedAfterLcd(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&sunEventsInitialiseCalls, 8);
+	assertCalledOnceAtSequence(&motorInitialiseCalls, 8);
+}
+
+void motorInitialise(void)
+{
+	registerCallFor(&motorInitialiseCalls);
+}
+
+void test_initialise_called_expectSunEventsAreInitialisedAfterMotor(void)
+{
+	initialise();
+	assertCalledOnceAtSequence(&sunEventsInitialiseCalls, 9);
 }
 
 void sunEventsInitialise(void)

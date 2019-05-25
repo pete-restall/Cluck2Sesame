@@ -8,6 +8,7 @@
 #include "VoltageRegulator.h"
 #include "PwmTimer.h"
 #include "Lcd.h"
+#include "Motor.h"
 #include "SunEvents.h"
 
 void initialise(void)
@@ -20,6 +21,7 @@ void initialise(void)
 	voltageRegulatorInitialise();
 	pwmTimerInitialise();
 	lcdInitialise();
+	motorInitialise();
 	sunEventsInitialise();
 	eventPublish(SYSTEM_INITIALISED, &emptyEventArgs);
 }
