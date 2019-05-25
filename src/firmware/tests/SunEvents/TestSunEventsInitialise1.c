@@ -6,6 +6,7 @@
 
 #include "SunEvents.h"
 
+#include "../Fixture.h"
 #include "../NonDeterminism.h"
 
 TEST_FILE("SunEvents/SunEventsInitialise.c")
@@ -31,13 +32,13 @@ static void eventSubscribeStub(
 	}
 }
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	eventSubscribe_StubWithCallback(&eventSubscribeStub);
 	onLocationChanged = (const struct EventSubscription *) 0;
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 

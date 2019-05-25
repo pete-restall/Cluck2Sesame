@@ -6,7 +6,9 @@
 #include "VoltageRegulator.h"
 
 #include "VoltageRegulatorFixture.h"
-#include "NonDeterminism.h"
+
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("VoltageRegulator.c")
 TEST_FILE("VoltageRegulatorFixture.c")

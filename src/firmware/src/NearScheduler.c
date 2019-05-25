@@ -25,6 +25,9 @@ static struct NearSchedule *const noMoreSchedules = schedules + MAX_SCHEDULES;
 
 void nearSchedulerInitialise(void)
 {
+	PMD1bits.NCO1MD = 0;
+	asm("nop");
+
 	NCO1CON = 0;
 	NCO1CLK = NCOCLK_SOURCE_SOSC;
 	NCO1INCU = 0;

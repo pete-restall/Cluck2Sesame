@@ -5,7 +5,9 @@
 #include "Event.h"
 
 #include "Mock_EventHandler.h"
-#include "NonDeterminism.h"
+
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("Event.c")
 
@@ -27,7 +29,7 @@ static void eventHandlerThatIncrementsCounter(const struct Event *event)
 	eventHandlerCallCount++;
 }
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	eventHandlerCallCount = 0;
 
@@ -52,7 +54,7 @@ void setUp(void)
 	eventInitialise();
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 

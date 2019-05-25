@@ -7,7 +7,8 @@
 #include "Mock_LcdInternals.h"
 #include "Lcd.h"
 
-#include "NonDeterminism.h"
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("Event.c")
 TEST_FILE("Lcd/LcdInitialise.c")
@@ -16,13 +17,13 @@ TEST_FILE("Lcd/LcdEnableDisable.c")
 static void assertLcdConfigureNotCalled(int numCalls);
 static void publishVoltageRegulatorEnabled(void);
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	eventInitialise();
 	lcdInitialise();
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 
@@ -91,7 +92,8 @@ void test_lcdEnable_calledWhenVoltageRegulatorIsNotEnabledAndThenEventPublished_
 	lcdEnable();
 	lcdConfigure_Expect();
 	publishVoltageRegulatorEnabled();
-	while (eventDispatchNext());
+	while (eventDispatchNext())
+		;;
 }
 
 static void publishVoltageRegulatorEnabled(void)
@@ -104,5 +106,6 @@ void test_lcdEnable_notCalled_expectVoltageRegulatorEnabledEventDoesNotConfigure
 {
 	lcdConfigure_StubWithCallback(assertLcdConfigureNotCalled);
 	publishVoltageRegulatorEnabled();
-	while (eventDispatchNext());
+	while (eventDispatchNext())
+		;;
 }

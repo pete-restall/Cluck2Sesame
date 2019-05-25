@@ -15,9 +15,9 @@ void initialise(void)
 {
 	static const struct SystemInitialised emptyEventArgs = { };
 	eventInitialise();
+	powerManagementInitialise();
 	clockInitialise();
 	nearSchedulerInitialise();
-	powerManagementInitialise();
 	voltageRegulatorInitialise();
 	pwmTimerInitialise();
 	lcdInitialise();

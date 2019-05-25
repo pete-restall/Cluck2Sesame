@@ -9,19 +9,19 @@
 #include "ClockFixture.h"
 #include "ClockGetSetNowFixture.h"
 
+#include "../Fixture.h"
 #include "../NonDeterminism.h"
 
 TEST_FILE("Clock/ClockInitialise.c")
 TEST_FILE("Clock/ClockGetSetNow.c")
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	clockFixtureSetUp();
 	clockGetSetNowFixtureSetUp();
-	dispatchAllEvents();
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 	clockGetSetNowFixtureTearDown();
 	clockFixtureTearDown();
@@ -183,4 +183,33 @@ void test_clockGetNowGmt_calledWhenClockOfLastDayOfFebruaryInLeapYearMonthTicks_
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(before.date.dayOfYear + 1, now.date.dayOfYear, "DoY");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(before.date.month + 1, now.date.month, "M");
 	assertEqualDateTimeExceptMonthAndDayAndHourAndMinute(&before, &now);
+}
+
+void test_clockGetNowGmt_calledWhenClockOfLastDayOfNonLeapYearDecemberTicks_expectNewYearAndAndFirstMonthAndDayAndZeroHoursAndMinutes(void)
+{
+	struct DateAndTimeGet before =
+	{
+		.date =
+		{
+			.year = anyNonLeapYearLessThan(99),
+			.month = 12,
+			.day = 31
+		},
+		.time = { .hour = 23, .minute = 59, .second = anyByteLessThan(60) }
+	};
+
+	clockSetNowGmt((const struct DateAndTimeSet *) &before);
+	clockGetNowGmt(&before);
+
+	tick();
+	struct DateAndTimeGet now;
+	clockGetNowGmt(&now);
+
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.time.minute, "MM");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.time.hour, "HH");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, now.date.day, "D");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.date.dayOfYear, "DoY");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, now.date.month, "M");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(before.date.year + 1, now.date.year, "Y");
+	assertEqualDateTimeExceptYearAndMonthAndDayAndHourAndMinute(&before, &now);
 }

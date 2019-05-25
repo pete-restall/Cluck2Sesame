@@ -6,6 +6,7 @@
 #include "Mock_VoltageRegulator.h"
 #include "Motor.h"
 
+#include "../Fixture.h"
 #include "../NonDeterminism.h"
 
 TEST_FILE("Motor/MotorInitialise.c")
@@ -14,12 +15,12 @@ static void publishVoltageRegulatorEnabled(void);
 static void dispatchAllEvents(void);
 static void publishVoltageRegulatorDisabled(void);
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	eventInitialise();
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 

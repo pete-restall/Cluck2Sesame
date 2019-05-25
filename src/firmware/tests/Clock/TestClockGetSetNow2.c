@@ -9,6 +9,7 @@
 #include "ClockFixture.h"
 #include "ClockGetSetNowFixture.h"
 
+#include "../Fixture.h"
 #include "../NonDeterminism.h"
 
 TEST_FILE("Clock/ClockInitialise.c")
@@ -18,46 +19,16 @@ static void clockGetNowGmt_called_expectDayOfYearIsValidForEachMonth(
 	struct DateAndTimeSet *const monthPrototype,
 	const uint16_t *expectedDayOfYear);
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	clockFixtureSetUp();
 	clockGetSetNowFixtureSetUp();
-	dispatchAllEvents();
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 	clockGetSetNowFixtureTearDown();
 	clockFixtureTearDown();
-}
-
-void test_clockGetNowGmt_calledWhenClockOfLastDayOfNonLeapYearDecemberTicks_expectNewYearAndAndFirstMonthAndDayAndZeroHoursAndMinutes(void)
-{
-	struct DateAndTimeGet before =
-	{
-		.date =
-		{
-			.year = anyNonLeapYearLessThan(99),
-			.month = 12,
-			.day = 31
-		},
-		.time = { .hour = 23, .minute = 59, .second = anyByteLessThan(60) }
-	};
-
-	clockSetNowGmt((const struct DateAndTimeSet *) &before);
-	clockGetNowGmt(&before);
-
-	tick();
-	struct DateAndTimeGet now;
-	clockGetNowGmt(&now);
-
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.time.minute, "MM");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.time.hour, "HH");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, now.date.day, "D");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, now.date.dayOfYear, "DoY");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, now.date.month, "M");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(before.date.year + 1, now.date.year, "Y");
-	assertEqualDateTimeExceptYearAndMonthAndDayAndHourAndMinute(&before, &now);
 }
 
 void test_clockGetNowGmt_calledWhenClockOfLastDayOfLeapYearDecemberTicks_expectNewYearAndAndFirstMonthAndDayAndZeroHoursAndMinutes(void)
@@ -302,7 +273,7 @@ void test_clockGetNowGmt_calledWhenNotLeapYear_expectDayOfYearIsValidForEachMont
 
 	clockGetNowGmt_called_expectDayOfYearIsValidForEachMonth(
 		&monthStart,
-		&expectedDayOfYear);
+		expectedDayOfYear);
 }
 
 static void clockGetNowGmt_called_expectDayOfYearIsValidForEachMonth(
@@ -359,7 +330,7 @@ void test_clockGetNowGmt_calledWhenLeapYear_expectDayOfYearIsValidForEachMonthSt
 
 	clockGetNowGmt_called_expectDayOfYearIsValidForEachMonth(
 		&monthStart,
-		&expectedDayOfYear);
+		expectedDayOfYear);
 }
 
 void test_clockGetNowGmt_calledWhenNotLeapYear_expectDayOfYearIsValidForEachMonthEnd(void)
@@ -381,7 +352,7 @@ void test_clockGetNowGmt_calledWhenNotLeapYear_expectDayOfYearIsValidForEachMont
 
 	clockGetNowGmt_called_expectDayOfYearIsValidForEachMonth(
 		&monthEnd,
-		&expectedDayOfYear);
+		expectedDayOfYear);
 }
 
 void test_clockGetNowGmt_calledWhenLeapYear_expectDayOfYearIsValidForEachMonthEnd(void)
@@ -403,5 +374,5 @@ void test_clockGetNowGmt_calledWhenLeapYear_expectDayOfYearIsValidForEachMonthEn
 
 	clockGetNowGmt_called_expectDayOfYearIsValidForEachMonth(
 		&monthEnd,
-		&expectedDayOfYear);
+		expectedDayOfYear);
 }

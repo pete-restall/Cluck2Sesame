@@ -5,7 +5,9 @@
 
 #include "FakeLcd.h"
 #include "LcdFixture.h"
-#include "NonDeterminism.h"
+
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("Poll.c")
 TEST_FILE("Event.c")
@@ -28,12 +30,12 @@ static void onAddressSet(void *const state);
 
 static struct LcdSetAddressTransaction addressTransaction;
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	lcdFixtureInitialise();
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 	lcdFixtureShutdown();
 }

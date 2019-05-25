@@ -5,7 +5,9 @@
 
 #include "FakeLcd.h"
 #include "LcdFixture.h"
-#include "NonDeterminism.h"
+
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("Poll.c")
 TEST_FILE("Event.c")
@@ -31,7 +33,7 @@ static uint8_t screen[sizeof(fakeLcdDram) + 1];
 
 static const struct LcdPutsTransaction dummyTransaction = { .buffer = "\0" };
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	lcdFixtureInitialise();
 	for (uint8_t i = 0; i < sizeof(screen); i++)
@@ -40,7 +42,7 @@ void setUp(void)
 	screen[sizeof(screen) - 1] = '\0';
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 	lcdFixtureShutdown();
 }

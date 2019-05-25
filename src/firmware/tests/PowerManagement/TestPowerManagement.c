@@ -6,7 +6,9 @@
 #include "PowerManagement.h"
 
 #include "TestPowerManagement.h"
-#include "NonDeterminism.h"
+
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("Poll.c")
 
@@ -19,14 +21,14 @@ static struct Event onAllEventsDispatchedEvent;
 static const struct EventSubscription *onAllEventsDispatched;
 static uint8_t numberOfEventPublishesForWokenFromSleep;
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	sleepExecuted = 0;
 	onAllEventsDispatched = (const struct EventSubscription *) 0;
 	numberOfEventPublishesForWokenFromSleep = 0;
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 
@@ -36,6 +38,23 @@ void test_powerManagementInitialise_called_expectPeripheralInterruptsAllowWakeFr
 	uint8_t originalIntcon = INTCON;
 	powerManagementInitialise();
 	TEST_ASSERT_EQUAL_UINT8(originalIntcon | _INTCON_PEIE_MASK, INTCON);
+}
+
+void test_powerManagementInitialise_called_expectAllModulesExceptSystemClockAndNvmAreDisabled(void)
+{
+	PMD0 = _PMD0_SYSCMD_MASK | _PMD0_NVMMD_MASK;
+	PMD1 = 0;
+	PMD2 = 0;
+	PMD3 = 0;
+	PMD4 = 0;
+	PMD5 = 0;
+	powerManagementInitialise();
+	TEST_ASSERT_EQUAL_HEX8_MESSAGE(0b01000011, PMD0, "PMD0");
+	TEST_ASSERT_EQUAL_HEX8_MESSAGE(0b10000111, PMD1, "PMD1");
+	TEST_ASSERT_EQUAL_HEX8_MESSAGE(0b01100111, PMD2, "PMD2");
+	TEST_ASSERT_EQUAL_HEX8_MESSAGE(0b00111111, PMD3, "PMD3");
+	TEST_ASSERT_EQUAL_HEX8_MESSAGE(0b11110001, PMD4, "PMD4");
+	TEST_ASSERT_EQUAL_HEX8_MESSAGE(0b00011110, PMD5, "PMD5");
 }
 
 void test_powerManagementInitialise_called_expectSubscriptionToAllEventsDispatched(void)

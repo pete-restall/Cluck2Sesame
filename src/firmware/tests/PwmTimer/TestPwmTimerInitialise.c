@@ -4,16 +4,25 @@
 
 #include "PwmTimer.h"
 
-#include "NonDeterminism.h"
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("PwmTimer.c")
 
-void setUp(void)
+void onBeforeTest(void)
 {
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
+}
+
+void test_pwmTimerInitialise_called_expectTimer2ModuleIsEnabled(void)
+{
+	PMD1 = anyByteWithMaskSet(_PMD1_TMR2MD_MASK);
+	uint8_t originalPmd1 = PMD1;
+	pwmTimerInitialise();
+	TEST_ASSERT_EQUAL_UINT8(originalPmd1 & ~_PMD1_TMR2MD_MASK, PMD1);
 }
 
 void test_pwmTimerInitialise_called_expectTimerClockSourceIsInstructionClock(void)

@@ -5,6 +5,7 @@
 #include "TestSunEventsScenarios.h"
 #include "SunEvents.h"
 
+#include "../Fixture.h"
 #include "../NonDeterminism.h"
 
 TEST_FILE("SunEvents/SunEventsInitialise.c")
@@ -31,7 +32,7 @@ static const struct EventSubscription *onLocationChanged;
 static struct Event onDateChangedEvent;
 static const struct EventSubscription *onDateChanged;
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	assertSunEventsChanged = 1;
 	scenarioIndex = 0;
@@ -40,7 +41,7 @@ void setUp(void)
 	onDateChanged = (const struct EventSubscription *) 0;
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 

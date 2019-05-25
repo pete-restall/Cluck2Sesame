@@ -9,19 +9,20 @@
 #include "ClockFixture.h"
 #include "ClockGetSetNowFixture.h"
 
+#include "../Fixture.h"
 #include "../NonDeterminism.h"
 
 TEST_FILE("Clock/ClockInitialise.c")
 TEST_FILE("Clock/ClockGetSetNow.c")
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	clockFixtureSetUp();
 	clockGetSetNowFixtureSetUp();
 	dispatchAllEvents();
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 	clockGetSetNowFixtureTearDown();
 	clockFixtureTearDown();
@@ -143,7 +144,7 @@ void test_clockSetNowGmt_called_expectDateChangedIsPublishedWithCorrectDate(void
 	dispatchAllEvents();
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, dateChangedCalls, "Calls");
 	TEST_ASSERT_NOT_NULL_MESSAGE(dateChanged, "Args");
-	assertEqualDate(&now.date, dateChanged->today);
+	assertEqualDate(&now.date, (const struct Date *) dateChanged->today);
 }
 
 void test_clockSetNowGmt_called_expectTimeChangedIsPublishedAfterDateChanged(void)
@@ -190,7 +191,7 @@ void test_clockSetNowGmt_called_expectTimeChangedIsPublishedWithCorrectTime(void
 	clockSetNowGmt(&now);
 	dispatchAllEvents();
 	TEST_ASSERT_NOT_NULL(timeChanged);
-	assertEqualDate(&now.time, timeChanged->now);
+	assertEqualTime(&now.time, timeChanged->now);
 }
 
 // TODO: TEST SETNOW TO MAKE SURE DATE_CHANGED HAS DST FLAG SET / CLEAR

@@ -4,8 +4,10 @@
 #include "Mock_Event.h"
 #include "VoltageRegulator.h"
 
-#include "NonDeterminism.h"
 #include "VoltageRegulatorFixture.h"
+
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("VoltageRegulator.c")
 TEST_FILE("VoltageRegulatorFixture.c")

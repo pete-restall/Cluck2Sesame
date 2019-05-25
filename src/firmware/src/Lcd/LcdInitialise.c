@@ -27,6 +27,9 @@ static void buggyCompilerWorkaround(void)
 
 void lcdInitialise(void)
 {
+	PMD3bits.PWM3MD = 0;
+	PMD3bits.PWM5MD = 0;
+
 	ANSELA &= PORTA_PIN_MASK;
 	LATA &= PORTA_PIN_MASK;
 	ANSELC &= PORTC_PIN_MASK;

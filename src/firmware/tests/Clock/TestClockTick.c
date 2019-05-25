@@ -9,6 +9,7 @@
 #include "ClockFixture.h"
 #include "ClockGetSetNowFixture.h"
 
+#include "../Fixture.h"
 #include "../NonDeterminism.h"
 
 TEST_FILE("Clock/ClockInitialise.c")
@@ -16,13 +17,13 @@ TEST_FILE("Clock/ClockGetSetNow.c")
 
 static void tickWithoutSettingInterruptFlag(void);
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	clockFixtureSetUp();
 	clockGetSetNowFixtureSetUp();
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 	clockFixtureTearDown();
 }

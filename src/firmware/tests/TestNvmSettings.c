@@ -3,13 +3,15 @@
 
 #include "NvmSettings.h"
 
+#include "Fixture.h"
+
 TEST_FILE("NvmSettings.c")
 
-void setUp(void)
+void onBeforeTest(void)
 {
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 

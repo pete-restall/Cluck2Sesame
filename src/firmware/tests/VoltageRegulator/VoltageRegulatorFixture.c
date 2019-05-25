@@ -6,18 +6,20 @@
 #include "VoltageRegulator.h"
 
 #include "VoltageRegulatorFixture.h"
-#include "NonDeterminism.h"
+
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 static void ensureScheduleHandlerIsNotOmittedByTheCompiler(void);
 
 const struct NearSchedule *requestedSchedule;
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	requestedSchedule = (const struct NearSchedule *) 0;
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 	ensureScheduleHandlerIsNotOmittedByTheCompiler();
 }

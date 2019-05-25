@@ -5,7 +5,9 @@
 #include "Event.h"
 
 #include "Mock_EventHandler.h"
-#include "NonDeterminism.h"
+
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("Event.c")
 
@@ -17,7 +19,7 @@ static uint8_t eventState;
 static struct EventSubscription anotherSubscription;
 static uint8_t anotherEventState;
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	eventState = anyByte();
 	subscription.type = anyByteWithMaskClear(EVENT_TYPE_SYSTEM_MASK);
@@ -32,7 +34,7 @@ void setUp(void)
 	eventInitialise();
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 

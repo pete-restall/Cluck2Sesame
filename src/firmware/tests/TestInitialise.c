@@ -4,6 +4,8 @@
 #include "Main.h"
 #include "Mock_Event.h"
 
+#include "Fixture.h"
+
 TEST_FILE("Initialise.c")
 
 struct CallDetails
@@ -25,9 +27,9 @@ static void registerCallFor(struct CallDetails *const calls);
 
 static uint8_t callSequence;
 static struct CallDetails eventInitialiseCalls;
+static struct CallDetails powerManagementInitialiseCalls;
 static struct CallDetails clockInitialiseCalls;
 static struct CallDetails nearSchedulerInitialiseCalls;
-static struct CallDetails powerManagementInitialiseCalls;
 static struct CallDetails voltageRegulatorInitialiseCalls;
 static struct CallDetails pwmTimerInitialiseCalls;
 static struct CallDetails lcdInitialiseCalls;
@@ -35,13 +37,13 @@ static struct CallDetails motorInitialiseCalls;
 static struct CallDetails sunEventsInitialiseCalls;
 static struct CallDetails systemInitialisedEventPublishCalls;
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	callSequence = 1;
 	clearCallsFor(&eventInitialiseCalls);
+	clearCallsFor(&powerManagementInitialiseCalls);
 	clearCallsFor(&clockInitialiseCalls);
 	clearCallsFor(&nearSchedulerInitialiseCalls);
-	clearCallsFor(&powerManagementInitialiseCalls);
 	clearCallsFor(&voltageRegulatorInitialiseCalls);
 	clearCallsFor(&pwmTimerInitialiseCalls);
 	clearCallsFor(&lcdInitialiseCalls);
@@ -59,11 +61,11 @@ static void clearCallsFor(struct CallDetails *const calls)
 	calls->count = 0;
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 
-void test_initialise_called_expectEventSystemIsInitialised(void)
+void test_initialise_called_expectEventSystemIsInitialisedFirst(void)
 {
 	initialise();
 	assertCalledOnceAtSequence(&eventInitialiseCalls, 1);
@@ -88,10 +90,21 @@ static void registerCallFor(struct CallDetails *const calls)
 	calls->count++;
 }
 
-void test_initialise_called_expectClockIsInitialisedAfterEvents(void)
+void test_initialise_called_expectPowerManagementIsInitialisedAfterEvents(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&clockInitialiseCalls, 2);
+	assertCalledOnceAtSequence(&powerManagementInitialiseCalls, 2);
+}
+
+void powerManagementInitialise(void)
+{
+	registerCallFor(&powerManagementInitialiseCalls);
+}
+
+void test_initialise_called_expectClockIsInitialisedAfterPowerManagement(void)
+{
+	initialise();
+	assertCalledOnceAtSequence(&clockInitialiseCalls, 3);
 }
 
 void clockInitialise(void)
@@ -102,7 +115,7 @@ void clockInitialise(void)
 void test_initialise_called_expectNearSchedulerIsInitialisedAfterClock(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&nearSchedulerInitialiseCalls, 3);
+	assertCalledOnceAtSequence(&nearSchedulerInitialiseCalls, 4);
 }
 
 void nearSchedulerInitialise(void)
@@ -110,18 +123,7 @@ void nearSchedulerInitialise(void)
 	registerCallFor(&nearSchedulerInitialiseCalls);
 }
 
-void test_initialise_called_expectPowerManagementIsInitialisedAfterNearScheduler(void)
-{
-	initialise();
-	assertCalledOnceAtSequence(&powerManagementInitialiseCalls, 4);
-}
-
-void powerManagementInitialise(void)
-{
-	registerCallFor(&powerManagementInitialiseCalls);
-}
-
-void test_initialise_called_expectVoltageRegulatorIsInitialisedAfterPowerManagement(void)
+void test_initialise_called_expectVoltageRegulatorIsInitialisedAfterNearScheduler(void)
 {
 	initialise();
 	assertCalledOnceAtSequence(&voltageRegulatorInitialiseCalls, 5);

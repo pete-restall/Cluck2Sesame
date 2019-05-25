@@ -5,15 +5,16 @@
 #include "Mock_Event.h"
 #include "NearScheduler.h"
 
-#include "NonDeterminism.h"
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("NearScheduler.c")
 
-void setUp(void)
+void onBeforeTest(void)
 {
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 
@@ -46,6 +47,14 @@ void test_MS_TO_TICKS_calledWithRemainderOfFourMillisecondMultiples_ExpectTicksR
 			roundedUpTicks,
 			MS_TO_TICKS(msMultipleOfFour + remainder));
 	}
+}
+
+void test_nearSchedulerInitialise_called_expectNcoModuleIsEnabled(void)
+{
+	PMD1 = anyByteWithMaskSet(_PMD1_NCO1MD_MASK);
+	uint8_t originalPmd1 = PMD1;
+	nearSchedulerInitialise();
+	TEST_ASSERT_EQUAL_UINT8(originalPmd1 & ~_PMD1_NCO1MD_MASK, PMD1);
 }
 
 void test_nearSchedulerInitialise_called_expectNcoIsDisabled(void)

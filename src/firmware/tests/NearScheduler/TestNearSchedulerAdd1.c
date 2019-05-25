@@ -4,8 +4,10 @@
 
 #include "NearScheduler.h"
 
-#include "NonDeterminism.h"
 #include "NearSchedulerFixture.h"
+
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("NearScheduler.c")
 TEST_FILE("NearSchedulerFixture.c")

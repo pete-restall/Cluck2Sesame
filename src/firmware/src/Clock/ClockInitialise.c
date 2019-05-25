@@ -20,10 +20,12 @@ static void buggyCompilerWorkaround(void)
 
 void clockInitialise(void)
 {
-	T0CON0 = T0CON0_POSTSCALE_1SECOND_MASK;
+	PMD1bits.TMR0MD = 0;
 	OSCENbits.SOSCEN = 1;
 	while (!OSCSTATbits.SOR)
 		;;
+
+	T0CON0 = T0CON0_POSTSCALE_1SECOND_MASK;
 
 	TMR0H = 59;
 	TMR0L = 0;

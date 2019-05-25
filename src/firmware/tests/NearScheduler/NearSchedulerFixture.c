@@ -4,8 +4,10 @@
 
 #include "NearScheduler.h"
 
-#include "NonDeterminism.h"
 #include "NearSchedulerFixture.h"
+
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 const struct NearSchedule dummySchedule =
 {
@@ -22,7 +24,7 @@ static const void *handlerSchedules[16];
 static const void **handlerStateWrptr;
 static const void **handlerStateRdptr;
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	onWokenFromSleep = (struct EventSubscription *) 0;
 	nearSchedulerInitialise();
@@ -38,7 +40,7 @@ void setUp(void)
 	NCO1INCL = 0;
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 

@@ -5,18 +5,27 @@
 #include "Event.h"
 #include "Clock.h"
 
+#include "../Fixture.h"
 #include "../NonDeterminism.h"
 
 TEST_FILE("Clock/ClockInitialise.c")
 TEST_FILE("Clock/ClockGetSetNow.c")
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	eventInitialise();
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
+}
+
+void test_clockInitialise_called_expectTimer0ModuleIsEnabled(void)
+{
+	PMD1 = anyByteWithMaskSet(_PMD1_TMR0MD_MASK);
+	uint8_t originalPmd1 = PMD1;
+	clockInitialise();
+	TEST_ASSERT_EQUAL_UINT8(originalPmd1 & ~_PMD1_TMR0MD_MASK, PMD1);
 }
 
 void test_clockInitialise_called_expectOscillatorIsEnabled(void)

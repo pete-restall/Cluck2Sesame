@@ -4,16 +4,17 @@
 
 #include "PwmTimer.h"
 
-#include "NonDeterminism.h"
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("PwmTimer.c")
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	pwmTimerInitialise();
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 

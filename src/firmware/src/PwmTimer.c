@@ -18,6 +18,9 @@ static uint8_t enableCount;
 
 void pwmTimerInitialise(void)
 {
+	PMD1bits.TMR2MD = 0;
+	enableCount = 0;
+
 	T2CON = T2CON_PRESCALER_2 | T2CON_POSTSCALER_8;
 	T2CLKCON = T2CLKCON_FOSC_OVER_4;
 	T2HLT =
@@ -30,7 +33,6 @@ void pwmTimerInitialise(void)
 	PR2 = 63;
 	PIR4bits.TMR2IF = 0;
 	PIE4bits.TMR2IE = 0;
-	enableCount = 0;
 }
 
 void pwmTimerEnable(void)

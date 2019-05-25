@@ -7,18 +7,29 @@
 #include "Mock_LcdInternals.h"
 #include "Lcd.h"
 
-#include "NonDeterminism.h"
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("Event.c")
 TEST_FILE("Lcd/LcdInitialise.c")
 TEST_FILE("Lcd/LcdEnableDisable.c")
 
-void setUp(void)
+void onBeforeTest(void)
 {
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
+}
+
+void test_lcdInitialise_called_expectPwm3And5ModulesAreEnabled(void)
+{
+	PMD3 = anyByteWithMaskSet(_PMD3_PWM3MD_MASK | _PMD3_PWM5MD_MASK);
+	uint8_t originalPmd3 = PMD3;
+	lcdInitialise();
+	TEST_ASSERT_EQUAL_UINT8(
+		originalPmd3 & ~(_PMD3_PWM3MD_MASK | _PMD3_PWM5MD_MASK),
+		PMD3);
 }
 
 void test_lcdInitialise_called_expectLcdPortAPinsAreAllOutputs(void)

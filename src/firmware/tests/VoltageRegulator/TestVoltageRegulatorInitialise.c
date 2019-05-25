@@ -6,15 +6,16 @@
 #include "Mock_NearScheduler.h"
 #include "VoltageRegulator.h"
 
-#include "NonDeterminism.h"
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("VoltageRegulator.c")
 
-void setUp(void)
+void onBeforeTest(void)
 {
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 

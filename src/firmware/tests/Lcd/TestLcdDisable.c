@@ -7,19 +7,20 @@
 #include "Mock_LcdInternals.h"
 #include "Lcd.h"
 
-#include "NonDeterminism.h"
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("Event.c")
 TEST_FILE("Lcd/LcdInitialise.c")
 TEST_FILE("Lcd/LcdEnableDisable.c")
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	lcdInitialise();
 	lcdEnable();
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 

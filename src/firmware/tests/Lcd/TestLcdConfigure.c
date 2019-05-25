@@ -5,7 +5,9 @@
 
 #include "FakeLcd.h"
 #include "LcdFixture.h"
-#include "NonDeterminism.h"
+
+#include "../Fixture.h"
+#include "../NonDeterminism.h"
 
 TEST_FILE("Poll.c")
 TEST_FILE("Event.c")
@@ -21,12 +23,12 @@ TEST_FILE("Lcd/LcdWrite.c")
 
 extern void poll(void);
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	lcdFixtureInitialise();
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 	lcdFixtureShutdown();
 }

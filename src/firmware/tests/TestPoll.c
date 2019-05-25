@@ -4,6 +4,7 @@
 #include "Main.h"
 #include "Mock_Event.h"
 
+#include "Fixture.h"
 #include "NonDeterminism.h"
 
 TEST_FILE("Poll.c")
@@ -18,12 +19,12 @@ static void eventPublishThatIncrementsCounter(
 	numberOfEventPublishCalls++;
 }
 
-void setUp(void)
+void onBeforeTest(void)
 {
 	numberOfEventPublishCalls = 0;
 }
 
-void tearDown(void)
+void onAfterTest(void)
 {
 }
 
