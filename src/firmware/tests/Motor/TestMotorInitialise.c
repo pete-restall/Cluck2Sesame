@@ -3,11 +3,16 @@
 #include <unity.h>
 
 #include "Event.h"
+#include "Mock_VoltageRegulator.h"
 #include "Motor.h"
 
 #include "../NonDeterminism.h"
 
 TEST_FILE("Motor/MotorInitialise.c")
+
+static void publishVoltageRegulatorEnabled(void);
+static void dispatchAllEvents(void);
+static void publishVoltageRegulatorDisabled(void);
 
 void setUp(void)
 {
@@ -54,12 +59,12 @@ void test_motorInitialise_called_expectMotorPortCPinsAreAllDigital(void)
 	TEST_ASSERT_EQUAL_UINT8(originalAnselc & ~usedPins, ANSELC);
 }
 
-void test_motorInitialise_called_expectMotorCurrentSensePinIsDigital(void)
+void test_motorInitialise_called_expectMotorCurrentSensePinIsAnalogue(void)
 {
-	ANSELB = anyByteWithMaskSet(_ANSELB_ANSB1_MASK);
+	ANSELB = anyByteWithMaskClear(_ANSELB_ANSB1_MASK);
 	uint8_t originalAnselb = ANSELB;
 	motorInitialise();
-	TEST_ASSERT_EQUAL_UINT8(originalAnselb & ~_ANSELB_ANSB1_MASK, ANSELB);
+	TEST_ASSERT_EQUAL_UINT8(originalAnselb | _ANSELB_ANSB1_MASK, ANSELB);
 }
 
 void test_motorInitialise_called_expectMotorPortCPinsAreAllLow(void)
@@ -82,4 +87,62 @@ void test_motorInitialise_called_expectMotorCurrentSensePinIsLow(void)
 	uint8_t originalLATB = LATB;
 	motorInitialise();
 	TEST_ASSERT_EQUAL_UINT8(originalLATB & ~_LATB_LATB1_MASK, LATB);
+}
+
+void test_voltageRegulatorEnabled_onPublished_expectEncoderPinsAreInputs(void)
+{
+	static const uint8_t encoderPins = _TRISC_TRISC2_MASK | _TRISC_TRISC3_MASK;
+	motorInitialise();
+	uint8_t originalTrisc = TRISC;
+	publishVoltageRegulatorEnabled();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(originalTrisc | encoderPins, TRISC);
+}
+
+static void publishVoltageRegulatorEnabled(void)
+{
+	static const struct VoltageRegulatorEnabled emptyEventArgs = { };
+	eventPublish(VOLTAGE_REGULATOR_ENABLED, &emptyEventArgs);
+}
+
+static void dispatchAllEvents(void)
+{
+	while (eventDispatchNext())
+		;;
+}
+
+void test_voltageRegulatorEnabled_onPublished_expectCurrentSensePinIsInput(void)
+{
+	motorInitialise();
+	uint8_t originalTrisb = TRISB;
+	publishVoltageRegulatorEnabled();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(originalTrisb | _TRISB_TRISB1_MASK, TRISB);
+}
+
+void test_voltageRegulatorDisabled_onPublished_expectEncoderPinsAreOutputs(void)
+{
+	static const uint8_t encoderPins = _TRISC_TRISC2_MASK | _TRISC_TRISC3_MASK;
+	motorInitialise();
+	TRISC = anyByteWithMaskSet(encoderPins);
+	uint8_t originalTrisc = TRISC;
+	publishVoltageRegulatorDisabled();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(originalTrisc & ~encoderPins, TRISC);
+}
+
+static void publishVoltageRegulatorDisabled(void)
+{
+	static const struct VoltageRegulatorDisabled emptyEventArgs = { };
+	eventPublish(VOLTAGE_REGULATOR_DISABLED, &emptyEventArgs);
+}
+
+void test_voltageRegulatorDisabled_onPublished_expectCurrentSensePinIsOutput(void)
+{
+	motorInitialise();
+	TRISB = anyByteWithMaskSet(_TRISB_TRISB1_MASK);
+	uint8_t originalTrisb = TRISB;
+	publishVoltageRegulatorDisabled();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(originalTrisb & ~_TRISB_TRISB1_MASK, TRISB);
 }

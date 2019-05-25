@@ -1,6 +1,12 @@
 #include <xc.h>
 
+#include "../Event.h"
+#include "../VoltageRegulator.h"
+
 #include "Motor.h"
+
+static void onVoltageRegulatorEnabled(const struct Event *event);
+static void onVoltageRegulatorDisabled(const struct Event *event);
 
 void motorInitialise(void)
 {
@@ -9,9 +15,38 @@ void motorInitialise(void)
 	TRISC &= 0b00110011;
 
 	LATBbits.LATB1 = 0;
-	ANSELBbits.ANSB1 = 0;
+	ANSELBbits.ANSB1 = 1;
 	TRISBbits.TRISB1 = 0;
+
+	static const struct EventSubscription onVoltageRegulatorEnabledSubscription =
+	{
+		.type = VOLTAGE_REGULATOR_ENABLED,
+		.handler = &onVoltageRegulatorEnabled,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onVoltageRegulatorEnabledSubscription);
+
+	static const struct EventSubscription onVoltageRegulatorDisabledSubscription =
+	{
+		.type = VOLTAGE_REGULATOR_DISABLED,
+		.handler = &onVoltageRegulatorDisabled,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onVoltageRegulatorDisabledSubscription);
 }
 
-// TODO: ON VOLTAGE REGULATOR ENABLED, RB1(A), RC2(D), RC3(D) NEED TO BE INPUTS
-// TODO: ON VOLTAGE REGULATOR DISABLED, RB1(A), RC2(D), RC3(D) NEED TO BE OUTPUTS
+static void onVoltageRegulatorEnabled(const struct Event *event)
+{
+	TRISBbits.TRISB1 = 1;
+	TRISCbits.TRISC2 = 1;
+	TRISCbits.TRISC3 = 1;
+}
+
+static void onVoltageRegulatorDisabled(const struct Event *event)
+{
+	TRISBbits.TRISB1 = 0;
+	TRISCbits.TRISC2 = 0;
+	TRISCbits.TRISC3 = 0;
+}
