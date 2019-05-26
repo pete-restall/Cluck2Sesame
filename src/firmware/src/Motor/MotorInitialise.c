@@ -16,11 +16,15 @@
 #define CWG1CLKCON_USE_FOSC 1
 #define CWG1DAT_USE_PWM4 0b0100
 
-#define PPS_OUT_CWG1A 0x05
-#define PPS_OUT_CWG1B 0x06
-
 #define CM1NCH_CURRENT_SENSE_PIN 0b011
 #define CM1PCH_DAC 0b101
+
+#define T1CLK_USE_T1CKIN_PIN 0
+
+#define PPS_IN_RC3 0x13
+
+#define PPS_OUT_CWG1A 0x05
+#define PPS_OUT_CWG1B 0x06
 
 static void onVoltageRegulatorEnabled(const struct Event *event);
 static void onVoltageRegulatorDisabled(const struct Event *event);
@@ -72,7 +76,14 @@ static void onVoltageRegulatorEnabled(const struct Event *event)
 
 // TODO: CLC2
 // TODO: CCP1
-// TODO: TMR1
+
+	T1CKIPPS = PPS_IN_RC3;
+	TMR1H = 0;
+	TMR1L = 0;
+	T1GCON = 0;
+	PIR4bits.TMR1IF = 0;
+	T1CLK = T1CLK_USE_T1CKIN_PIN;
+	T1CON = _T1CON_nSYNC_MASK | _T1CON_RD16_MASK | _T1CON_ON_MASK;
 
 	PWM4DCH = 0;
 	PWM4DCL = 0;
@@ -90,8 +101,7 @@ static void onVoltageRegulatorEnabled(const struct Event *event)
 
 	PWM4CON = _PWM4CON_PWM4EN_MASK;
 	CM1CON0 = _CM1CON0_EN_MASK | _CM1CON0_HYS_MASK;
-	CWG1CON0 = CWG1CON0_SYNCHRONOUS_STEERING_MODE | _CWG1CON0_EN_MASK;
-
+	CWG1CON0 = _CWG1CON0_EN_MASK | CWG1CON0_SYNCHRONOUS_STEERING_MODE;
 	RC6PPS = PPS_OUT_CWG1A;
 	RC7PPS = PPS_OUT_CWG1B;
 }

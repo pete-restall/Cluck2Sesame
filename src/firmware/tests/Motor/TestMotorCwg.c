@@ -24,7 +24,7 @@ void onAfterTest(void)
 {
 }
 
-void test_voltageRegulatorEnabled_onPublished_expectCwgModuleIsEnabled(void)
+void test_voltageRegulatorEnabled_onPublished_expectCwgIsEnabled(void)
 {
 	CWG1CON0 = anyByteWithMaskClear(_CWG1CON0_EN_MASK);
 	publishVoltageRegulatorEnabled();
