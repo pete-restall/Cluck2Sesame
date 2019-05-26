@@ -5,6 +5,9 @@
 
 #include "Motor.h"
 
+#define CM1NCH_CURRENT_SENSE_PIN 0b011
+#define CM1PCH_DAC 0b101
+
 static void onVoltageRegulatorEnabled(const struct Event *event);
 static void onVoltageRegulatorDisabled(const struct Event *event);
 
@@ -50,7 +53,11 @@ static void onVoltageRegulatorEnabled(const struct Event *event)
 	PMD5bits.CLC2MD = 0;
 	PMD4bits.CWG1MD = 0;
 
-	// COMPARATOR POSITIVE INPUT USES DAC
+	PIR2bits.C1IF = 0;
+	CM1NCH = CM1NCH_CURRENT_SENSE_PIN;
+	CM1PCH = CM1PCH_DAC;
+	CM1CON1 = _CM1CON1_INTP_MASK;
+	CM1CON0 = _CM1CON0_EN_MASK | _CM1CON0_HYS_MASK;
 	// DAC VALUE OF 25 IS ABOUT 1.5A WHEN USING VDD (+3.3V) REFERENCE
 	// FEED COMPARATOR TO CWG1 AUTO-SHUTDOWN
 	// FEED CCP1 OUTPUT TO CWG1 AUTO-SHUTDOWN (VIA CLC2)
