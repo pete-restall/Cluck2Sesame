@@ -32,12 +32,12 @@ void test_voltageRegulatorEnabled_onPublished_expectComparatorIsEnabled(void)
 	TEST_ASSERT_TRUE(CM1CON0bits.EN);
 }
 
-void test_voltageRegulatorEnabled_onPublished_expectComparatorOutputIsNotInverted(void)
+void test_voltageRegulatorEnabled_onPublished_expectComparatorOutputIsInverted(void)
 {
-	CM1CON0 = anyByteWithMaskSet(_CM1CON0_POL_MASK);
+	CM1CON0 = anyByteWithMaskClear(_CM1CON0_POL_MASK);
 	publishVoltageRegulatorEnabled();
 	dispatchAllEvents();
-	TEST_ASSERT_FALSE(CM1CON0bits.POL);
+	TEST_ASSERT_TRUE(CM1CON0bits.POL);
 }
 
 void test_voltageRegulatorEnabled_onPublished_expectComparatorHasHysteresis(void)
