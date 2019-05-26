@@ -27,7 +27,7 @@ void test_nvmSettings_getLcdBacklightBrightness_expectDefaultValue(void)
 
 void test_nvmSettings_getMotorCurrentLimit_expectDefaultValue(void)
 {
-	TEST_ASSERT_EQUAL_UINT8(0x18, nvmSettings.motor.currentLimit);
+	TEST_ASSERT_EQUAL_UINT8(0x13, nvmSettings.motor.currentLimit);
 }
 
 void test_nvmSettings_getMotorTravelLimit_expectDefaultValue(void)

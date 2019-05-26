@@ -18,7 +18,7 @@ __section("NvmSettings") const union NvmSettings nvmSettings =
 	},
 	.motor =
 	{
-		.currentLimit = DAC_AMPS(1.5),
+		.currentLimit = DAC_AMPS(1.2),
 		.travelLimit = 0
 	}
 };

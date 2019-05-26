@@ -24,7 +24,7 @@ void onAfterTest(void)
 {
 }
 
-void test_voltageRegulatorEnabled_onPublished_expectPwmModuleIsEnabled(void)
+void test_voltageRegulatorEnabled_onPublished_expectPwmIsEnabled(void)
 {
 	PWM4CON = anyByteWithMaskClear(_PWM4CON_PWM4EN_MASK);
 	publishVoltageRegulatorEnabled();
