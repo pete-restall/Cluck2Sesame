@@ -23,23 +23,6 @@ void onAfterTest(void)
 {
 }
 
-void test_voltageRegulatorEnabled_onPublished_expectEncoderPinsAreInputs(void)
-{
-	static const uint8_t encoderPins = _TRISC_TRISC2_MASK | _TRISC_TRISC3_MASK;
-	uint8_t originalTrisc = TRISC;
-	publishVoltageRegulatorEnabled();
-	dispatchAllEvents();
-	TEST_ASSERT_EQUAL_UINT8(originalTrisc | encoderPins, TRISC);
-}
-
-void test_voltageRegulatorEnabled_onPublished_expectCurrentSensePinIsInput(void)
-{
-	uint8_t originalTrisb = TRISB;
-	publishVoltageRegulatorEnabled();
-	dispatchAllEvents();
-	TEST_ASSERT_EQUAL_UINT8(originalTrisb | _TRISB_TRISB1_MASK, TRISB);
-}
-
 void test_voltageRegulatorEnabled_onPublished_expectCurrentSenseComparatorAndDacAreEnabled(void)
 {
 	static const uint8_t modules = _PMD2_CMP1MD_MASK | _PMD2_DAC1MD_MASK;
