@@ -24,3 +24,13 @@ void test_nvmSettings_getLcdBacklightBrightness_expectDefaultValue(void)
 {
 	TEST_ASSERT_EQUAL_UINT8(0x80, nvmSettings.lcd.backlightBrightness);
 }
+
+void test_nvmSettings_getMotorCurrentLimit_expectDefaultValue(void)
+{
+	TEST_ASSERT_EQUAL_UINT8(0x18, nvmSettings.motor.currentLimit);
+}
+
+void test_nvmSettings_getMotorTravelLimit_expectDefaultValue(void)
+{
+	TEST_ASSERT_EQUAL_UINT8(0x00, nvmSettings.motor.travelLimit);
+}

@@ -12,6 +12,12 @@ union NvmSettings
 			uint8_t contrast;
 			uint8_t backlightBrightness;
 		} lcd;
+
+		struct
+		{
+			uint8_t currentLimit;
+			uint16_t travelLimit;
+		} motor;
 	};
 };
 
