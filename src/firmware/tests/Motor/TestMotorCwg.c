@@ -152,3 +152,19 @@ void test_voltageRegulatorEnabled_onPublished_expectInputSourceIsPwm4(void)
 	dispatchAllEvents();
 	TEST_ASSERT_EQUAL_UINT8(4, CWG1DAT);
 }
+
+void test_voltageRegulatorEnabled_onPublished_expectPwmAIsMappedToRc6(void)
+{
+	RC6PPS = anyByteExcept(0x05);
+	publishVoltageRegulatorEnabled();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(0x05, RC6PPS);
+}
+
+void test_voltageRegulatorEnabled_onPublished_expectPwmBIsMappedToRc7(void)
+{
+	RC7PPS = anyByteExcept(0x06);
+	publishVoltageRegulatorEnabled();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(0x06, RC7PPS);
+}
