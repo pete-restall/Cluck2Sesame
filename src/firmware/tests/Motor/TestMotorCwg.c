@@ -97,12 +97,12 @@ void test_voltageRegulatorEnabled_onPublished_expectNoAutoShutdownOnComparator2O
 	TEST_ASSERT_FALSE(CWG1AS1bits.AS3E);
 }
 
-void test_voltageRegulatorEnabled_onPublished_expectAutoShutdownOnComparator1Output(void)
+void test_voltageRegulatorEnabled_onPublished_expectNoAutoShutdownOnComparator1Output(void)
 {
-	CWG1AS1 = anyByteWithMaskClear(_CWG1AS1_AS2E_MASK);
+	CWG1AS1 = anyByteWithMaskSet(_CWG1AS1_AS2E_MASK);
 	publishVoltageRegulatorEnabled();
 	dispatchAllEvents();
-	TEST_ASSERT_TRUE(CWG1AS1bits.AS2E);
+	TEST_ASSERT_FALSE(CWG1AS1bits.AS2E);
 }
 
 void test_voltageRegulatorEnabled_onPublished_expectNoAutoShutdownOnTimer2(void)
