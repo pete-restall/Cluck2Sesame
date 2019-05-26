@@ -43,10 +43,13 @@ void motorInitialise(void)
 
 static void onVoltageRegulatorEnabled(const struct Event *event)
 {
+	PMD2bits.DAC1MD = 0;
+	DAC1CON1 = nvmSettings.motor.currentLimit;
+	DAC1CON0 = _DAC1CON0_EN_MASK;
+
 	TRISBbits.TRISB1 = 1;
 	TRISCbits.TRISC2 = 1;
 	TRISCbits.TRISC3 = 1;
-	PMD2bits.DAC1MD = 0;
 	PMD2bits.CMP1MD = 0;
 	PMD1bits.TMR1MD = 0;
 	PMD3bits.CCP1MD = 0;
@@ -54,13 +57,14 @@ static void onVoltageRegulatorEnabled(const struct Event *event)
 	PMD5bits.CLC2MD = 0;
 	PMD4bits.CWG1MD = 0;
 
-	DAC1CON1 = nvmSettings.motor.currentLimit;
-	DAC1CON0 = _DAC1CON0_EN_MASK;
+	PWM4DCH = 0;
+	PWM4DCL = 0;
+	PWM4CON = _PWM4CON_PWM4EN_MASK;
 
-	PIR2bits.C1IF = 0;
 	CM1NCH = CM1NCH_CURRENT_SENSE_PIN;
 	CM1PCH = CM1PCH_DAC;
 	CM1CON1 = _CM1CON1_INTP_MASK;
+	PIR2bits.C1IF = 0;
 	CM1CON0 = _CM1CON0_EN_MASK | _CM1CON0_HYS_MASK;
 	// FEED COMPARATOR TO CWG1 AUTO-SHUTDOWN
 	// FEED CCP1 OUTPUT TO CWG1 AUTO-SHUTDOWN (VIA CLC2)
