@@ -52,6 +52,15 @@ uint8_t anyByteLessThan(uint8_t value)
 	return anyByte() % value;
 }
 
+uint16_t anyWordExcept(uint16_t except)
+{
+	uint16_t word = anyWord();
+	while (word == except)
+		word = anyWord();
+
+	return word;
+}
+
 uint16_t anyWord(void)
 {
 	uint16_t word = 0;

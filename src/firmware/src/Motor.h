@@ -25,10 +25,11 @@ struct MotorStopped
 		uint8_t all;
 		struct
 		{
-			unsigned int manuallyStopped : 1;
 			unsigned int currentLimited : 1;
+			unsigned int encoderTimeout : 1;
+			unsigned int encoderOverflow : 1;
 		};
-	} flags;
+	} fault;
 };
 
 extern void motorInitialise(void);

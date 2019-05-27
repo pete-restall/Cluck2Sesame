@@ -9,5 +9,6 @@ extern uint8_t anyByteWithMaskClear(uint8_t mask);
 extern uint8_t anyByteLessThan(uint8_t value);
 extern uint8_t anyBoolean(void);
 extern uint16_t anyWord(void);
+extern uint16_t anyWordExcept(uint16_t except);
 
 #endif

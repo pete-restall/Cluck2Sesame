@@ -1,4 +1,5 @@
 #include <xc.h>
+#include <stdint.h>
 
 #include "../Event.h"
 #include "../VoltageRegulator.h"
