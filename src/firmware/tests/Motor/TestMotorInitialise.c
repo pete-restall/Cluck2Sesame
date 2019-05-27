@@ -5,6 +5,8 @@
 #include "Event.h"
 #include "Motor.h"
 
+#include "MotorFixture.h"
+
 #include "../Fixture.h"
 #include "../NonDeterminism.h"
 
@@ -12,11 +14,12 @@ TEST_FILE("Motor/MotorInitialise.c")
 
 void onBeforeTest(void)
 {
-	eventInitialise();
+	motorFixtureSetUp();
 }
 
 void onAfterTest(void)
 {
+	motorFixtureTearDown();
 }
 
 void test_motorInitialise_called_expectMotorPortCPinsAreAllOutputs(void)

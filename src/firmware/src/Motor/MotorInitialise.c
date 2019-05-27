@@ -39,6 +39,8 @@ static inline void configurePwmAsOffAndComparatorAsCurrentSenseUsingDac(void);
 static inline void configureCwgForPwmOutputWithClcShutdown(void);
 static void onVoltageRegulatorDisabled(const struct Event *event);
 
+uint8_t motorEnableCount;
+
 void motorInitialise(void)
 {
 	LATC &= 0b00110011;
@@ -66,6 +68,8 @@ void motorInitialise(void)
 	};
 
 	eventSubscribe(&onVoltageRegulatorDisabledSubscription);
+
+	motorEnableCount = 0;
 }
 
 static void onVoltageRegulatorEnabled(const struct Event *event)

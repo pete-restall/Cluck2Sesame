@@ -3,7 +3,6 @@
 #include <unity.h>
 
 #include "Event.h"
-#include "Mock_VoltageRegulator.h"
 #include "Motor.h"
 
 #include "MotorFixture.h"
@@ -15,13 +14,14 @@ TEST_FILE("Motor/MotorInitialise.c")
 
 void onBeforeTest(void)
 {
-	eventInitialise();
+	motorFixtureSetUp();
 	motorInitialise();
 	PMD1bits.TMR1MD = 0;
 }
 
 void onAfterTest(void)
 {
+	motorFixtureTearDown();
 }
 
 void test_voltageRegulatorEnabled_onPublished_expectTimer1IsEnabled(void)
