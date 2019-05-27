@@ -72,3 +72,38 @@ void test_motorEnable_calledForSecondTimeWhenVoltageRegulatorIsAlreadyEnabled_ex
 	dispatchAllEvents();
 	TEST_ASSERT_EQUAL_UINT8(1, onMotorEnabledCalls);
 }
+
+void test_motorEnable_calledForSecondTimeWhenVoltageRegulatorIsNotEnabled_expectMotorEnabledEventIsNotPublished(void)
+{
+	stubVoltageRegulatorIsEnabled(0);
+	motorEnable();
+	motorEnable();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(0, onMotorEnabledCalls);
+}
+
+void test_motorEnable_calledForFirstTimeWhenVoltageRegulatorIsNotEnabled_expectMotorEnabledEventIsPublishedWhenVoltageRegulatorIsEnabled(void)
+{
+	stubVoltageRegulatorIsEnabled(0);
+	motorEnable();
+	publishVoltageRegulatorEnabled();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(1, onMotorEnabledCalls);
+}
+
+void test_motorEnable_calledTwiceWhenVoltageRegulatorIsNotEnabled_expectOneMotorEnabledEventIsPublishedWhenVoltageRegulatorIsEnabled(void)
+{
+	stubVoltageRegulatorIsEnabled(0);
+	motorEnable();
+	motorEnable();
+	publishVoltageRegulatorEnabled();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(1, onMotorEnabledCalls);
+}
+
+void test_voltageRegulatorEnabled_onPublishedBeforeFirstMotorEnabledCall_expectMotorEnabledEventIsNotPublished(void)
+{
+	publishVoltageRegulatorEnabled();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(0, onMotorEnabledCalls);
+}

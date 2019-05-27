@@ -57,3 +57,26 @@ void test_motorDisable_called_expectMotorDisabledEventIsPublishedBeforeVoltageRe
 		onMotorDisabledSequence < onVoltageRegulatorDisabledSequence,
 		"Sequence");
 }
+
+void test_motorDisable_calledWhenStillEnabled_expectMotorDisabledEventIsNotPublished(void)
+{
+	motorEnable();
+	motorEnable();
+	motorDisable();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(0, onMotorDisabledCalls);
+}
+
+void test_motorDisable_calledMoreTimesThanEnabled_expectEventsDoNotGetOutOfSync(void)
+{
+	motorEnable();
+	motorDisable();
+	motorDisable();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(1, onMotorDisabledCalls);
+
+	motorEnable();
+	motorDisable();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(2, onMotorDisabledCalls);
+}

@@ -21,10 +21,11 @@ void motorDisable(void)
 	if (motorEnableCount == 0)
 		return;
 
-	motorEnableCount--;
-
-	static const struct MotorDisabled eventArgs = { };
-	eventPublish(MOTOR_DISABLED, &eventArgs);
+	if (--motorEnableCount == 0)
+	{
+		static const struct MotorDisabled eventArgs = { };
+		eventPublish(MOTOR_DISABLED, &eventArgs);
+	}
 
 	voltageRegulatorDisable();
 }

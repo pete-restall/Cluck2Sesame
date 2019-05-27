@@ -89,6 +89,12 @@ static void onVoltageRegulatorEnabled(const struct Event *event)
 
 	RC6PPS = PPS_OUT_CWG1A;
 	RC7PPS = PPS_OUT_CWG1B;
+
+	if (motorEnableCount != 0)
+	{
+		static const struct MotorEnabled eventArgs = { };
+		eventPublish(MOTOR_ENABLED, &eventArgs);
+	}
 }
 
 static inline void configureTimer1AndCcpForEncoder(void)
