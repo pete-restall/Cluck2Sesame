@@ -40,12 +40,12 @@ void test_voltageRegulatorEnabled_onPublished_expectTimer1PrescalerIs1To1(void)
 	TEST_ASSERT_EQUAL_UINT8(0, T1CONbits.CKPS);
 }
 
-void test_voltageRegulatorEnabled_onPublished_expectTimer1IsAsynchronous(void)
+void test_voltageRegulatorEnabled_onPublished_expectTimer1IsSynchronousToAllowGlitchlessCompare(void)
 {
-	T1CON = anyByteWithMaskClear(_T1CON_nSYNC_MASK);
+	T1CON = anyByteWithMaskSet(_T1CON_nSYNC_MASK);
 	publishVoltageRegulatorEnabled();
 	dispatchAllEvents();
-	TEST_ASSERT_TRUE(T1CONbits.nSYNC);
+	TEST_ASSERT_FALSE(T1CONbits.nSYNC);
 }
 
 void test_voltageRegulatorEnabled_onPublished_expectTimer1ReadsAre16BitsBuffered(void)

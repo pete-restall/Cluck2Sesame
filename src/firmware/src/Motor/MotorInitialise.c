@@ -16,6 +16,8 @@
 #define CWG1CLKCON_USE_FOSC 1
 #define CWG1DAT_USE_PWM4 0b0100
 
+#define CCPCON_MODE_COMPARE_AND_SET (0b1000 << _CCP1CON_MODE_POSITION)
+
 #define CM1NCH_CURRENT_SENSE_PIN 0b011
 #define CM1PCH_DAC 0b101
 
@@ -31,7 +33,10 @@
 #define PPS_OUT_CWG1B 0x06
 
 static void onVoltageRegulatorEnabled(const struct Event *event);
+static inline void configureTimer1AndCcpForEncoder(void);
 static inline void configureClcAsOrGateForCcpAndComparator(void);
+static inline void configurePwmAsOffAndComparatorAsCurrentSenseUsingDac(void);
+static inline void configureCwgForPwmOutputWithClcShutdown(void);
 static void onVoltageRegulatorDisabled(const struct Event *event);
 
 void motorInitialise(void)
@@ -72,43 +77,31 @@ static void onVoltageRegulatorEnabled(const struct Event *event)
 	TRISBbits.TRISB1 = 1;
 	TRISCbits.TRISC2 = 1;
 	TRISCbits.TRISC3 = 1;
-	PMD3bits.PWM4MD = 0;
 
+	configureTimer1AndCcpForEncoder();
 	configureClcAsOrGateForCcpAndComparator();
+	configureCwgForPwmOutputWithClcShutdown();
+	configurePwmAsOffAndComparatorAsCurrentSenseUsingDac();
 
-	PMD3bits.CCP1MD = 0;
-// TODO: CCP1
+	RC6PPS = PPS_OUT_CWG1A;
+	RC7PPS = PPS_OUT_CWG1B;
+}
 
+static inline void configureTimer1AndCcpForEncoder(void)
+{
 	PMD1bits.TMR1MD = 0;
+	PMD3bits.CCP1MD = 0;
 	T1CKIPPS = PPS_IN_RC3;
 	TMR1H = 0;
 	TMR1L = 0;
 	T1GCON = 0;
 	PIR4bits.TMR1IF = 0;
 	T1CLK = T1CLK_USE_T1CKIN_PIN;
-	T1CON = _T1CON_nSYNC_MASK | _T1CON_RD16_MASK | _T1CON_ON_MASK;
+	T1CON = _T1CON_ON_MASK | _T1CON_RD16_MASK;
 
-	PWM4DCH = 0;
-	PWM4DCL = 0;
-
-	PMD4bits.CWG1MD = 0;
-	CWG1AS0 = CWG1AS0_FORCE_ALL_ZERO_ON_SHUTDOWN;
-	CWG1AS1 = CWG1AS1_SHUTDOWN_ON_CLC2;
-	CWG1STR = 0;
-	CWG1CLKCON = CWG1CLKCON_USE_FOSC;
-	CWG1DAT = CWG1DAT_USE_PWM4;
-
-	PMD2bits.CMP1MD = 0;
-	CM1NCH = CM1NCH_CURRENT_SENSE_PIN;
-	CM1PCH = CM1PCH_DAC;
-	CM1CON1 = _CM1CON1_INTP_MASK;
-	PIR2bits.C1IF = 0;
-
-	PWM4CON = _PWM4CON_PWM4EN_MASK;
-	CM1CON0 = _CM1CON0_EN_MASK | _CM1CON0_HYS_MASK | _CM1CON0_POL_MASK;
-	CWG1CON0 = _CWG1CON0_EN_MASK | CWG1CON0_SYNCHRONOUS_STEERING_MODE;
-	RC6PPS = PPS_OUT_CWG1A;
-	RC7PPS = PPS_OUT_CWG1B;
+	CCPR1H = 0;
+	CCPR1L = 0;
+	CCP1CON = _CCP1CON_EN_MASK | CCPCON_MODE_COMPARE_AND_SET;
 }
 
 static inline void configureClcAsOrGateForCcpAndComparator(void)
@@ -122,6 +115,32 @@ static inline void configureClcAsOrGateForCcpAndComparator(void)
 	CLC2GLS3 = 0;
 	CLC2POL = 0b10001110;
 	CLC2CON = _CLC2CON_LC2EN_MASK | CLCCON_MODE_AND4;
+}
+
+static inline void configureCwgForPwmOutputWithClcShutdown(void)
+{
+	PMD4bits.CWG1MD = 0;
+	CWG1AS0 = CWG1AS0_FORCE_ALL_ZERO_ON_SHUTDOWN;
+	CWG1AS1 = CWG1AS1_SHUTDOWN_ON_CLC2;
+	CWG1STR = 0;
+	CWG1CLKCON = CWG1CLKCON_USE_FOSC;
+	CWG1DAT = CWG1DAT_USE_PWM4;
+	CWG1CON0 = _CWG1CON0_EN_MASK | CWG1CON0_SYNCHRONOUS_STEERING_MODE;
+}
+
+static inline void configurePwmAsOffAndComparatorAsCurrentSenseUsingDac(void)
+{
+	PMD2bits.CMP1MD = 0;
+	PMD3bits.PWM4MD = 0;
+	CM1NCH = CM1NCH_CURRENT_SENSE_PIN;
+	CM1PCH = CM1PCH_DAC;
+	CM1CON1 = _CM1CON1_INTP_MASK;
+	PIR2bits.C1IF = 0;
+
+	PWM4DCH = 0;
+	PWM4DCL = 0;
+	PWM4CON = _PWM4CON_PWM4EN_MASK;
+	CM1CON0 = _CM1CON0_EN_MASK | _CM1CON0_HYS_MASK | _CM1CON0_POL_MASK;
 }
 
 static void onVoltageRegulatorDisabled(const struct Event *event)
