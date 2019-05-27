@@ -9,23 +9,30 @@ void motorEnable(void)
 {
 	voltageRegulatorEnable();
 
-	if (motorEnableCount++ == 0 && voltageRegulatorIsEnabled())
+	if (motorState.enableCount++ == 0 && voltageRegulatorIsEnabled())
 	{
 		static const struct MotorEnabled eventArgs = { };
 		eventPublish(MOTOR_ENABLED, &eventArgs);
+		motorState.flags.isFullyEnabled = 1;
 	}
 }
 
 void motorDisable(void)
 {
-	if (motorEnableCount == 0)
+	if (motorState.enableCount == 0)
 		return;
 
-	if (--motorEnableCount == 0)
+	if (--motorState.enableCount == 0)
 	{
 		static const struct MotorDisabled eventArgs = { };
 		eventPublish(MOTOR_DISABLED, &eventArgs);
+		motorState.flags.isFullyEnabled = 0;
 	}
 
 	voltageRegulatorDisable();
+}
+
+uint8_t motorIsEnabled(void)
+{
+	return motorState.flags.isFullyEnabled != 0;
 }

@@ -39,7 +39,7 @@ static inline void configurePwmAsOffAndComparatorAsCurrentSenseUsingDac(void);
 static inline void configureCwgForPwmOutputWithClcShutdown(void);
 static void onVoltageRegulatorDisabled(const struct Event *event);
 
-uint8_t motorEnableCount;
+struct MotorState motorState;
 
 void motorInitialise(void)
 {
@@ -69,7 +69,8 @@ void motorInitialise(void)
 
 	eventSubscribe(&onVoltageRegulatorDisabledSubscription);
 
-	motorEnableCount = 0;
+	motorState.enableCount = 0;
+	motorState.flags.all = 0;
 }
 
 static void onVoltageRegulatorEnabled(const struct Event *event)
@@ -90,10 +91,11 @@ static void onVoltageRegulatorEnabled(const struct Event *event)
 	RC6PPS = PPS_OUT_CWG1A;
 	RC7PPS = PPS_OUT_CWG1B;
 
-	if (motorEnableCount != 0)
+	if (motorState.enableCount != 0)
 	{
 		static const struct MotorEnabled eventArgs = { };
 		eventPublish(MOTOR_ENABLED, &eventArgs);
+		motorState.flags.isFullyEnabled = 1;
 	}
 }
 
