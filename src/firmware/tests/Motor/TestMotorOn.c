@@ -14,6 +14,12 @@ TEST_FILE("Motor/MotorInitialise.c")
 TEST_FILE("Motor/MotorEnableDisable.c")
 TEST_FILE("Motor/MotorOnOff.c")
 
+#define STEERING_MASK ( \
+		_CWG1STR_STRA_MASK | \
+		_CWG1STR_STRB_MASK | \
+		_CWG1STR_STRC_MASK | \
+		_CWG1STR_STRD_MASK)
+
 static void ensureMotorFullyEnabled(void);
 static int16_t anyClockwiseCount(void);
 static int16_t anyAntiClockwiseCount(void);
@@ -42,6 +48,7 @@ void test_motorOn_calledWithPositiveCount_expectCcpLimitIsSameValue(void)
 static void ensureMotorFullyEnabled(void)
 {
 	stubVoltageRegulatorIsEnabled(1);
+	publishVoltageRegulatorEnabled();
 	motorEnable();
 	dispatchAllEvents();
 }
@@ -142,8 +149,87 @@ void test_motorOn_called_expectCcpModeIsCompareWithSetAndHoldOutputWithTmr1Prese
 		CCP1CON | _CCP1CON_OUT_MASK);
 }
 
-// TODO: motorOn(+) - CWG1STRbits.STRA = 0, CWG1STRbits.STRB = 1
-// TODO: motorOn(-) - CWG1STRbits.STRB = 0, CWG1STRbits.STRA = 1
-// TODO: motorOn(0) - CWG1STRbits.STRA = 0, CWG1STRbits.STRB = 0
-// TODO: motorOn(0) - CCP1CON.MODE = 0
-// TODO: motorOn(0) - CWG1AS0bits.SHUTDOWN = 0
+void test_motorOn_calledWithZero_expectCcpModeIsUnchanged(void)
+{
+	ensureMotorFullyEnabled();
+	CCP1CON = anyByteWithMaskSet(_CCP1CON_MODE1_MASK);
+	uint8_t originalCcp1con = CCP1CON | _CCP1CON_OUT_MASK;
+
+	motorOn(0);
+	TEST_ASSERT_EQUAL_UINT8(originalCcp1con, CCP1CON | _CCP1CON_OUT_MASK);
+}
+
+void test_motorOn_called_expectShutdownFlagIsCleared(void)
+{
+	ensureMotorFullyEnabled();
+	CWG1AS0 = anyByteWithMaskSet(_CWG1AS0_SHUTDOWN_MASK);
+	uint8_t originalCwg1as0 = CWG1AS0;
+	motorOn(anyEncoderCount());
+	TEST_ASSERT_EQUAL_UINT8(originalCwg1as0 & ~_CWG1AS0_SHUTDOWN_MASK, CWG1AS0);
+}
+
+void test_motorOn_calledWithZero_expectShutdownFlagIsNotCleared(void)
+{
+	ensureMotorFullyEnabled();
+	CWG1AS0 = anyByteWithMaskSet(_CWG1AS0_SHUTDOWN_MASK);
+	uint8_t originalCwg1as0 = CWG1AS0;
+	motorOn(0);
+	TEST_ASSERT_EQUAL_UINT8(originalCwg1as0, CWG1AS0);
+}
+
+void test_motorOn_calledWithClockwiseCountWhenNotTurning_expectPwmSteeringToStrb(void)
+{
+	ensureMotorFullyEnabled();
+	CWG1STR = anyByteWithMaskClear(STEERING_MASK);
+	uint8_t originalCwg1strWithClearSteering = CWG1STR;
+	motorOn(anyClockwiseCount());
+	TEST_ASSERT_EQUAL_UINT8(
+		originalCwg1strWithClearSteering | _CWG1STR_STRB_MASK,
+		CWG1STR);
+}
+
+void test_motorOn_calledWithClockwiseCountWhenTurning_expectPwmSteeringIsNotModified(void)
+{
+	ensureMotorFullyEnabled();
+	CWG1STR = anyByteWithMaskSet(STEERING_MASK) & ~_CWG1STR_STRB_MASK;
+	uint8_t originalCwg1str = CWG1STR;
+	motorOn(anyClockwiseCount());
+	TEST_ASSERT_EQUAL_UINT8(originalCwg1str, CWG1STR);
+}
+
+void test_motorOn_calledWithAntiClockwiseCountWhenNotTurning_expectPwmSteeringToStra(void)
+{
+	ensureMotorFullyEnabled();
+	CWG1STR = anyByteWithMaskClear(STEERING_MASK);
+	uint8_t originalCwg1strWithClearSteering = CWG1STR;
+	motorOn(anyAntiClockwiseCount());
+	TEST_ASSERT_EQUAL_UINT8(
+		originalCwg1strWithClearSteering | _CWG1STR_STRA_MASK,
+		CWG1STR);
+}
+
+void test_motorOn_calledWithAntiClockwiseCountWhenTurning_expectPwmSteeringIsNotModified(void)
+{
+	ensureMotorFullyEnabled();
+	CWG1STR = anyByteWithMaskSet(STEERING_MASK) & ~_CWG1STR_STRA_MASK;
+	uint8_t originalCwg1str = CWG1STR;
+	motorOn(anyAntiClockwiseCount());
+	TEST_ASSERT_EQUAL_UINT8(originalCwg1str, CWG1STR);
+}
+
+void test_motorOn_calledWithZeroWhenTurning_expectPwmSteeringIsNotModified(void)
+{
+	ensureMotorFullyEnabled();
+	CWG1STR = anyByteWithMaskSet(STEERING_MASK) & ~_CWG1STR_STRA_MASK;
+	uint8_t originalCwg1str = CWG1STR;
+	motorOn(0);
+	TEST_ASSERT_EQUAL_UINT8(originalCwg1str, CWG1STR);
+}
+
+// TODO: motorOn() - probably shouldn't clear TMR1IF; that should be the 'on woken from sleep' handler's responsibility (also make sure TMR1IE is set in motorInitialise())
+// TODO: motorOn() - turning, the PWM duty cycle should not be modified
+// TODO: motorOn() - when not turning, clear the PWM duty cycle
+// TODO: motorOn() - start off the PWM soft-start
+
+// TODO: motorOff() - CWG1STRbits.STRA = 0, CWG1STRbits.STRB = 0
+// TODO: motorOff() - TMR1 not cleared, CCPR1 not cleared

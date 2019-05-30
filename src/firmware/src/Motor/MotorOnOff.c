@@ -8,11 +8,13 @@
 
 void motorOn(int16_t count)
 {
-	if (count == 0)
+	if (count == 0 || (CWG1STR & 0x0f))
 		return;
 
+	uint8_t steeringMask = _CWG1STR_STRB_MASK;
 	if (count < 0)
 	{
+		steeringMask = _CWG1STR_STRA_MASK;
 		count = -count;
 		if (count == -32768)
 			count = 0x7fff;
@@ -24,6 +26,8 @@ void motorOn(int16_t count)
 	TMR1H = 0;
 	TMR1L = 0;
 	PIR4bits.TMR1IF = 0;
+	CWG1AS0bits.SHUTDOWN = 0;
+	CWG1STR |= steeringMask;
 	CCP1CON |= CCP1CON_COMPARE_AND_SET_MODE;
 }
 
