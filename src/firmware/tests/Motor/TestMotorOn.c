@@ -128,3 +128,22 @@ void test_motorOn_calledWithZero_expectTimer1InterruptFlagIsNotCleared(void)
 	motorOn(0);
 	TEST_ASSERT_TRUE(PIR4bits.TMR1IF);
 }
+
+void test_motorOn_called_expectCcpModeIsCompareWithSetAndHoldOutputWithTmr1Preserved(void)
+{
+	ensureMotorFullyEnabled();
+	CCP1CON = anyByteWithMaskSet(_CCP1CON_MODE1_MASK);
+	uint8_t originalCcp1conWithClearMode =
+		(CCP1CON & ~(0b1111 << _CCP1CON_MODE_POSITION)) | _CCP1CON_OUT_MASK;
+
+	motorOn(anyEncoderCount());
+	TEST_ASSERT_EQUAL_UINT8(
+		originalCcp1conWithClearMode | (0b1000 << _CCP1CON_MODE_POSITION),
+		CCP1CON | _CCP1CON_OUT_MASK);
+}
+
+// TODO: motorOn(+) - CWG1STRbits.STRA = 0, CWG1STRbits.STRB = 1
+// TODO: motorOn(-) - CWG1STRbits.STRB = 0, CWG1STRbits.STRA = 1
+// TODO: motorOn(0) - CWG1STRbits.STRA = 0, CWG1STRbits.STRB = 0
+// TODO: motorOn(0) - CCP1CON.MODE = 0
+// TODO: motorOn(0) - CWG1AS0bits.SHUTDOWN = 0

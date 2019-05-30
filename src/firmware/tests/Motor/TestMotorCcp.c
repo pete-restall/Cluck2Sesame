@@ -32,12 +32,12 @@ void test_voltageRegulatorEnabled_onPublished_expectCcpIsEnabled(void)
 	TEST_ASSERT_TRUE(CCP1CONbits.EN);
 }
 
-void test_voltageRegulatorEnabled_onPublished_expectCcpModeIsCompareAndSetWithoutClearingTmr1(void)
+void test_voltageRegulatorEnabled_onPublished_expectCcpModeIsHeldInReset(void)
 {
 	CCP1CON = anyByte();
 	publishVoltageRegulatorEnabled();
 	dispatchAllEvents();
-	TEST_ASSERT_EQUAL_UINT8(0b1000, CCP1CONbits.MODE);
+	TEST_ASSERT_EQUAL_UINT8(0b0000, CCP1CONbits.MODE);
 }
 
 void test_voltageRegulatorEnabled_onPublished_expectComparisonWordIsZero(void)
