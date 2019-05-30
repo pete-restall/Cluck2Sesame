@@ -2,6 +2,7 @@
 #define __CLUCK3SESAME_TESTS_MOTOR_MOTORFIXTURE_H
 #include <stdint.h>
 #include "VoltageRegulator.h"
+#include "Motor.h"
 
 extern uint8_t voltageRegulatorIsEnabledValue;
 extern uint8_t voltageRegulatorEnableCalls;
@@ -14,6 +15,10 @@ extern uint8_t onMotorEnabledCalls;
 extern uint8_t onMotorEnabledSequence;
 extern uint8_t onMotorDisabledCalls;
 extern uint8_t onMotorDisabledSequence;
+extern uint8_t onMotorStartedCalls;
+extern struct MotorStarted onMotorStartedArgs;
+extern uint8_t onMotorStoppedCalls;
+extern struct MotorStopped onMotorStoppedArgs;
 
 extern void motorFixtureSetUp(void);
 extern void motorFixtureTearDown(void);

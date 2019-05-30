@@ -1,6 +1,7 @@
 #include <xc.h>
 #include <unity.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "Event.h"
 #include "VoltageRegulator.h"
@@ -13,6 +14,8 @@
 static void onMotorEnabled(const struct Event *event);
 static void onMotorDisabled(const struct Event *event);
 static void onVoltageRegulatorDisabled(const struct Event *event);
+static void onMotorStarted(const struct Event *event);
+static void onMotorStopped(const struct Event *event);
 
 static uint8_t callSequence;
 static uint8_t voltageRegulatorDisableIsStubbedForEvent;
@@ -28,6 +31,10 @@ uint8_t onMotorEnabledCalls;
 uint8_t onMotorEnabledSequence;
 uint8_t onMotorDisabledCalls;
 uint8_t onMotorDisabledSequence;
+uint8_t onMotorStartedCalls;
+struct MotorStarted onMotorStartedArgs;
+uint8_t onMotorStoppedCalls;
+struct MotorStopped onMotorStoppedArgs;
 
 void motorFixtureSetUp(void)
 {
@@ -46,6 +53,8 @@ void motorFixtureSetUp(void)
 	onMotorEnabledSequence = 0;
 	onMotorDisabledCalls = 0;
  	onMotorDisabledSequence = 0;
+	onMotorStartedCalls = 0;
+	onMotorStoppedCalls = 0;
 
 	static const struct EventSubscription onMotorEnabledSubscription =
 	{
@@ -64,6 +73,24 @@ void motorFixtureSetUp(void)
 	};
 
 	eventSubscribe(&onMotorDisabledSubscription);
+
+	static const struct EventSubscription onMotorStartedSubscription =
+	{
+		.type = MOTOR_STARTED,
+		.handler = &onMotorStarted,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onMotorStartedSubscription);
+
+	static const struct EventSubscription onMotorStoppedSubscription =
+	{
+		.type = MOTOR_STOPPED,
+		.handler = &onMotorStopped,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onMotorStoppedSubscription);
 }
 
 static void onMotorEnabled(const struct Event *event)
@@ -156,6 +183,20 @@ static void onVoltageRegulatorDisabled(const struct Event *event)
 void stubVoltageRegulatorDisableToPublishEvent(void)
 {
 	voltageRegulatorDisableIsStubbedForEvent = 1;
+}
+
+static void onMotorStarted(const struct Event *event)
+{
+	TEST_ASSERT_NOT_NULL_MESSAGE(event->args, "MTR STD");
+	onMotorStartedCalls++;
+	memcpy(&onMotorStartedArgs, event->args, sizeof(struct MotorStarted));
+}
+
+static void onMotorStopped(const struct Event *event)
+{
+	TEST_ASSERT_NOT_NULL_MESSAGE(event->args, "MTR SPD");
+	onMotorStoppedCalls++;
+	memcpy(&onMotorStoppedArgs, event->args, sizeof(struct MotorStopped));
 }
 
 int16_t anyClockwiseCount(void)

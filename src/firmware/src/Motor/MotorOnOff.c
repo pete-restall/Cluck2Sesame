@@ -12,10 +12,15 @@
 #define CCP1CON_MODE_MASK (0b1111 << _CCP1CON_MODE_POSITION)
 #define CCP1CON_COMPARE_AND_SET_MODE (0b1000 << _CCP1CON_MODE_POSITION)
 
+static struct MotorStarted motorStartedEventArgs;
+
 void motorOn(int16_t count)
 {
 	if (count == 0 || (CWG1STR & 0x0f))
 		return;
+
+	motorStartedEventArgs.count = count;
+	eventPublish(MOTOR_STARTED, &motorStartedEventArgs);
 
 	uint8_t steeringMask = _CWG1STR_STRB_MASK;
 	if (count < 0)
@@ -41,5 +46,19 @@ void motorOn(int16_t count)
 
 void motorOff(void)
 {
+	if (!(CWG1STR & CWG1STR_STEERING_MASK))
+		return;
+
+	static struct MotorStopped eventArgs;
+	eventArgs.fault.currentLimited = PIR2bits.C1IF != 0 ? 1 : 0;
+	eventArgs.fault.encoderOverflow = PIR4bits.TMR1IF != 0 ? 1 : 0;
+	eventArgs.requestedCount = motorStartedEventArgs.count;
+	eventArgs.actualCount = (int16_t) ((uint16_t) TMR1L);
+	eventArgs.actualCount |= ((int16_t) TMR1H) << 8;
+	if (CWG1STRbits.STRA)
+		eventArgs.actualCount = -eventArgs.actualCount;
+
+	eventPublish(MOTOR_STOPPED, &eventArgs);
+
 	CWG1STR &= ~CWG1STR_STEERING_MASK;
 }
