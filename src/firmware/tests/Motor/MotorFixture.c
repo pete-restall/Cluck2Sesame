@@ -6,6 +6,8 @@
 #include "VoltageRegulator.h"
 #include "Motor.h"
 
+#include "../NonDeterminism.h"
+
 #include "MotorFixture.h"
 
 static void onMotorEnabled(const struct Event *event);
@@ -82,6 +84,19 @@ void motorFixtureTearDown(void)
 {
 }
 
+void ensureMotorFullyEnabled(void)
+{
+	stubVoltageRegulatorIsEnabled(1);
+	publishVoltageRegulatorEnabled();
+	motorEnable();
+	dispatchAllEvents();
+}
+
+void stubVoltageRegulatorIsEnabled(uint8_t value)
+{
+	voltageRegulatorIsEnabledValue = value;
+}
+
 void publishVoltageRegulatorEnabled(void)
 {
 	static const struct VoltageRegulatorEnabled emptyEventArgs = { };
@@ -98,11 +113,6 @@ void publishVoltageRegulatorDisabled(void)
 {
 	static const struct VoltageRegulatorDisabled emptyEventArgs = { };
 	eventPublish(VOLTAGE_REGULATOR_DISABLED, &emptyEventArgs);
-}
-
-void stubVoltageRegulatorIsEnabled(uint8_t value)
-{
-	voltageRegulatorIsEnabledValue = value;
 }
 
 uint8_t voltageRegulatorIsEnabled(void)
@@ -146,4 +156,19 @@ static void onVoltageRegulatorDisabled(const struct Event *event)
 void stubVoltageRegulatorDisableToPublishEvent(void)
 {
 	voltageRegulatorDisableIsStubbedForEvent = 1;
+}
+
+int16_t anyClockwiseCount(void)
+{
+	return (int16_t) anyWordExcept(0) & 0x7fff;
+}
+
+int16_t anyAntiClockwiseCount(void)
+{
+	return -anyClockwiseCount();
+}
+
+int16_t anyEncoderCount(void)
+{
+	return (int16_t) anyWordExcept(0);
 }

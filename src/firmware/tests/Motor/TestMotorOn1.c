@@ -20,11 +20,6 @@ TEST_FILE("Motor/MotorOnOff.c")
 		_CWG1STR_STRC_MASK | \
 		_CWG1STR_STRD_MASK)
 
-static void ensureMotorFullyEnabled(void);
-static int16_t anyClockwiseCount(void);
-static int16_t anyAntiClockwiseCount(void);
-static int16_t anyEncoderCount(void);
-
 void onBeforeTest(void)
 {
 	motorFixtureSetUp();
@@ -45,19 +40,6 @@ void test_motorOn_calledWithPositiveCount_expectCcpLimitIsSameValue(void)
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE((clockwise >> 0) & 0xff, CCPR1L, "CCPR1L");
 }
 
-static void ensureMotorFullyEnabled(void)
-{
-	stubVoltageRegulatorIsEnabled(1);
-	publishVoltageRegulatorEnabled();
-	motorEnable();
-	dispatchAllEvents();
-}
-
-static int16_t anyClockwiseCount(void)
-{
-	return (int16_t) anyWordExcept(0) & 0x7fff;
-}
-
 void test_motorOn_calledWithNegativeCount_expectCcpLimitIsNegatedValue(void)
 {
 	ensureMotorFullyEnabled();
@@ -65,11 +47,6 @@ void test_motorOn_calledWithNegativeCount_expectCcpLimitIsNegatedValue(void)
 	motorOn(antiClockwise);
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE((-antiClockwise >> 8) & 0xff, CCPR1H, "CCPR1H");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE((-antiClockwise >> 0) & 0xff, CCPR1L, "CCPR1L");
-}
-
-static int16_t anyAntiClockwiseCount(void)
-{
-	return -anyClockwiseCount();
 }
 
 void test_motorOn_calledWithMaximumNegativeCount_expectCcpLimitIsMaximumPositiveValue(void)
@@ -88,11 +65,6 @@ void test_motorOn_called_expectTimer1IsCleared(void)
 	motorOn(anyEncoderCount());
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, TMR1L, "TMR1L");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, TMR1H, "TMR1H");
-}
-
-static int16_t anyEncoderCount(void)
-{
-	return (int16_t) anyWordExcept(0);
 }
 
 void test_motorOn_called_expectTimer1InterruptFlagIsCleared(void)
@@ -227,9 +199,3 @@ void test_motorOn_calledWithZeroWhenTurning_expectPwmSteeringIsNotModified(void)
 }
 
 // TODO: motorOn() - probably shouldn't clear TMR1IF; that should be the 'on woken from sleep' handler's responsibility (also make sure TMR1IE is set in motorInitialise())
-// TODO: motorOn() - turning, the PWM duty cycle should not be modified
-// TODO: motorOn() - when not turning, clear the PWM duty cycle
-// TODO: motorOn() - start off the PWM soft-start
-
-// TODO: motorOff() - CWG1STRbits.STRA = 0, CWG1STRbits.STRB = 0
-// TODO: motorOff() - TMR1 not cleared, CCPR1 not cleared

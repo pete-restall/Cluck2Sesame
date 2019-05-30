@@ -24,4 +24,9 @@ extern void stubVoltageRegulatorIsEnabled(uint8_t value);
 extern void mockOnVoltageRegulatorDisabled(void);
 extern void stubVoltageRegulatorDisableToPublishEvent(void);
 
+extern void ensureMotorFullyEnabled(void);
+extern int16_t anyClockwiseCount(void);
+extern int16_t anyAntiClockwiseCount(void);
+extern int16_t anyEncoderCount(void);
+
 #endif
