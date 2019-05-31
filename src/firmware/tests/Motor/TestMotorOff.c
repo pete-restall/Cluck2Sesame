@@ -130,4 +130,5 @@ void test_motorOff_calledWhenCurrentLimited_expectMotorStoppedEventIsPublishedWi
 
 // TODO: motorOff() - CWG1STRbits.STRA = 0, CWG1STRbits.STRB = 0
 // TODO: motorOff() - TMR1 not cleared, CCPR1 not cleared
+// TODO: motorOff() - PWM stops increasing (no more schedules)
 // TODO: MOTOR_STOPPED when timeout - expect fault.encoderTimeout set

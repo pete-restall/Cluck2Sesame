@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "Event.h"
+#include "NearScheduler.h"
 #include "VoltageRegulator.h"
 #include "Motor.h"
 
@@ -35,6 +36,8 @@ uint8_t onMotorStartedCalls;
 struct MotorStarted onMotorStartedArgs;
 uint8_t onMotorStoppedCalls;
 struct MotorStopped onMotorStoppedArgs;
+uint16_t nearSchedulerAddCalls;
+const struct NearSchedule *nearSchedulerAddArgs[8];
 
 void motorFixtureSetUp(void)
 {
@@ -55,6 +58,7 @@ void motorFixtureSetUp(void)
  	onMotorDisabledSequence = 0;
 	onMotorStartedCalls = 0;
 	onMotorStoppedCalls = 0;
+	nearSchedulerAddCalls = 0;
 
 	static const struct EventSubscription onMotorEnabledSubscription =
 	{
@@ -212,4 +216,13 @@ int16_t anyAntiClockwiseCount(void)
 int16_t anyEncoderCount(void)
 {
 	return (int16_t) anyWordExcept(0);
+}
+
+void nearSchedulerAdd(const struct NearSchedule *const schedule)
+{
+	nearSchedulerAddArgs[
+		nearSchedulerAddCalls++ % (
+			sizeof(nearSchedulerAddArgs) /
+			sizeof(const struct NearSchedule *))
+	] = schedule;
 }

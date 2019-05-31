@@ -1,6 +1,7 @@
 #ifndef __CLUCK3SESAME_TESTS_MOTOR_MOTORFIXTURE_H
 #define __CLUCK3SESAME_TESTS_MOTOR_MOTORFIXTURE_H
 #include <stdint.h>
+#include "NearScheduler.h"
 #include "VoltageRegulator.h"
 #include "Motor.h"
 
@@ -19,6 +20,8 @@ extern uint8_t onMotorStartedCalls;
 extern struct MotorStarted onMotorStartedArgs;
 extern uint8_t onMotorStoppedCalls;
 extern struct MotorStopped onMotorStoppedArgs;
+extern uint16_t nearSchedulerAddCalls;
+extern const struct NearSchedule *nearSchedulerAddArgs[8];
 
 extern void motorFixtureSetUp(void);
 extern void motorFixtureTearDown(void);

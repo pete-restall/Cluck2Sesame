@@ -1,6 +1,9 @@
 #include <xc.h>
 #include <stdint.h>
 
+#include "../Event.h"
+#include "../NearScheduler.h"
+
 #include "Motor.h"
 
 #define CWG1STR_STEERING_MASK ( \
@@ -12,7 +15,15 @@
 #define CCP1CON_MODE_MASK (0b1111 << _CCP1CON_MODE_POSITION)
 #define CCP1CON_COMPARE_AND_SET_MODE (0b1000 << _CCP1CON_MODE_POSITION)
 
+static void incrementPwmDutyCycle(void *state);
+
 static struct MotorStarted motorStartedEventArgs;
+
+static const struct NearSchedule pwmDutyCycleIncrementingSchedule =
+{
+	.ticks = 1,
+	.handler = &incrementPwmDutyCycle
+};
 
 void motorOn(int16_t count)
 {
@@ -42,6 +53,16 @@ void motorOn(int16_t count)
 	CWG1AS0bits.SHUTDOWN = 0;
 	CWG1STR |= steeringMask;
 	CCP1CON |= CCP1CON_COMPARE_AND_SET_MODE;
+
+	nearSchedulerAdd(&pwmDutyCycleIncrementingSchedule);
+}
+
+static void incrementPwmDutyCycle(void *state)
+{
+	if ((PWM4DCH & 0x3f) != 0x3f || PWM4DCL != 0x80)
+		nearSchedulerAdd(&pwmDutyCycleIncrementingSchedule);
+
+	PWM4DC += 1 << 6;
 }
 
 void motorOff(void)
