@@ -1,6 +1,7 @@
 #include <xc.h>
 
 #include "../Event.h"
+#include "../PowerManagement.h"
 #include "../NvmSettings.h"
 #include "../VoltageRegulator.h"
 
@@ -38,6 +39,7 @@ static inline void configureClcAsOrGateForCcpAndComparator(void);
 static inline void configurePwmAsOffAndComparatorAsCurrentSenseUsingDac(void);
 static inline void configureCwgForPwmOutputWithClcShutdown(void);
 static void onVoltageRegulatorDisabled(const struct Event *event);
+static void onWokenFromSleep(const struct Event *event);
 
 struct MotorState motorState;
 
@@ -68,6 +70,15 @@ void motorInitialise(void)
 	};
 
 	eventSubscribe(&onVoltageRegulatorDisabledSubscription);
+
+	static const struct EventSubscription onWokenFromSleepSubscription =
+	{
+		.type = WOKEN_FROM_SLEEP,
+		.handler = &onWokenFromSleep,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onWokenFromSleepSubscription);
 
 	motorState.enableCount = 0;
 	motorState.flags.all = 0;
@@ -108,6 +119,7 @@ static inline void configureTimer1AndCcpForEncoder(void)
 	TMR1L = 0;
 	T1GCON = 0;
 	PIR4bits.TMR1IF = 0;
+	PIE4bits.TMR1IE = 1;
 	T1CLK = T1CLK_USE_T1CKIN_PIN;
 	T1CON = _T1CON_ON_MASK | _T1CON_RD16_MASK;
 
@@ -127,6 +139,7 @@ static inline void configureClcAsOrGateForCcpAndComparator(void)
 	CLC2GLS3 = 0;
 	CLC2POL = 0b10001110;
 	CLC2CON = _CLC2CON_LC2EN_MASK | CLCCON_MODE_AND4;
+	// TODO: SET UP TMR1IF AS AN INPUT AS WELL (THAT'S AN OVERFLOW CONDITION)
 }
 
 static inline void configureCwgForPwmOutputWithClcShutdown(void)
@@ -137,6 +150,8 @@ static inline void configureCwgForPwmOutputWithClcShutdown(void)
 	CWG1STR = 0;
 	CWG1CLKCON = CWG1CLKCON_USE_FOSC;
 	CWG1DAT = CWG1DAT_USE_PWM4;
+	PIR7bits.CWG1IF = 0;
+	PIE7bits.CWG1IE = 1;
 	CWG1CON0 = _CWG1CON0_EN_MASK | CWG1CON0_SYNCHRONOUS_STEERING_MODE;
 }
 
@@ -167,4 +182,10 @@ static void onVoltageRegulatorDisabled(const struct Event *event)
 	TRISBbits.TRISB1 = 0;
 	TRISCbits.TRISC2 = 0;
 	TRISCbits.TRISC3 = 0;
+}
+
+static void onWokenFromSleep(const struct Event *event)
+{
+	if (PIR7bits.CWG1IF || PIR4bits.TMR1IF || PIR2bits.C1IF)
+		motorOff();
 }

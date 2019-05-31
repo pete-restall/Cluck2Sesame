@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "Event.h"
+#include "PowerManagement.h"
 #include "NearScheduler.h"
 #include "VoltageRegulator.h"
 #include "Motor.h"
@@ -225,4 +226,10 @@ void nearSchedulerAdd(const struct NearSchedule *const schedule)
 			sizeof(nearSchedulerAddArgs) /
 			sizeof(const struct NearSchedule *))
 	] = schedule;
+}
+
+void publishWokenFromSleep(void)
+{
+	static const struct WokenFromSleep emptyEventArgs = { };
+	eventPublish(WOKEN_FROM_SLEEP, &emptyEventArgs);
 }

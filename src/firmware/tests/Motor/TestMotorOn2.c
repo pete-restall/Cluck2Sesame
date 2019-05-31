@@ -16,12 +16,6 @@ TEST_FILE("Motor/MotorOnOff.c")
 
 #define MIN(x, y) (x < y ? x : y)
 
-#define STEERING_MASK ( \
-		_CWG1STR_STRA_MASK | \
-		_CWG1STR_STRB_MASK | \
-		_CWG1STR_STRC_MASK | \
-		_CWG1STR_STRD_MASK)
-
 static void fakeMotorAlreadyTurning(void);
 
 void onBeforeTest(void)
@@ -165,5 +159,30 @@ void test_motorOn_called_expectPwmIsNotIncrementedPast8BitMaximum(void)
 	}
 }
 
-// TODO: motorOn() - encoder limit hit before PWM finishes incrementing, expect PWM stops incrementing (no more schedules)
-// TODO: motorOn() - current limit hit before PWM finishes incrementing, expect PWM stops incrementing (no more schedules)
+void test_motorOn_calledWhenMotorIsStoppedByInterruptBeforeFullPwmDutyCycle_expectPwmStopsIncrementing(void)
+{
+	ensureMotorFullyEnabled();
+	motorOn(anyEncoderCount());
+	PIR7bits.CWG1IF = 1;
+	publishWokenFromSleep();
+	dispatchAllEvents();
+
+	const struct NearSchedule *schedule = nearSchedulerAddArgs[0];
+	if (schedule && schedule->handler)
+		schedule->handler(schedule->state);
+
+	TEST_ASSERT_EQUAL_UINT16(1, nearSchedulerAddCalls);
+}
+
+void test_motorOn_calledWhenMotorIsStoppedManuallyBeforeFullPwmDutyCycle_expectPwmStopsIncrementing(void)
+{
+	ensureMotorFullyEnabled();
+	motorOn(anyEncoderCount());
+	motorOff();
+
+	const struct NearSchedule *schedule = nearSchedulerAddArgs[0];
+	if (schedule && schedule->handler)
+		schedule->handler(schedule->state);
+
+	TEST_ASSERT_EQUAL_UINT16(1, nearSchedulerAddCalls);
+}

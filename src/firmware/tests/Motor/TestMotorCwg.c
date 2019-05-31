@@ -11,6 +11,8 @@
 #include "../NonDeterminism.h"
 
 TEST_FILE("Motor/MotorInitialise.c")
+TEST_FILE("Motor/MotorEnableDisable.c")
+TEST_FILE("Motor/MotorOnOff.c")
 
 void onBeforeTest(void)
 {
@@ -127,6 +129,24 @@ void test_voltageRegulatorEnabled_onPublished_expectSteeringOverridesAreZero(voi
 	publishVoltageRegulatorEnabled();
 	dispatchAllEvents();
 	TEST_ASSERT_EQUAL_UINT8(0, CWG1STR & 0xf0);
+}
+
+void test_voltageRegulatorEnabled_onPublished_expectCwgInterruptFlagIsClear(void)
+{
+	PIR7 = anyByteWithMaskSet(_PIR7_CWG1IF_MASK);
+	uint8_t originalPir7 = PIR7;
+	publishVoltageRegulatorEnabled();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(originalPir7 & ~_PIR7_CWG1IF_MASK, PIR7);
+}
+
+void test_voltageRegulatorEnabled_onPublished_expectCwgInterruptFlagWakesDeviceFromSleep(void)
+{
+	PIE7 = anyByteWithMaskClear(_PIE7_CWG1IE_MASK);
+	uint8_t originalPie7 = PIE7;
+	publishVoltageRegulatorEnabled();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(originalPie7 | _PIE7_CWG1IE_MASK, PIE7);
 }
 
 void test_voltageRegulatorEnabled_onPublished_expectAllOutputsAreOverridden(void)

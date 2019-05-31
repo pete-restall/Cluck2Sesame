@@ -6,12 +6,6 @@
 
 #include "Motor.h"
 
-#define CWG1STR_STEERING_MASK ( \
-	_CWG1STR_STRA_MASK | \
-	_CWG1STR_STRB_MASK | \
-	_CWG1STR_STRC_MASK | \
-	_CWG1STR_STRD_MASK)
-
 #define CCP1CON_MODE_MASK (0b1111 << _CCP1CON_MODE_POSITION)
 #define CCP1CON_COMPARE_AND_SET_MODE (0b1000 << _CCP1CON_MODE_POSITION)
 
@@ -59,6 +53,9 @@ void motorOn(int16_t count)
 
 static void incrementPwmDutyCycle(void *state)
 {
+	if (!(CWG1STR & CWG1STR_STEERING_MASK))
+		return;
+
 	if ((PWM4DCH & 0x3f) != 0x3f || PWM4DCL != 0x80)
 		nearSchedulerAdd(&pwmDutyCycleIncrementingSchedule);
 
@@ -67,19 +64,24 @@ static void incrementPwmDutyCycle(void *state)
 
 void motorOff(void)
 {
-	if (!(CWG1STR & CWG1STR_STEERING_MASK))
-		return;
+	if (CWG1STR & CWG1STR_STEERING_MASK)
+	{
+		uint8_t antiClockwise = CWG1STRbits.STRA;
+		CWG1STR &= ~CWG1STR_STEERING_MASK;
 
-	static struct MotorStopped eventArgs;
-	eventArgs.fault.currentLimited = PIR2bits.C1IF != 0 ? 1 : 0;
-	eventArgs.fault.encoderOverflow = PIR4bits.TMR1IF != 0 ? 1 : 0;
-	eventArgs.requestedCount = motorStartedEventArgs.count;
-	eventArgs.actualCount = (int16_t) ((uint16_t) TMR1L);
-	eventArgs.actualCount |= ((int16_t) TMR1H) << 8;
-	if (CWG1STRbits.STRA)
-		eventArgs.actualCount = -eventArgs.actualCount;
+		static struct MotorStopped eventArgs;
+		eventArgs.fault.currentLimited = PIR2bits.C1IF != 0 ? 1 : 0;
+		eventArgs.fault.encoderOverflow = PIR4bits.TMR1IF != 0 ? 1 : 0;
+		eventArgs.requestedCount = motorStartedEventArgs.count;
+		eventArgs.actualCount = (int16_t) ((uint16_t) TMR1L);
+		eventArgs.actualCount |= ((int16_t) TMR1H) << 8;
+		if (antiClockwise)
+			eventArgs.actualCount = -eventArgs.actualCount;
 
-	eventPublish(MOTOR_STOPPED, &eventArgs);
+		eventPublish(MOTOR_STOPPED, &eventArgs);
+	}
 
-	CWG1STR &= ~CWG1STR_STEERING_MASK;
+	PIR2bits.C1IF = 0;
+	PIR4bits.TMR1IF = 0;
+	PIR7bits.CWG1IF = 0;
 }

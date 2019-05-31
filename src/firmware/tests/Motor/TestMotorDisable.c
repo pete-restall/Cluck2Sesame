@@ -12,6 +12,7 @@
 
 TEST_FILE("Motor/MotorInitialise.c")
 TEST_FILE("Motor/MotorEnableDisable.c")
+TEST_FILE("Motor/MotorOnOff.c")
 
 void onBeforeTest(void)
 {

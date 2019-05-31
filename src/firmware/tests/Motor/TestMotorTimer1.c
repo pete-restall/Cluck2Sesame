@@ -11,6 +11,8 @@
 #include "../NonDeterminism.h"
 
 TEST_FILE("Motor/MotorInitialise.c")
+TEST_FILE("Motor/MotorEnableDisable.c")
+TEST_FILE("Motor/MotorOnOff.c")
 
 void onBeforeTest(void)
 {
@@ -97,4 +99,13 @@ void test_voltageRegulatorEnabled_onPublished_expectTimer1InterruptFlagIsCleared
 	publishVoltageRegulatorEnabled();
 	dispatchAllEvents();
 	TEST_ASSERT_EQUAL_UINT8(originalPir4 & ~_PIR4_TMR1IF_MASK, PIR4);
+}
+
+void test_voltageRegulatorEnabled_onPublished_expectTimer1InterruptWakesDeviceFromSleep(void)
+{
+	PIE4 = anyByteWithMaskClear(_PIE4_TMR1IE_MASK);
+	uint8_t originalPie4 = PIE4;
+	publishVoltageRegulatorEnabled();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(originalPie4 | _PIE4_TMR1IE_MASK, PIE4);
 }

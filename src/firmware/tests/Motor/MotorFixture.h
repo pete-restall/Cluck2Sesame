@@ -5,6 +5,12 @@
 #include "VoltageRegulator.h"
 #include "Motor.h"
 
+#define STEERING_MASK ( \
+	_CWG1STR_STRA_MASK | \
+	_CWG1STR_STRB_MASK | \
+	_CWG1STR_STRC_MASK | \
+	_CWG1STR_STRD_MASK)
+
 extern uint8_t voltageRegulatorIsEnabledValue;
 extern uint8_t voltageRegulatorEnableCalls;
 extern uint8_t voltageRegulatorEnableSequence;
@@ -36,5 +42,6 @@ extern void ensureMotorFullyEnabled(void);
 extern int16_t anyClockwiseCount(void);
 extern int16_t anyAntiClockwiseCount(void);
 extern int16_t anyEncoderCount(void);
+extern void publishWokenFromSleep(void);
 
 #endif
