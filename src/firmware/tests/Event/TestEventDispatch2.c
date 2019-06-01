@@ -22,12 +22,12 @@ static uint8_t anotherEventState;
 void onBeforeTest(void)
 {
 	eventState = anyByte();
-	subscription.type = anyByteWithMaskClear(EVENT_TYPE_SYSTEM_MASK);
+	subscription.type = anyByte();
 	subscription.handler = &eventHandler;
 	subscription.state = &eventState;
 
 	anotherEventState = anyByte();
-	anotherSubscription.type = anyByteExcept(subscription.type) & ~EVENT_TYPE_SYSTEM_MASK;
+	anotherSubscription.type = anyByteExcept(subscription.type);
 	anotherSubscription.handler = &anotherEventHandler;
 	anotherSubscription.state = &anotherEventState;
 
