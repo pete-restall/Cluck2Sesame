@@ -1,8 +1,8 @@
 #include <xc.h>
 #include <stdint.h>
 
-#include "../Event.h"
-#include "../Clock.h"
+#include "../Platform/Event.h"
+#include "../Platform/Clock.h"
 #include "../Location.h"
 
 #include "SunEvents.h"

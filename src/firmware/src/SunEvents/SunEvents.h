@@ -1,8 +1,8 @@
 #ifndef __CLUCK3SESAME_SRC_SUNEVENTS_SUNEVENTS_H
 #define __CLUCK3SESAME_SRC_SUNEVENTS_SUNEVENTS_H
+#include "../Platform/Clock.h"
 #include "../SunEvents.h"
 #include "../Location.h"
-#include "../Clock.h"
 
 #define LOOKUP_STEP 6
 #define LOOKUP_LENGTH (366 / LOOKUP_STEP)

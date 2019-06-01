@@ -1,8 +1,9 @@
 #include <xc.h>
+#include <stdint.h>
 #include <unity.h>
 
-#include "Main.h"
-#include "Mock_Event.h"
+#include "Platform/Main.h"
+#include "Platform/Mock_Event.h"
 
 #include "Fixture.h"
 

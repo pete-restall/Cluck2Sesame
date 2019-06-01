@@ -1,8 +1,9 @@
 #include <xc.h>
+#include <stdint.h>
 #include <unity.h>
 
-#include "Mock_Event.h"
-#include "Mock_Clock.h"
+#include "Platform/Mock_Event.h"
+#include "Platform/Mock_Clock.h"
 
 #include "SunEvents.h"
 

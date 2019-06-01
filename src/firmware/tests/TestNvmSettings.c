@@ -1,11 +1,11 @@
 #include <xc.h>
 #include <unity.h>
 
-#include "NvmSettings.h"
+#include "Platform/NvmSettings.h"
 
 #include "Fixture.h"
 
-TEST_FILE("NvmSettings.c")
+TEST_FILE("Platform/NvmSettings.c")
 
 void onBeforeTest(void)
 {
