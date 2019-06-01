@@ -25,6 +25,19 @@ void onAfterTest(void)
 	motorFixtureTearDown();
 }
 
+void test_motorDisable_calledAfterEnable_expectPwmTimerIsDisabled(void)
+{
+	motorEnable();
+	motorDisable();
+	TEST_ASSERT_EQUAL_UINT8(1, pwmTimerDisableCalls);
+}
+
+void test_motorDisable_calledBeforeEnable_expectPwmTimerIsNotDisabled(void)
+{
+	motorDisable();
+	TEST_ASSERT_EQUAL_UINT8(0, pwmTimerDisableCalls);
+}
+
 void test_motorDisable_calledAfterEnable_expectVoltageRegulatorIsDisabled(void)
 {
 	motorEnable();

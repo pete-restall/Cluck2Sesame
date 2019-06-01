@@ -25,6 +25,21 @@ void onAfterTest(void)
 	motorFixtureTearDown();
 }
 
+void test_motorEnable_called_expectPwmTimerIsEnabled(void)
+{
+	motorEnable();
+	TEST_ASSERT_EQUAL_UINT8(1, pwmTimerEnableCalls);
+}
+
+void test_motorEnable_calledMoreThanOnce_expectPwmTimerIsEnabledSameNumberOfTimes(void)
+{
+	uint8_t numberOfCalls = anyByteLessThan(10);
+	for (uint8_t i = 0; i < numberOfCalls; i++)
+		motorEnable();
+
+	TEST_ASSERT_EQUAL_UINT8(numberOfCalls, pwmTimerEnableCalls);
+}
+
 void test_motorEnable_calledWhenVoltageRegulatorIsDisabled_expectVoltageRegulatorIsEnabled(void)
 {
 	stubVoltageRegulatorIsEnabled(0);

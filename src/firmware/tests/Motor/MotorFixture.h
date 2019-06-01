@@ -11,6 +11,8 @@
 	_CWG1STR_STRC_MASK | \
 	_CWG1STR_STRD_MASK)
 
+extern uint8_t pwmTimerEnableCalls;
+extern uint8_t pwmTimerDisableCalls;
 extern uint8_t voltageRegulatorIsEnabledValue;
 extern uint8_t voltageRegulatorEnableCalls;
 extern uint8_t voltageRegulatorEnableSequence;

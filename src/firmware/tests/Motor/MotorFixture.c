@@ -22,6 +22,8 @@ static void onMotorStopped(const struct Event *event);
 static uint8_t callSequence;
 static uint8_t voltageRegulatorDisableIsStubbedForEvent;
 
+uint8_t pwmTimerEnableCalls;
+uint8_t pwmTimerDisableCalls;
 uint8_t voltageRegulatorIsEnabledValue;
 uint8_t voltageRegulatorEnableCalls;
 uint8_t voltageRegulatorEnableSequence;
@@ -45,6 +47,8 @@ void motorFixtureSetUp(void)
 	eventInitialise();
 
 	callSequence = 1;
+	pwmTimerEnableCalls = 0;
+	pwmTimerDisableCalls = 0;
 	voltageRegulatorDisableIsStubbedForEvent = 0;
 	voltageRegulatorIsEnabledValue = 0;
 	voltageRegulatorEnableCalls = 0;
@@ -114,6 +118,16 @@ static void onMotorDisabled(const struct Event *event)
 
 void motorFixtureTearDown(void)
 {
+}
+
+void pwmTimerEnable(void)
+{
+	pwmTimerEnableCalls++;
+}
+
+void pwmTimerDisable(void)
+{
+	pwmTimerDisableCalls++;
 }
 
 void ensureMotorFullyEnabled(void)

@@ -3,12 +3,14 @@
 
 #include "../Event.h"
 #include "../VoltageRegulator.h"
+#include "../PwmTimer.h"
 
 #include "Motor.h"
 
 void motorEnable(void)
 {
 	voltageRegulatorEnable();
+	pwmTimerEnable();
 
 	if (motorState.enableCount++ == 0 && voltageRegulatorIsEnabled())
 	{
@@ -30,6 +32,7 @@ void motorDisable(void)
 		motorState.flags.isFullyEnabled = 0;
 	}
 
+	pwmTimerDisable();
 	voltageRegulatorDisable();
 }
 
