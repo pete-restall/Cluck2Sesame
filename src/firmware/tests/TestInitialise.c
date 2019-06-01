@@ -30,6 +30,7 @@ static struct CallDetails eventInitialiseCalls;
 static struct CallDetails powerManagementInitialiseCalls;
 static struct CallDetails clockInitialiseCalls;
 static struct CallDetails nearSchedulerInitialiseCalls;
+static struct CallDetails farSchedulerInitialiseCalls;
 static struct CallDetails voltageRegulatorInitialiseCalls;
 static struct CallDetails pwmTimerInitialiseCalls;
 static struct CallDetails lcdInitialiseCalls;
@@ -44,6 +45,7 @@ void onBeforeTest(void)
 	clearCallsFor(&powerManagementInitialiseCalls);
 	clearCallsFor(&clockInitialiseCalls);
 	clearCallsFor(&nearSchedulerInitialiseCalls);
+	clearCallsFor(&farSchedulerInitialiseCalls);
 	clearCallsFor(&voltageRegulatorInitialiseCalls);
 	clearCallsFor(&pwmTimerInitialiseCalls);
 	clearCallsFor(&lcdInitialiseCalls);
@@ -123,10 +125,21 @@ void nearSchedulerInitialise(void)
 	registerCallFor(&nearSchedulerInitialiseCalls);
 }
 
-void test_initialise_called_expectVoltageRegulatorIsInitialisedAfterNearScheduler(void)
+void test_initialise_called_expectFarSchedulerIsInitialisedAfterNearScheduler(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&voltageRegulatorInitialiseCalls, 5);
+	assertCalledOnceAtSequence(&farSchedulerInitialiseCalls, 5);
+}
+
+void farSchedulerInitialise(void)
+{
+	registerCallFor(&farSchedulerInitialiseCalls);
+}
+
+void test_initialise_called_expectVoltageRegulatorIsInitialisedAfterFarScheduler(void)
+{
+	initialise();
+	assertCalledOnceAtSequence(&voltageRegulatorInitialiseCalls, 6);
 }
 
 void voltageRegulatorInitialise(void)
@@ -137,7 +150,7 @@ void voltageRegulatorInitialise(void)
 void test_initialise_called_expectPwmTimerIsInitialisedAfterVoltageRegulator(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&pwmTimerInitialiseCalls, 6);
+	assertCalledOnceAtSequence(&pwmTimerInitialiseCalls, 7);
 }
 
 void pwmTimerInitialise(void)
@@ -148,7 +161,7 @@ void pwmTimerInitialise(void)
 void test_initialise_called_expectLcdIsInitialisedAfterPwmTimer(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&lcdInitialiseCalls, 7);
+	assertCalledOnceAtSequence(&lcdInitialiseCalls, 8);
 }
 
 void lcdInitialise(void)
@@ -159,7 +172,7 @@ void lcdInitialise(void)
 void test_initialise_called_expectMotorIsInitialisedAfterLcd(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&motorInitialiseCalls, 8);
+	assertCalledOnceAtSequence(&motorInitialiseCalls, 9);
 }
 
 void motorInitialise(void)
@@ -170,7 +183,7 @@ void motorInitialise(void)
 void test_initialise_called_expectSunEventsAreInitialisedAfterMotor(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&sunEventsInitialiseCalls, 9);
+	assertCalledOnceAtSequence(&sunEventsInitialiseCalls, 10);
 }
 
 void sunEventsInitialise(void)

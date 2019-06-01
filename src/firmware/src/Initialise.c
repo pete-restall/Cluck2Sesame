@@ -4,6 +4,7 @@
 #include "Event.h"
 #include "Clock.h"
 #include "NearScheduler.h"
+#include "FarScheduler.h"
 #include "PowerManagement.h"
 #include "VoltageRegulator.h"
 #include "PwmTimer.h"
@@ -18,6 +19,7 @@ void initialise(void)
 	powerManagementInitialise();
 	clockInitialise();
 	nearSchedulerInitialise();
+	farSchedulerInitialise();
 	voltageRegulatorInitialise();
 	pwmTimerInitialise();
 	lcdInitialise();

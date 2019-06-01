@@ -8,8 +8,6 @@
 #define EMPTY_EVENT_ARGS
 #endif
 
-#define EVENT_TYPE_SYSTEM_MASK ((EventType) 0b10000000)
-
 typedef uint8_t EventType;
 
 struct Event
