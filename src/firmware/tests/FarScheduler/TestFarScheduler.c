@@ -244,3 +244,21 @@ void test_farSchedulerAdd_calledWhenNoMoreSpaceButSomeSchedulesHaveBeenActioned_
 
 	TEST_ASSERT_EQUAL_UINT8(33, onScheduledCalls);
 }
+
+void test_farSchedulerRemove_called_expectScheduleIsNotActioned(void)
+{
+	static const struct DateWithFlags today = { .year = 1, .month = 2, .day = 3 };
+	static const struct DateChanged dateChangedArgs = { .today = &today };
+
+	static const struct Time now = { .hour = 4, .minute = 5 };
+	static const struct TimeChanged timeChangedArgs = { .now = &now };
+
+	struct FarSchedule schedule;
+	stubScheduleFor(&schedule, 4, 5);
+	farSchedulerAdd(&schedule);
+	farSchedulerRemove(&schedule);
+
+	eventPublish(TIME_CHANGED, &timeChangedArgs);
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8(0, onScheduledCalls);
+}

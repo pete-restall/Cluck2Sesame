@@ -16,5 +16,6 @@ struct FarSchedule
 
 extern void farSchedulerInitialise(void);
 extern void farSchedulerAdd(const struct FarSchedule *const schedule);
+extern void farSchedulerRemove(const struct FarSchedule *const schedule);
 
 #endif

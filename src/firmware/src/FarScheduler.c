@@ -85,3 +85,12 @@ void farSchedulerAdd(const struct FarSchedule *const schedule)
 		}
 	}
 }
+
+void farSchedulerRemove(const struct FarSchedule *const schedule)
+{
+	for (struct FarScheduleWithFlags *dest = schedules; dest != noMoreSchedules; dest++)
+	{
+		if (dest->data == schedule)
+			dest->data = (const struct FarSchedule *) 0;
+	}
+}
