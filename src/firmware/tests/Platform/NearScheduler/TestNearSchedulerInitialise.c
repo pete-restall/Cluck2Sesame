@@ -5,8 +5,8 @@
 #include "Mock_Event.h"
 #include "Platform/NearScheduler.h"
 
-#include "../Fixture.h"
-#include "../NonDeterminism.h"
+#include "../../Fixture.h"
+#include "../../NonDeterminism.h"
 
 TEST_FILE("Platform/NearScheduler.c")
 

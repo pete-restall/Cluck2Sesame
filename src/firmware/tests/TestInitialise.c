@@ -3,7 +3,7 @@
 #include <unity.h>
 
 #include "Platform/Main.h"
-#include "Platform/Mock_Event.h"
+#include "Mock_Event.h"
 
 #include "Fixture.h"
 

@@ -7,8 +7,8 @@
 #include "FakeLcd.h"
 #include "LcdFixture.h"
 
-#include "../Fixture.h"
-#include "../NonDeterminism.h"
+#include "../../Fixture.h"
+#include "../../NonDeterminism.h"
 
 TEST_FILE("Platform/Poll.c")
 TEST_FILE("Platform/Event.c")

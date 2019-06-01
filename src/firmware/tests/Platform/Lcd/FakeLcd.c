@@ -6,7 +6,7 @@
 
 #include "FakeLcd.h"
 
-#include "../NonDeterminism.h"
+#include "../../NonDeterminism.h"
 
 #define DRAM_ADDR(x) __at(0x23a0 + (x))
 

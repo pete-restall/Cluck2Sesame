@@ -7,8 +7,8 @@
 
 #include "VoltageRegulatorFixture.h"
 
-#include "../Fixture.h"
-#include "../NonDeterminism.h"
+#include "../../Fixture.h"
+#include "../../NonDeterminism.h"
 
 TEST_FILE("Platform/VoltageRegulator.c")
 TEST_FILE("Platform/VoltageRegulatorFixture.c")

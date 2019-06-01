@@ -12,7 +12,7 @@
 #include "FakeLcd.h"
 #include "LcdFixture.h"
 
-#include "../NonDeterminism.h"
+#include "../../NonDeterminism.h"
 
 extern void poll(void);
 

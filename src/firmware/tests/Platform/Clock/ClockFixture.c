@@ -7,7 +7,7 @@
 #include "Platform/Clock.h"
 
 #include "ClockFixture.h"
-#include "../NonDeterminism.h"
+#include "../../NonDeterminism.h"
 
 static uint8_t stubCallSequence;
 

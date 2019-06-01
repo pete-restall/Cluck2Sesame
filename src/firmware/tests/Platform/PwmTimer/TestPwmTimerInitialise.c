@@ -4,8 +4,8 @@
 
 #include "Platform/PwmTimer.h"
 
-#include "../Fixture.h"
-#include "../NonDeterminism.h"
+#include "../../Fixture.h"
+#include "../../NonDeterminism.h"
 
 TEST_FILE("Platform/PwmTimer.c")
 

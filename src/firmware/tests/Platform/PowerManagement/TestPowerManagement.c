@@ -7,8 +7,8 @@
 
 #include "TestPowerManagement.h"
 
-#include "../Fixture.h"
-#include "../NonDeterminism.h"
+#include "../../Fixture.h"
+#include "../../NonDeterminism.h"
 
 TEST_FILE("Platform/Poll.c")
 

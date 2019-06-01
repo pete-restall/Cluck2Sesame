@@ -6,8 +6,8 @@
 #include "Mock_Clock.h"
 #include "Platform/FarScheduler.h"
 
-#include "../Fixture.h"
-#include "../NonDeterminism.h"
+#include "../../Fixture.h"
+#include "../../NonDeterminism.h"
 
 TEST_FILE("Platform/FarScheduler.c")
 

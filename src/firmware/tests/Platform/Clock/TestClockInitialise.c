@@ -5,8 +5,8 @@
 #include "Platform/Event.h"
 #include "Platform/Clock.h"
 
-#include "../Fixture.h"
-#include "../NonDeterminism.h"
+#include "../../Fixture.h"
+#include "../../NonDeterminism.h"
 
 TEST_FILE("Platform/Clock/ClockInitialise.c")
 TEST_FILE("Platform/Clock/ClockGetSetNow.c")

@@ -6,8 +6,8 @@
 
 #include "NearSchedulerFixture.h"
 
-#include "../Fixture.h"
-#include "../NonDeterminism.h"
+#include "../../Fixture.h"
+#include "../../NonDeterminism.h"
 
 #define MAX_SCHEDULES 8
 

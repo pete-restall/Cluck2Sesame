@@ -9,7 +9,7 @@
 #include "Platform/VoltageRegulator.h"
 #include "Platform/Motor.h"
 
-#include "../NonDeterminism.h"
+#include "../../NonDeterminism.h"
 
 #include "MotorFixture.h"
 

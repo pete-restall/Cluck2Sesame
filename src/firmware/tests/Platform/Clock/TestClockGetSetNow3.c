@@ -9,8 +9,8 @@
 #include "ClockFixture.h"
 #include "ClockGetSetNowFixture.h"
 
-#include "../Fixture.h"
-#include "../NonDeterminism.h"
+#include "../../Fixture.h"
+#include "../../NonDeterminism.h"
 
 TEST_FILE("Platform/Clock/ClockInitialise.c")
 TEST_FILE("Platform/Clock/ClockGetSetNow.c")

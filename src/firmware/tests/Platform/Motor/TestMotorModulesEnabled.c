@@ -7,8 +7,8 @@
 
 #include "MotorFixture.h"
 
-#include "../Fixture.h"
-#include "../NonDeterminism.h"
+#include "../../Fixture.h"
+#include "../../NonDeterminism.h"
 
 TEST_FILE("Platform/Motor/MotorInitialise.c")
 TEST_FILE("Platform/Motor/MotorEnableDisable.c")

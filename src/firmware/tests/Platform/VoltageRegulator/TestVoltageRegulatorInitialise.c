@@ -6,8 +6,8 @@
 #include "Mock_NearScheduler.h"
 #include "Platform/VoltageRegulator.h"
 
-#include "../Fixture.h"
-#include "../NonDeterminism.h"
+#include "../../Fixture.h"
+#include "../../NonDeterminism.h"
 
 TEST_FILE("Platform/VoltageRegulator.c")
 
