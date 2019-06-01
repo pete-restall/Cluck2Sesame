@@ -1,5 +1,6 @@
 #include <xc.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "Event.h"
 #include "Clock.h"
@@ -47,8 +48,8 @@ void farSchedulerInitialise(void)
 
 	eventSubscribe(&onTimeChangedSubscription);
 
-	for (uint8_t i = 0; i < MAX_SCHEDULES; i++)
-		schedules[i].data = (const struct FarSchedule *) 0;
+	dateDiscriminator = 1;
+	memset(&schedules, 0, sizeof(schedules));
 }
 
 static void onDateChanged(const struct Event *const event)
@@ -58,21 +59,29 @@ static void onDateChanged(const struct Event *const event)
 
 static void onTimeChanged(const struct Event *const event)
 {
-	// TODO: OBVIOUSLY MORE THAN JUST schedules[0]...
 	const struct TimeChanged *args = (const struct TimeChanged *) event->args;
-	if (schedules[0].dateDiscriminator == dateDiscriminator)
+	for (struct FarScheduleWithFlags *schedule = schedules; schedule != noMoreSchedules; schedule++)
 	{
-		const struct FarSchedule *schedule = schedules[0].data;
 		if (
-			schedule->time.hour == args->now->hour &&
-			schedule->time.minute == args->now->minute)
-			eventPublish(schedule->eventType, schedule->eventArgs);
+			schedule->dateDiscriminator == dateDiscriminator &&
+			schedule->data->time.hour == args->now->hour &&
+			schedule->data->time.minute == args->now->minute)
+		{
+			eventPublish(schedule->data->eventType, schedule->data->eventArgs);
+			schedule->data = (const struct FarSchedule *) 0;
+		}
 	}
 }
 
 void farSchedulerAdd(const struct FarSchedule *const schedule)
 {
-	// TODO: OBVIOUSLY MORE THAN JUST schedules[0]...
-	schedules[0].dateDiscriminator = dateDiscriminator;
-	schedules[0].data = schedule;
+	for (struct FarScheduleWithFlags *dest = schedules; dest != noMoreSchedules; dest++)
+	{
+		if (!dest->data)
+		{
+			dest->dateDiscriminator = dateDiscriminator;
+			dest->data = schedule;
+			return;
+		}
+	}
 }

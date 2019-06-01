@@ -166,3 +166,81 @@ void test_timeChanged_onPublishedWithNonMatchingMinuteInTheFuture_expectSchedule
 	dispatchAllEvents();
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, onScheduledCalls, "Calls");
 }
+
+void test_timeChanged_onPublishedWhenMoreThanOneMatchingSchedule_expectAllSchedulesAreActioned(void)
+{
+	static const struct DateWithFlags today = { .year = 1, .month = 2, .day = 3 };
+	static const struct DateChanged dateChangedArgs = { .today = &today };
+
+	static const struct Time now = { .hour = 4, .minute = 5 };
+	static const struct TimeChanged timeChangedArgs = { .now = &now };
+
+	struct FarSchedule schedule;
+	stubScheduleFor(&schedule, now.hour, now.minute);
+	farSchedulerAdd(&schedule);
+	farSchedulerAdd(&schedule);
+
+	eventPublish(TIME_CHANGED, &timeChangedArgs);
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(2, onScheduledCalls, "Calls");
+}
+
+void test_farSchedulerAdd_calledWhenNoMoreSpace_expectNoSchedulesAreOverwritten(void)
+{
+	static const struct DateWithFlags today = { .year = 1, .month = 2, .day = 3 };
+	static const struct DateChanged dateChangedArgs = { .today = &today };
+
+	static struct Time now = { .hour = 4, .minute = 5 };
+	static const struct TimeChanged timeChangedArgs = { .now = &now };
+
+	static struct FarSchedule schedules[33];
+	for (uint8_t i = 0; i < 33; i++)
+	{
+		stubScheduleFor(&schedules[i], now.hour, now.minute + i);
+		farSchedulerAdd(&schedules[i]);
+	}
+
+	for (uint8_t i = 0; i < 32; i++)
+	{
+		eventPublish(TIME_CHANGED, &timeChangedArgs);
+		dispatchAllEvents();
+		now.minute++;
+	}
+
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(32, onScheduledCalls, "(1)");
+
+	eventPublish(TIME_CHANGED, &timeChangedArgs);
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(32, onScheduledCalls, "(2)");
+}
+
+void test_farSchedulerAdd_calledWhenNoMoreSpaceButSomeSchedulesHaveBeenActioned_expectActionedSchedulesAreOverwritten(void)
+{
+	static const struct DateWithFlags today = { .year = 1, .month = 2, .day = 3 };
+	static const struct DateChanged dateChangedArgs = { .today = &today };
+
+	static struct Time now = { .hour = 4, .minute = 5 };
+	static const struct TimeChanged timeChangedArgs = { .now = &now };
+
+	static struct FarSchedule schedules[33];
+	stubScheduleFor(&schedules[32], now.hour, now.minute);
+	farSchedulerAdd(&schedules[32]);
+	eventPublish(TIME_CHANGED, &timeChangedArgs);
+	dispatchAllEvents();
+	now.minute++;
+
+	for (uint8_t i = 0; i < 32; i++)
+	{
+		stubScheduleFor(&schedules[i], now.hour, now.minute + i);
+		farSchedulerAdd(&schedules[i]);
+	}
+
+	for (uint8_t i = 0; i < 32; i++)
+	{
+		eventPublish(TIME_CHANGED, &timeChangedArgs);
+		dispatchAllEvents();
+		now.minute++;
+	}
+
+	TEST_ASSERT_EQUAL_UINT8(33, onScheduledCalls);
+}
