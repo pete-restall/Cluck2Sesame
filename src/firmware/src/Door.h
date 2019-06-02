@@ -16,13 +16,13 @@ union DoorFaults
 	};
 };
 
-#define DOOR_OPENED ((EventType) 0x40)
+#define DOOR_OPENED ((EventType) 0x50)
 struct DoorOpened { EMPTY_EVENT_ARGS };
 
-#define DOOR_CLOSED ((EventType) 0x41)
+#define DOOR_CLOSED ((EventType) 0x51)
 struct DoorClosed { EMPTY_EVENT_ARGS };
 
-#define DOOR_ABORTED ((EventType) 0x42)
+#define DOOR_ABORTED ((EventType) 0x52)
 struct DoorAborted
 {
 	union DoorFaults fault;

@@ -9,7 +9,7 @@
 
 struct Location;
 
-#define LOCATION_CHANGED ((EventType) 0x20)
+#define LOCATION_CHANGED ((EventType) 0x40)
 struct LocationChanged
 {
 	const struct Location *const location;

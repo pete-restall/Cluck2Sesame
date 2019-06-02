@@ -3,19 +3,19 @@
 #include <stdint.h>
 #include "Event.h"
 
-#define MOTOR_ENABLED ((EventType) 0x38)
+#define MOTOR_ENABLED ((EventType) 0x28)
 struct MotorEnabled { EMPTY_EVENT_ARGS };
 
-#define MOTOR_DISABLED ((EventType) 0x39)
+#define MOTOR_DISABLED ((EventType) 0x29)
 struct MotorDisabled { EMPTY_EVENT_ARGS };
 
-#define MOTOR_STARTED ((EventType) 0x3a)
+#define MOTOR_STARTED ((EventType) 0x2a)
 struct MotorStarted
 {
 	int16_t count;
 };
 
-#define MOTOR_STOPPED ((EventType) 0x3b)
+#define MOTOR_STOPPED ((EventType) 0x2b)
 struct MotorStopped
 {
 	int16_t actualCount;

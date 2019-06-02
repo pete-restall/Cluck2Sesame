@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "Event.h"
 
-#define LCD_ENABLED ((EventType) 0x30)
+#define LCD_ENABLED ((EventType) 0x20)
 struct LcdEnabled { EMPTY_EVENT_ARGS };
 
 #define LCD_CMD_FUNCTION 0b00100000

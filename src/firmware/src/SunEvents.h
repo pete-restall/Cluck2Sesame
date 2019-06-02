@@ -3,7 +3,7 @@
 #include "Platform/Event.h"
 #include "Platform/Clock.h"
 
-#define SUN_EVENTS_CHANGED ((EventType) 0x18)
+#define SUN_EVENTS_CHANGED ((EventType) 0x48)
 struct SunEventsChanged
 {
 	struct Time sunrise;
