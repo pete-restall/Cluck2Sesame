@@ -39,13 +39,13 @@ void lcdInitialise(void)
 	TRISC &= PORTC_PIN_MASK;
 
 	PWM5CON = 0;
-	PWM5DCH = (nvmSettings.lcd.contrast >> 2) & 0b00111111;
-	PWM5DCL = nvmSettings.lcd.contrast << 6;
+	PWM5DCH = (nvmSettings.platform.lcd.contrast >> 2) & 0b00111111;
+	PWM5DCL = nvmSettings.platform.lcd.contrast << 6;
 	RA2PPS = PPS_OUT_PWM5;
 
 	PWM3CON = 0;
-	PWM3DCH = (nvmSettings.lcd.backlightBrightness >> 2) & 0b00111111;
-	PWM3DCL = nvmSettings.lcd.backlightBrightness << 6;
+	PWM3DCH = (nvmSettings.platform.lcd.backlightBrightness >> 2) & 0b00111111;
+	PWM3DCL = nvmSettings.platform.lcd.backlightBrightness << 6;
 	RC5PPS = PPS_OUT_PWM3;
 
 	lcdState.enableCount = 0;

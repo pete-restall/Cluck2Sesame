@@ -71,8 +71,8 @@ void test_voltageRegulatorEnabled_onPublished_expectDacNegativeReferenceIsVss(vo
 
 void test_voltageRegulatorEnabled_onPublished_expectCurrentLimitComesFromNvmSettings(void)
 {
-	DAC1CON1 = anyByteExcept(nvmSettings.motor.currentLimit);
+	DAC1CON1 = anyByteExcept(nvmSettings.platform.motor.currentLimit);
 	publishVoltageRegulatorEnabled();
 	dispatchAllEvents();
-	TEST_ASSERT_EQUAL_UINT8(nvmSettings.motor.currentLimit, DAC1CON1);
+	TEST_ASSERT_EQUAL_UINT8(nvmSettings.platform.motor.currentLimit, DAC1CON1);
 }

@@ -11,14 +11,16 @@
 
 __section("NvmSettings") const union NvmSettings nvmSettings =
 {
-	.lcd =
+	.platform =
 	{
-		.contrast = PWM_VOLTS(1.3),
-		.backlightBrightness = PWM_VOLTS(1.65)
-	},
-	.motor =
-	{
-		.currentLimit = DAC_AMPS(1.2),
-		.travelLimit = 0
+		.lcd =
+		{
+			.contrast = PWM_VOLTS(1.3),
+			.backlightBrightness = PWM_VOLTS(1.65)
+		},
+		.motor =
+		{
+			.currentLimit = DAC_AMPS(1.2)
+		}
 	}
 };
