@@ -9,6 +9,7 @@ struct SystemInitialised { EMPTY_EVENT_ARGS };
 struct AllEventsDispatched { EMPTY_EVENT_ARGS };
 
 extern void initialise(void);
+extern void applicationInitialise(void);
 extern void poll(void);
 
 #endif

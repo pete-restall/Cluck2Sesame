@@ -7,7 +7,7 @@
 
 #include "Fixture.h"
 
-TEST_FILE("Initialise.c")
+TEST_FILE("Platform/Initialise.c")
 
 struct CallDetails
 {
@@ -36,7 +36,7 @@ static struct CallDetails voltageRegulatorInitialiseCalls;
 static struct CallDetails pwmTimerInitialiseCalls;
 static struct CallDetails lcdInitialiseCalls;
 static struct CallDetails motorInitialiseCalls;
-static struct CallDetails sunEventsInitialiseCalls;
+static struct CallDetails applicationInitialiseCalls;
 static struct CallDetails systemInitialisedEventPublishCalls;
 
 void onBeforeTest(void)
@@ -51,7 +51,7 @@ void onBeforeTest(void)
 	clearCallsFor(&pwmTimerInitialiseCalls);
 	clearCallsFor(&lcdInitialiseCalls);
 	clearCallsFor(&motorInitialiseCalls);
-	clearCallsFor(&sunEventsInitialiseCalls);
+	clearCallsFor(&applicationInitialiseCalls);
 	clearCallsFor(&systemInitialisedEventPublishCalls);
 
 	eventInitialise_StubWithCallback(&eventInitialiseCallback);
@@ -181,15 +181,15 @@ void motorInitialise(void)
 	registerCallFor(&motorInitialiseCalls);
 }
 
-void test_initialise_called_expectSunEventsAreInitialisedAfterMotor(void)
+void test_initialise_called_expectApplicationIsInitialisedAfterMotor(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&sunEventsInitialiseCalls, 10);
+	assertCalledOnceAtSequence(&applicationInitialiseCalls, 10);
 }
 
-void sunEventsInitialise(void)
+void applicationInitialise(void)
 {
-	registerCallFor(&sunEventsInitialiseCalls);
+	registerCallFor(&applicationInitialiseCalls);
 }
 
 void test_initialise_called_expectSystemInitialisedEventIsPublishedLast(void)

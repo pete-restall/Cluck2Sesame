@@ -1,17 +1,15 @@
 #include <xc.h>
 
-#include "Platform/Main.h"
-#include "Platform/Event.h"
-#include "Platform/Clock.h"
-#include "Platform/NearScheduler.h"
-#include "Platform/FarScheduler.h"
-#include "Platform/PowerManagement.h"
-#include "Platform/VoltageRegulator.h"
-#include "Platform/PwmTimer.h"
-#include "Platform/Lcd.h"
-#include "Platform/Motor.h"
-
-#include "SunEvents.h"
+#include "Main.h"
+#include "Event.h"
+#include "Clock.h"
+#include "NearScheduler.h"
+#include "FarScheduler.h"
+#include "PowerManagement.h"
+#include "VoltageRegulator.h"
+#include "PwmTimer.h"
+#include "Lcd.h"
+#include "Motor.h"
 
 void initialise(void)
 {
@@ -25,6 +23,6 @@ void initialise(void)
 	pwmTimerInitialise();
 	lcdInitialise();
 	motorInitialise();
-	sunEventsInitialise();
+	applicationInitialise();
 	eventPublish(SYSTEM_INITIALISED, &emptyEventArgs);
 }
