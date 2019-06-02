@@ -125,33 +125,34 @@ void test_motorOn_calledWhenAlreadyTurning_expectNoNearScheduleAddedForPwm(void)
 	TEST_ASSERT_EQUAL_UINT8(0, nearSchedulerAddCalls);
 }
 
-void test_motorOn_called_expectPwmIncrementsOnEachNearSchedulerTick(void)
+void test_motorOn_called_expectPwmIncrementsBy8UpTo256OnEachNearSchedulerTick(void)
 {
 	ensureMotorFullyEnabled();
 	motorOn(anyEncoderCount());
 
 	uint8_t i = 0;
-	for (uint8_t pwmDutyCycle = 1; pwmDutyCycle != 0; pwmDutyCycle++)
+	for (uint16_t pwmDutyCycle = 8; pwmDutyCycle != 0; pwmDutyCycle += 8)
 	{
 		const struct NearSchedule *schedule = nearSchedulerAddArgs[i++ & 0x07];
 		if (schedule && schedule->handler)
 			schedule->handler(schedule->state);
 
-		uint8_t pwmLow = (pwmDutyCycle << 6) & 0xc0;
-		uint8_t pwmHigh = (pwmDutyCycle >> 2) & 0x3f;
+		uint8_t pwmLow = (uint8_t) ((pwmDutyCycle << 6) & 0xc0);
+		uint8_t pwmHigh = (uint8_t) ((pwmDutyCycle >> 2) & 0xff);
 		TEST_ASSERT_EQUAL_UINT8_MESSAGE(pwmLow, PWM4DCL, "PWM4DCL");
 		TEST_ASSERT_EQUAL_UINT8_MESSAGE(pwmHigh, PWM4DCH, "PWM4DCH");
 	}
 }
 
-void test_motorOn_called_expectPwmIsNotIncrementedPast8BitMaximum(void)
+void test_motorOn_called_expectPwmIsNotIncrementedJustPast8BitMaximumToPreventSpikes(void)
 {
 	ensureMotorFullyEnabled();
 	motorOn(anyEncoderCount());
 
-	for (uint16_t calls = 0; calls < 256; calls++)
+	const uint8_t total = 256 / 8;
+	for (uint8_t calls = 0; calls < total + 1; calls++)
 	{
-		TEST_ASSERT_EQUAL_UINT16(MIN(255, 1 + calls), nearSchedulerAddCalls);
+		TEST_ASSERT_EQUAL_UINT16(MIN(total, 1 + calls), nearSchedulerAddCalls);
 
 		const struct NearSchedule *schedule = nearSchedulerAddArgs[calls & 0x07];
 		if (schedule && schedule->handler)

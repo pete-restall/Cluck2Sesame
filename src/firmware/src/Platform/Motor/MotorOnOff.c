@@ -56,10 +56,10 @@ static void incrementPwmDutyCycle(void *state)
 	if (!(CWG1STR & CWG1STR_STEERING_MASK))
 		return;
 
-	if ((PWM4DCH & 0x3f) != 0x3f || PWM4DCL != 0x80)
+	if (PWM4DCH != (256 - 8) >> 2)
 		nearSchedulerAdd(&pwmDutyCycleIncrementingSchedule);
 
-	PWM4DC += 1 << 6;
+	PWM4DCH += 8 >> 2;
 }
 
 void motorOff(void)
