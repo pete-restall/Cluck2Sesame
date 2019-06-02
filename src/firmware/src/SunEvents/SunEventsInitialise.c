@@ -12,6 +12,7 @@ static void onDateChanged(const struct Event *const event);
 
 void sunEventsInitialise(void)
 {
+	// TODO: THE NVM_SETTINGS_CHANGED EVENT SHOULD BE HANDLED; PROBABLY RENDERS LOCATION_CHANGED OBSOLETE
 	static const struct EventSubscription onLocationChangedSubscription =
 	{
 		.type = LOCATION_CHANGED,

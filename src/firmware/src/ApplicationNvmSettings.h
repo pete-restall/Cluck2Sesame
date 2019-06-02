@@ -15,6 +15,12 @@ union ApplicationNvmSettings
 
 		struct
 		{
+			struct {
+				unsigned int isManuallyOverridden : 1;
+				unsigned int isSunEventDriven : 1;
+				unsigned int isTimeDriven : 1;
+			} mode;
+
 			uint16_t height;
 		} door;
 	};
