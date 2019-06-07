@@ -15,11 +15,24 @@ union ApplicationNvmSettings
 
 		struct
 		{
-			struct {
+			struct
+			{
 				unsigned int isManuallyOverridden : 1;
 				unsigned int isSunEventDriven : 1;
 				unsigned int isTimeDriven : 1;
 			} mode;
+
+			struct
+			{
+				uint8_t hour;
+				uint8_t minute;
+			} autoOpenTime;
+
+			struct
+			{
+				uint8_t hour;
+				uint8_t minute;
+			} autoCloseTime;
 
 			uint16_t height;
 		} door;
