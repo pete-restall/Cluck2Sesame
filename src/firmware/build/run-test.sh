@@ -46,6 +46,8 @@ break fpbase
 
 reset
 write rngSeed ${RNG_SEED_LOW} ${RNG_SEED_HIGH}
+run
+wait
 
 $(cat ${PARTIAL_FIXTURE_PATH_AND_FILENAME} | sed s/\$\{cwd\}/$(echo ${PARTIAL_FIXTURE_PATH} | sed 's/\//\\\//g')/g)
 
