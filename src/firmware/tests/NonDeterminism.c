@@ -4,7 +4,7 @@
 
 #include "NonDeterminism.h"
 
-int rngSeed = 0;
+volatile int rngSeed = 0;
 
 static void ensureSeedIsInitialised(void)
 {

@@ -45,9 +45,6 @@ break unityBreakpointHook
 break fpbase
 
 reset
-run
-wait
-
 write rngSeed ${RNG_SEED_LOW} ${RNG_SEED_HIGH}
 
 $(cat ${PARTIAL_FIXTURE_PATH_AND_FILENAME} | sed s/\$\{cwd\}/$(echo ${PARTIAL_FIXTURE_PATH} | sed 's/\//\\\//g')/g)
