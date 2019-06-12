@@ -3,10 +3,12 @@
 #include "../Platform/FarScheduler.h"
 #include "../Platform/NvmSettings.h"
 #include "../ApplicationNvmSettings.h"
+#include "../SunEvents.h"
 
 #include "Door.h"
 
 static void onDateOrNvmSettingsChanged(const struct Event *const event);
+static void onSunEventsChanged(const struct Event *const event);
 
 static const struct DoorOpenScheduleActioned openingScheduleEventArgs = { };
 static struct FarSchedule openingSchedule =
@@ -41,6 +43,15 @@ void doorInitialise(void)
 	};
 
 	eventSubscribe(&onNvmSettingsChangedSubscription);
+
+	static const struct EventSubscription onSunEventsChangedSubscription =
+	{
+		.type = SUN_EVENTS_CHANGED,
+		.handler = &onSunEventsChanged,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onSunEventsChangedSubscription);
 }
 
 static void onDateOrNvmSettingsChanged(const struct Event *const event)
@@ -60,4 +71,21 @@ static void onDateOrNvmSettingsChanged(const struct Event *const event)
 	farSchedulerAdd(&closingSchedule);
 }
 
-// TODO: VERIFY THAT SUN EVENT SCHEDULE USES SAME POINTERS AS TIME SCHEDULES, SINCE OTHERWISE WE MAY END UP WITH TWO SETS OF SCHEDULES BEING FIRED OFF
+static void onSunEventsChanged(const struct Event *const event)
+{
+	if (!nvmSettings.application.door.mode.isSunEventDriven)
+		return;
+
+	const struct SunEventsChanged *args = (const struct SunEventsChanged *) event->args;
+
+	// TODO: OFFSETS FROM nvmSettings.application.door.sunEvents NEED ADDING !
+	farSchedulerRemove(&openingSchedule);
+	openingSchedule.time.hour = args->sunrise.hour,
+	openingSchedule.time.minute = args->sunrise.minute;
+	farSchedulerAdd(&openingSchedule);
+
+	farSchedulerRemove(&closingSchedule);
+	closingSchedule.time.hour = args->sunset.hour,
+	closingSchedule.time.minute = args->sunset.minute;
+	farSchedulerAdd(&closingSchedule);
+}

@@ -34,6 +34,12 @@ union ApplicationNvmSettings
 				uint8_t minute;
 			} autoCloseTime;
 
+			struct
+			{
+				int8_t sunriseOffsetMinutes;
+				int8_t sunsetOffsetMinutes;
+			} sunEvents;
+
 			uint16_t height;
 		} door;
 	};

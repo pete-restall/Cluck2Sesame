@@ -5,6 +5,7 @@
 #include "Platform/Event.h"
 #include "Platform/NvmSettings.h"
 #include "ApplicationNvmSettings.h"
+#include "SunEvents.h"
 #include "Door.h"
 
 #include "DoorFixture.h"
@@ -84,6 +85,15 @@ void stubNvmSettingsForManuallyDrivenMode(void)
 
 void stubNvmSettingsForSunEventDrivenMode(void)
 {
+	stubNvmSettingsForSunEventDrivenModeWithOffsets(
+		(int8_t) anyByte(),
+		(int8_t) anyByte());
+}
+
+void stubNvmSettingsForSunEventDrivenModeWithOffsets(
+	int8_t sunriseMinutes,
+	int8_t sunsetMinutes)
+{
 	union ApplicationNvmSettings settings =
 	{
 		.door =
@@ -93,6 +103,11 @@ void stubNvmSettingsForSunEventDrivenMode(void)
 				.isTimeDriven = 0,
 				.isManuallyOverridden = 0,
 				.isSunEventDriven = 1
+			},
+			.sunEvents =
+			{
+				.sunriseOffsetMinutes = sunriseMinutes,
+				.sunsetOffsetMinutes = sunsetMinutes
 			}
 		}
 	};
@@ -118,6 +133,15 @@ void stubNvmSettingsForUnspecifiedMode(void)
 	stubNvmApplicationSettings(&settings);
 }
 
+void stubAnySunEvents(struct SunEventsChanged *const eventArgs)
+{
+	eventArgs->sunrise.hour = anyByteLessThan(24);
+	eventArgs->sunrise.minute = anyByteLessThan(60);
+
+	eventArgs->sunset.hour = anyByteLessThan(24);
+	eventArgs->sunset.minute = anyByteLessThan(60);
+}
+
 void publishDateChanged(void)
 {
 	static const struct DateWithFlags today = { };
@@ -129,6 +153,11 @@ void publishNvmSettingsChanged(void)
 {
 	static const struct NvmSettingsChanged nvmSettingsChangedEventArgs = { };
 	eventPublish(NVM_SETTINGS_CHANGED, &nvmSettingsChangedEventArgs);
+}
+
+void publishSunEventsChanged(const struct SunEventsChanged *const eventArgs)
+{
+	eventPublish(SUN_EVENTS_CHANGED, eventArgs);
 }
 
 void assertFarSchedulesAreEqualWithAnyNonNullArgs(
