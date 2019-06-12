@@ -6,16 +6,23 @@ extern void doorFixtureInitialise(void);
 extern void doorFixtureShutdown(void);
 
 extern void stubNvmSettingsForTimeDrivenMode(void);
-extern void publishDateChanged(void);
-extern void assertFarSchedulesAreEqualWithAnyNonNullArgs(
-	const struct FarSchedule *const expected,
-	const struct FarSchedule *const actual);
-
 extern void stubNvmSettingsForManuallyDrivenMode(void);
 extern void stubNvmSettingsForSunEventDrivenMode(void);
 extern void stubNvmSettingsForUnspecifiedMode(void);
 
+extern void publishDateChanged(void);
+extern void publishNvmSettingsChanged(void);
+
+extern void assertFarSchedulesAreEqualWithAnyNonNullArgs(
+	const struct FarSchedule *const expected,
+	const struct FarSchedule *const actual);
+
 extern uint8_t farSchedulerAddCalls;
+extern uint8_t farSchedulerAddSequence[8];
 extern const struct FarSchedule *farSchedulerAddArgs[8];
+
+extern uint8_t farSchedulerRemoveCalls;
+extern uint8_t farSchedulerRemoveSequence[8];
+extern const struct FarSchedule *farSchedulerRemoveArgs[8];
 
 #endif

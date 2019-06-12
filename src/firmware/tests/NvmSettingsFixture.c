@@ -16,7 +16,7 @@ void stubNvmApplicationSettings(const union ApplicationNvmSettings *const settin
 	static union NvmSettings replacementSettings;
 	memcpy(
 		&replacementSettings.platform,
-		&nvmSettings.platform,
+		(const void *) &nvmSettings.platform,
 		sizeof(nvmSettings.platform));
 
 	memcpy(
