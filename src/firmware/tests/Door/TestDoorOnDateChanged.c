@@ -77,14 +77,6 @@ void test_dateChanged_onPublishedWhenDoorIsManuallyDriven_expectSchedulesAreNotA
 	TEST_ASSERT_EQUAL_UINT8(0, farSchedulerAddCalls);
 }
 
-void test_dateChanged_onPublishedWhenDoorIsManuallyDriven_expectSchedulesAreNotRemovedForOpeningAndClosingTimes(void)
-{
-	stubNvmSettingsForManuallyDrivenMode();
-	publishDateChanged();
-	dispatchAllEvents();
-	TEST_ASSERT_EQUAL_UINT8(0, farSchedulerRemoveCalls);
-}
-
 void test_dateChanged_onPublishedWhenDoorIsSunEventDriven_expectSchedulesAreNotAddedForOpeningAndClosingTimes(void)
 {
 	stubNvmSettingsForSunEventDrivenMode();
@@ -93,26 +85,10 @@ void test_dateChanged_onPublishedWhenDoorIsSunEventDriven_expectSchedulesAreNotA
 	TEST_ASSERT_EQUAL_UINT8(0, farSchedulerAddCalls);
 }
 
-void test_dateChanged_onPublishedWhenDoorIsSunEventDrivenMode_expectSchedulesAreNotRemovedForOpeningAndClosingTimes(void)
-{
-	stubNvmSettingsForSunEventDrivenMode();
-	publishDateChanged();
-	dispatchAllEvents();
-	TEST_ASSERT_EQUAL_UINT8(0, farSchedulerRemoveCalls);
-}
-
 void test_dateChanged_onPublishedWhenDoorIsUnspecifiedMode_expectSchedulesAreNotAddedForOpeningAndClosingTimes(void)
 {
 	stubNvmSettingsForUnspecifiedMode();
 	publishDateChanged();
 	dispatchAllEvents();
 	TEST_ASSERT_EQUAL_UINT8(0, farSchedulerAddCalls);
-}
-
-void test_dateChanged_onPublishedWhenDoorIsUnspecifiedMode_expectSchedulesAreNotRemovedForOpeningAndClosingTimes(void)
-{
-	stubNvmSettingsForUnspecifiedMode();
-	publishDateChanged();
-	dispatchAllEvents();
-	TEST_ASSERT_EQUAL_UINT8(0, farSchedulerRemoveCalls);
 }

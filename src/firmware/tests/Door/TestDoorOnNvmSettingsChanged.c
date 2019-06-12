@@ -99,12 +99,14 @@ void test_nvmSettingsChanged_onPublishedWhenDoorIsManuallyDriven_expectSchedules
 	TEST_ASSERT_EQUAL_UINT8(0, farSchedulerAddCalls);
 }
 
-void test_nvmSettingsChanged_onPublishedWhenDoorIsManuallyDriven_expectSchedulesAreNotRemovedForOpeningAndClosingTimes(void)
+void test_nvmSettingsChanged_onPublishedWhenDoorIsManuallyDriven_expectSchedulesAreRemovedForOpeningAndClosingTimes(void)
 {
 	stubNvmSettingsForManuallyDrivenMode();
 	publishNvmSettingsChanged();
 	dispatchAllEvents();
-	TEST_ASSERT_EQUAL_UINT8(0, farSchedulerRemoveCalls);
+	TEST_ASSERT_EQUAL_UINT8(2, farSchedulerRemoveCalls);
+	TEST_ASSERT_NOT_NULL_MESSAGE(farSchedulerAddArgs[0], "Open");
+	TEST_ASSERT_NOT_NULL_MESSAGE(farSchedulerAddArgs[1], "Close");
 }
 
 void test_nvmSettingsChanged_onPublishedWhenDoorIsSunEventDriven_expectSchedulesAreNotAddedForOpeningAndClosingTimes(void)
@@ -115,12 +117,14 @@ void test_nvmSettingsChanged_onPublishedWhenDoorIsSunEventDriven_expectSchedules
 	TEST_ASSERT_EQUAL_UINT8(0, farSchedulerAddCalls);
 }
 
-void test_nvmSettingsChanged_onPublishedWhenDoorIsSunEventDriven_expectSchedulesAreNotRemovedForOpeningAndClosingTimes(void)
+void test_nvmSettingsChanged_onPublishedWhenDoorIsSunEventDriven_expectSchedulesAreRemovedForOpeningAndClosingTimes(void)
 {
 	stubNvmSettingsForSunEventDrivenMode();
 	publishNvmSettingsChanged();
 	dispatchAllEvents();
-	TEST_ASSERT_EQUAL_UINT8(0, farSchedulerRemoveCalls);
+	TEST_ASSERT_EQUAL_UINT8(2, farSchedulerRemoveCalls);
+	TEST_ASSERT_NOT_NULL_MESSAGE(farSchedulerAddArgs[0], "Open");
+	TEST_ASSERT_NOT_NULL_MESSAGE(farSchedulerAddArgs[1], "Close");
 }
 
 void test_nvmSettingsChanged_onPublishedWhenDoorIsUnspecifiedMode_expectSchedulesAreNotAddedForOpeningAndClosingTimes(void)
@@ -131,10 +135,12 @@ void test_nvmSettingsChanged_onPublishedWhenDoorIsUnspecifiedMode_expectSchedule
 	TEST_ASSERT_EQUAL_UINT8(0, farSchedulerAddCalls);
 }
 
-void test_nvmSettingsChanged_onPublishedWhenDoorIsUnspecifiedMode_expectSchedulesAreNotRemovedForOpeningAndClosingTimes(void)
+void test_nvmSettingsChanged_onPublishedWhenDoorIsUnspecifiedMode_expectSchedulesAreRemovedForOpeningAndClosingTimes(void)
 {
 	stubNvmSettingsForUnspecifiedMode();
 	publishNvmSettingsChanged();
 	dispatchAllEvents();
-	TEST_ASSERT_EQUAL_UINT8(0, farSchedulerRemoveCalls);
+	TEST_ASSERT_EQUAL_UINT8(2, farSchedulerRemoveCalls);
+	TEST_ASSERT_NOT_NULL_MESSAGE(farSchedulerAddArgs[0], "Open");
+	TEST_ASSERT_NOT_NULL_MESSAGE(farSchedulerAddArgs[1], "Close");
 }
