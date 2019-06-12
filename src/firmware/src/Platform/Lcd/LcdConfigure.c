@@ -12,7 +12,7 @@ void lcdConfigure(void)
 	static const struct NearSchedule waitForLcdToStabilise =
 	{
 		.ticks = MS_TO_TICKS(48),
-		.handler = lcdConfigureStateMachine
+		.handler = &lcdConfigureStateMachine
 	};
 
 	nearSchedulerAdd(&waitForLcdToStabilise);
@@ -27,7 +27,7 @@ static void lcdConfigureStateMachine(void *const state)
 	struct NearSchedule waitForLcdCommand =
 	{
 		.ticks = MS_TO_TICKS(8),
-		.handler = lcdConfigureStateMachine,
+		.handler = &lcdConfigureStateMachine,
 		.state = (void *) (((int) state) + 1)
 	};
 

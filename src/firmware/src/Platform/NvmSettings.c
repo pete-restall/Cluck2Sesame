@@ -9,7 +9,7 @@
 #define DAC_VOLTS_PER_AMP (3 / 1.8)
 #define DAC_AMPS(x) DAC_VOLTS((x) * DAC_VOLTS_PER_AMP)
 
-__section("NvmSettings") const union NvmSettings nvmSettings =
+__section("NvmSettings") const volatile union NvmSettings nvmSettings =
 {
 	.platform =
 	{

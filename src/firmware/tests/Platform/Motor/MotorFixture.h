@@ -34,7 +34,6 @@ extern const struct NearSchedule *nearSchedulerAddArgs[8];
 extern void motorFixtureSetUp(void);
 extern void motorFixtureTearDown(void);
 extern void publishVoltageRegulatorEnabled(void);
-extern void dispatchAllEvents(void);
 extern void publishVoltageRegulatorDisabled(void);
 extern void stubVoltageRegulatorIsEnabled(uint8_t value);
 extern void mockOnVoltageRegulatorDisabled(void);

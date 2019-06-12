@@ -17,8 +17,6 @@ static void stubScheduleFor(
 	uint8_t hour,
 	uint8_t minute);
 
-static void dispatchAllEvents(void);
-
 static struct EventSubscription onScheduledSubscription;
 static uint8_t onScheduledCalls;
 static const void *onScheduledArgs;
@@ -74,12 +72,6 @@ static void stubScheduleFor(
 	schedule->time.minute = minute;
 	schedule->eventType = onScheduledSubscription.type;
 	schedule->eventArgs = (void *) (int) anyWord();
-}
-
-static void dispatchAllEvents(void)
-{
-	while (eventDispatchNext())
-		;;
 }
 
 void test_timeChanged_onPublishedWithMatchingScheduleTime_expectScheduleIsActioned(void)

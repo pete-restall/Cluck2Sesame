@@ -10,6 +10,7 @@
 #include "ClockGetSetNowFixture.h"
 
 #include "../../NonDeterminism.h"
+#include "../../Fixture.h"
 
 void clockGetSetNowFixtureSetUp(void)
 {

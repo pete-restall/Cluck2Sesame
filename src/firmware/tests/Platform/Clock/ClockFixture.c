@@ -162,12 +162,6 @@ void publishWokenFromSleep(void)
 	eventPublish(WOKEN_FROM_SLEEP, &emptyArgs);
 }
 
-void dispatchAllEvents(void)
-{
-	while (eventDispatchNext())
-		;;
-}
-
 void mockOnDateChanged(void)
 {
 	static const struct EventSubscription onDateChangedSubscription =

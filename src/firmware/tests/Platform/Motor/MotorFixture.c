@@ -10,6 +10,7 @@
 #include "Platform/Motor.h"
 
 #include "../../NonDeterminism.h"
+#include "../../Fixture.h"
 
 #include "MotorFixture.h"
 
@@ -147,12 +148,6 @@ void publishVoltageRegulatorEnabled(void)
 {
 	static const struct VoltageRegulatorEnabled emptyEventArgs = { };
 	eventPublish(VOLTAGE_REGULATOR_ENABLED, &emptyEventArgs);
-}
-
-void dispatchAllEvents(void)
-{
-	while (eventDispatchNext())
-		;;
 }
 
 void publishVoltageRegulatorDisabled(void)
