@@ -78,7 +78,7 @@ void test_onDateChanged_ExpectSunEventsChangedIsPublishedWithCalculatedSunEventT
 	}
 }
 
-void eventSubscribe(const struct EventSubscription *const subscription)
+void eventSubscribe(const struct EventSubscription *subscription)
 {
 	TEST_ASSERT_NOT_NULL_MESSAGE(subscription, "Null subscription");
 	TEST_ASSERT_NOT_NULL_MESSAGE(subscription->handler, "Null handler");
@@ -100,7 +100,7 @@ void eventSubscribe(const struct EventSubscription *const subscription)
 		TEST_FAIL_MESSAGE("Unknown subscription type");
 }
 
-void eventPublish(EventType type, const void *const args)
+void eventPublish(EventType type, const void *args)
 {
 	if (assertSunEventsChanged && type == SUN_EVENTS_CHANGED)
 	{

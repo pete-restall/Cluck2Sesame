@@ -26,7 +26,7 @@ void eventInitialise(void)
 	eventsWriteIndex = 0;
 }
 
-void eventSubscribe(const struct EventSubscription *const subscription)
+void eventSubscribe(const struct EventSubscription *subscription)
 {
 	int8_t freeIndex = -1;
 	uint8_t i;
@@ -42,7 +42,7 @@ void eventSubscribe(const struct EventSubscription *const subscription)
 		subscriptions[freeIndex] = subscription;
 }
 
-void eventUnsubscribe(const struct EventSubscription *const subscription)
+void eventUnsubscribe(const struct EventSubscription *subscription)
 {
 	uint8_t i;
 	for (i = 0; i < MAX_SUBSCRIPTIONS; i++)
@@ -55,7 +55,7 @@ void eventUnsubscribe(const struct EventSubscription *const subscription)
 	}
 }
 
-void eventPublish(EventType type, const void *const args)
+void eventPublish(EventType type, const void *args)
 {
 	events[eventsWriteIndex].type = type;
 	events[eventsWriteIndex].args = args;

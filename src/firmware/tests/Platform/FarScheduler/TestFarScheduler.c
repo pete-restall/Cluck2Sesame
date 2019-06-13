@@ -11,7 +11,7 @@
 
 TEST_FILE("Platform/FarScheduler.c")
 
-static void onScheduled(const struct Event *const event);
+static void onScheduled(const struct Event *event);
 static void stubScheduleFor(
 	struct FarSchedule *schedule,
 	uint8_t hour,
@@ -35,7 +35,7 @@ void onBeforeTest(void)
 	eventSubscribe(&onScheduledSubscription);
 }
 
-static void onScheduled(const struct Event *const event)
+static void onScheduled(const struct Event *event)
 {
 	onScheduledArgs = event->args;
 	onScheduledCalls++;

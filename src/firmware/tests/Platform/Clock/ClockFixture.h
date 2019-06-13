@@ -16,42 +16,42 @@ extern void stubAnyDateTimeWithDayAndHourAndMinute(
 extern void stubAnyDateTime(void);
 
 extern void assertEqualDateTime(
-	const struct DateAndTimeGet *const expected,
-	const struct DateAndTimeGet *const actual);
+	const struct DateAndTimeGet *expected,
+	const struct DateAndTimeGet *actual);
 
 extern void assertEqualDateTimeExceptMinute(
-	const struct DateAndTimeGet *const expected,
-	const struct DateAndTimeGet *const actual);
+	const struct DateAndTimeGet *expected,
+	const struct DateAndTimeGet *actual);
 
 extern void assertEqualDateTimeExceptHourAndMinute(
-	const struct DateAndTimeGet *const expected,
-	const struct DateAndTimeGet *const actual);
+	const struct DateAndTimeGet *expected,
+	const struct DateAndTimeGet *actual);
 
 extern void assertEqualDateTimeExceptDayAndHourAndMinute(
-	const struct DateAndTimeGet *const expected,
-	const struct DateAndTimeGet *const actual);
+	const struct DateAndTimeGet *expected,
+	const struct DateAndTimeGet *actual);
 
 extern void assertEqualDateTimeExceptMonthAndDayAndHourAndMinute(
-	const struct DateAndTimeGet *const expected,
-	const struct DateAndTimeGet *const actual);
+	const struct DateAndTimeGet *expected,
+	const struct DateAndTimeGet *actual);
 
 extern void assertEqualDateTimeExceptYearAndMonthAndDayAndHourAndMinute(
-	const struct DateAndTimeGet *const expected,
-	const struct DateAndTimeGet *const actual);
+	const struct DateAndTimeGet *expected,
+	const struct DateAndTimeGet *actual);
 
 extern void assertEqualDate(
-	const struct Date *const expected,
-	const struct Date *const actual);
+	const struct Date *expected,
+	const struct Date *actual);
 
 extern void assertEqualTime(
-	const struct Time *const expected,
-	const struct Time *const actual);
+	const struct Time *expected,
+	const struct Time *actual);
 
 extern void publishWokenFromSleep(void);
 extern void mockOnTimeChanged(void);
-extern void onTimeChanged(const struct Event *const event);
+extern void onTimeChanged(const struct Event *event);
 extern void mockOnDateChanged(void);
-extern void onDateChanged(const struct Event *const event);
+extern void onDateChanged(const struct Event *event);
 
 extern const struct DateChanged *dateChanged;
 extern uint8_t dateChangedCalls;

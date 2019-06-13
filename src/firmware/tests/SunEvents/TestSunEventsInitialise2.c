@@ -19,7 +19,7 @@ static struct Event onDateChangedEvent;
 static const struct EventSubscription *onDateChanged;
 
 static void eventSubscribeStub(
-	const struct EventSubscription *const subscription,
+	const struct EventSubscription *subscription,
 	int numCalls)
 {
 	TEST_ASSERT_NOT_NULL_MESSAGE(subscription, "Null subscription");

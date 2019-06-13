@@ -1,5 +1,6 @@
 #ifndef __CLUCK3SESAME_SRC_PLATFORM_FARSCHEDULER_H
 #define __CLUCK3SESAME_SRC_PLATFORM_FARSCHEDULER_H
+#include <stdint.h>
 #include "Event.h"
 
 struct FarSchedule
@@ -15,7 +16,7 @@ struct FarSchedule
 };
 
 extern void farSchedulerInitialise(void);
-extern void farSchedulerAdd(const struct FarSchedule *const schedule);
-extern void farSchedulerRemove(const struct FarSchedule *const schedule);
+extern void farSchedulerAdd(const struct FarSchedule *schedule);
+extern void farSchedulerRemove(const struct FarSchedule *schedule);
 
 #endif

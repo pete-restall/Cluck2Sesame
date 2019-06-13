@@ -16,7 +16,7 @@ TEST_FILE("Platform/Clock/ClockInitialise.c")
 TEST_FILE("Platform/Clock/ClockGetSetNow.c")
 
 static void clockGetNowGmt_called_expectDayOfYearIsValidForEachMonth(
-	struct DateAndTimeSet *const monthPrototype,
+	struct DateAndTimeSet *monthPrototype,
 	const uint16_t *expectedDayOfYear);
 
 void onBeforeTest(void)
@@ -277,7 +277,7 @@ void test_clockGetNowGmt_calledWhenNotLeapYear_expectDayOfYearIsValidForEachMont
 }
 
 static void clockGetNowGmt_called_expectDayOfYearIsValidForEachMonth(
-	struct DateAndTimeSet *const monthPrototype,
+	struct DateAndTimeSet *monthPrototype,
 	const uint16_t *expectedDayOfYear)
 {
 	static const int8_t daysInMonth[] =

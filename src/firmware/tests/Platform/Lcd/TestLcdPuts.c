@@ -28,7 +28,7 @@ extern void poll(void);
 
 static void sendLineToLcdAndWaitUntilDone(void);
 static void sendOffsetLineToLcdAndWaitUntilDone(uint8_t offset);
-static void onLineDisplayed(void *const state);
+static void onLineDisplayed(void *state);
 
 static uint8_t screen[sizeof(fakeLcdDram) + 1];
 
@@ -84,7 +84,7 @@ static void sendOffsetLineToLcdAndWaitUntilDone(uint8_t offset)
 		poll();
 }
 
-static void onLineDisplayed(void *const state)
+static void onLineDisplayed(void *state)
 {
 	TEST_ASSERT_NOT_NULL(state);
 	*((uint8_t *) state) = 1;

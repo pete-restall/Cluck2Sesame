@@ -35,7 +35,7 @@ union NvmSettings
 };
 
 // TODO: FUNCTION NEEDS TO BE WRITTEN - IT WILL PUBLISH NVM_SETTINGS_CHANGED AFTER WRITING TO THE FLASH
-extern void nvmSettingsStore(const union NvmSettings *const newSettings);
+extern void nvmSettingsStore(const union NvmSettings *newSettings);
 
 extern __section("NvmSettings") const volatile union NvmSettings nvmSettings;
 

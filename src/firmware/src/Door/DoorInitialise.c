@@ -7,8 +7,8 @@
 
 #include "Door.h"
 
-static void onDateOrNvmSettingsChanged(const struct Event *const event);
-static void onSunEventsChanged(const struct Event *const event);
+static void onDateOrNvmSettingsChanged(const struct Event *event);
+static void onSunEventsChanged(const struct Event *event);
 
 static const struct DoorOpenScheduleActioned openingScheduleEventArgs = { };
 static struct FarSchedule openingSchedule =
@@ -54,7 +54,7 @@ void doorInitialise(void)
 	eventSubscribe(&onSunEventsChangedSubscription);
 }
 
-static void onDateOrNvmSettingsChanged(const struct Event *const event)
+static void onDateOrNvmSettingsChanged(const struct Event *event)
 {
 	farSchedulerRemove(&openingSchedule);
 	farSchedulerRemove(&closingSchedule);
@@ -71,7 +71,7 @@ static void onDateOrNvmSettingsChanged(const struct Event *const event)
 	farSchedulerAdd(&closingSchedule);
 }
 
-static void onSunEventsChanged(const struct Event *const event)
+static void onSunEventsChanged(const struct Event *event)
 {
 	if (!nvmSettings.application.door.mode.isSunEventDriven)
 		return;

@@ -5,7 +5,7 @@
 
 #include "Lcd.h"
 
-static void lcdConfigureStateMachine(void *const state);
+static void lcdConfigureStateMachine(void *state);
 
 void lcdConfigure(void)
 {
@@ -20,7 +20,7 @@ void lcdConfigure(void)
 	lcdState.flags.isBusy = 1;
 }
 
-static void lcdConfigureStateMachine(void *const state)
+static void lcdConfigureStateMachine(void *state)
 {
 	static const struct LcdEnabled emptyEventArgs = { };
 

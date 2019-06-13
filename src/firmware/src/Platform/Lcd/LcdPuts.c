@@ -14,9 +14,9 @@ static void buggyCompilerWorkaround(void)
 	};
 }
 
-static void __reentrant lcdPutsStateMachine(void *const state);
+static void lcdPutsStateMachine(void *state);
 
-void lcdPuts(const struct LcdPutsTransaction *const transaction)
+void lcdPuts(const struct LcdPutsTransaction *transaction)
 {
 	if (!transaction || lcdState.flags.isBusy)
 		return;
@@ -28,7 +28,7 @@ void lcdPuts(const struct LcdPutsTransaction *const transaction)
 	lcdPutsStateMachine((void *) transaction->buffer);
 }
 
-static void __reentrant lcdPutsStateMachine(void *const state)
+static void lcdPutsStateMachine(void *state)
 {
 	const uint8_t *buffer = (const uint8_t *) state;
 

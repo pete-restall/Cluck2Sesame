@@ -67,7 +67,7 @@ void assertNoHandlersCalled(void)
 	TEST_ASSERT_EQUAL_UINT8(0, numberOfHandlerCalls);
 }
 
-void assertHandlerCalledOnceWith(const void *const state)
+void assertHandlerCalledOnceWith(const void *state)
 {
 	assertHandlerCalledTimes(1);
 	assertHandlerCalledWith(state);
@@ -78,7 +78,7 @@ void assertHandlerCalledTimes(uint8_t times)
 	TEST_ASSERT_EQUAL_UINT8(times, numberOfHandlerCalls);
 }
 
-void assertHandlerCalledWith(const void *const state)
+void assertHandlerCalledWith(const void *state)
 {
 	if (handlerStateRdptr == handlerStateWrptr)
 	{
@@ -89,7 +89,7 @@ void assertHandlerCalledWith(const void *const state)
 	TEST_ASSERT_EQUAL_PTR(state, actual);
 }
 
-void eventSubscribe(const struct EventSubscription *const subscription)
+void eventSubscribe(const struct EventSubscription *subscription)
 {
 	TEST_ASSERT_NOT_NULL_MESSAGE(subscription, "Subscription");
 	TEST_ASSERT_NOT_NULL_MESSAGE(subscription->handler, "Handler");
@@ -105,12 +105,12 @@ void eventSubscribe(const struct EventSubscription *const subscription)
 	wokenFromSleepEvent.args = &emptyEventArgs;
 }
 
-void spyHandler(void *const state)
+void spyHandler(void *state)
 {
 	numberOfHandlerCalls++;
 	*(handlerStateWrptr++) = state;
 }
 
-void dummyHandler(void *const state)
+void dummyHandler(void *state)
 {
 }

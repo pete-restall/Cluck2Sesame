@@ -17,11 +17,11 @@ static void buggyCompilerWorkaround(void)
 	};
 }
 
-static void onWokenFromSleep(const struct Event *const event);
+static void onWokenFromSleep(const struct Event *event);
 
 static uint8_t ticks;
 static struct NearSchedule schedules[MAX_SCHEDULES];
-static struct NearSchedule *const noMoreSchedules = schedules + MAX_SCHEDULES;
+static struct NearSchedule *noMoreSchedules = schedules + MAX_SCHEDULES;
 
 void nearSchedulerInitialise(void)
 {
@@ -49,7 +49,7 @@ void nearSchedulerInitialise(void)
 		schedules[i].handler = (NearScheduleHandler) 0;
 }
 
-void nearSchedulerAdd(const struct NearSchedule *const schedule)
+void nearSchedulerAdd(const struct NearSchedule *schedule)
 {
 	struct NearSchedule *ptr;
 	for (ptr = schedules; ptr != noMoreSchedules; ptr++)
@@ -76,7 +76,7 @@ void nearSchedulerAdd(const struct NearSchedule *const schedule)
 	}
 }
 
-static void onWokenFromSleep(const struct Event *const event)
+static void onWokenFromSleep(const struct Event *event)
 {
 	if (!PIR7bits.NCO1IF)
 		return;

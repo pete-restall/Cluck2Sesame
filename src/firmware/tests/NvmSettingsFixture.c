@@ -11,7 +11,7 @@
 
 static void nvmUnlockSequence(void);
 
-void stubNvmApplicationSettings(const union ApplicationNvmSettings *const settings)
+void stubNvmApplicationSettings(const union ApplicationNvmSettings *settings)
 {
 	static union NvmSettings replacementSettings;
 	memcpy(

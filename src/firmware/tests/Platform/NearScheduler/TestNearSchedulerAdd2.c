@@ -14,8 +14,8 @@
 TEST_FILE("Platform/NearScheduler.c")
 TEST_FILE("NearSchedulerFixture.c")
 
-static void assertNcoInterruptFlagIsClear(void *const state);
-static void handlerAddingAnotherSchedule(void *const state);
+static void assertNcoInterruptFlagIsClear(void *state);
+static void handlerAddingAnotherSchedule(void *state);
 
 void test_nearSchedulerAdd_called_expectHandlerIsNotCalledOnTickRollover(void)
 {
@@ -46,7 +46,7 @@ void test_nearSchedulerAdd_called_expectHandlerIsCalledWithClearedNcoInterruptFl
 	tick();
 }
 
-static void assertNcoInterruptFlagIsClear(void *const state)
+static void assertNcoInterruptFlagIsClear(void *state)
 {
 	TEST_ASSERT_FALSE(PIR7bits.NCO1IF);
 }
@@ -93,7 +93,7 @@ void test_nearSchedulerAdd_calledWithHandlerThatAddsAnotherScheduleWhenBufferExc
 	assertHandlerCalledOnceWith(schedule.state);
 }
 
-static void handlerAddingAnotherSchedule(void *const state)
+static void handlerAddingAnotherSchedule(void *state)
 {
 	struct NearSchedule anotherSchedule =
 	{

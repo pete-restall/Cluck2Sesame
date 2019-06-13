@@ -10,7 +10,7 @@
 #define T0CON1_SOSC_SOURCE_MASK (0b110 << _T0CON1_T0CS_POSITION)
 #define T0CON1_PRESCALE_1SECOND_MASK (0b1111 << _T0CON1_T0CKPS_POSITION)
 
-static void onWokenFromSleep(const struct Event *const event);
+static void onWokenFromSleep(const struct Event *event);
 
 static void buggyCompilerWorkaround(void)
 {
@@ -61,7 +61,7 @@ void clockInitialise(void)
 	eventSubscribe(&onWokenFromSleepSubscription);
 }
 
-static void onWokenFromSleep(const struct Event *const event)
+static void onWokenFromSleep(const struct Event *event)
 {
 	if (!PIR0bits.TMR0IF)
 		return;

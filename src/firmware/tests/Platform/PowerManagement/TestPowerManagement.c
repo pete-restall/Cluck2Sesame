@@ -115,7 +115,7 @@ void test_onAllEventsDispatched_event_expectWokenFromSleepIsPublished(void)
 	TEST_ASSERT_EQUAL_UINT8(1, numberOfEventPublishesForWokenFromSleep);
 }
 
-void eventSubscribe(const struct EventSubscription *const subscription)
+void eventSubscribe(const struct EventSubscription *subscription)
 {
 	TEST_ASSERT_NOT_NULL_MESSAGE(subscription, "Null subscription");
 	TEST_ASSERT_NOT_NULL_MESSAGE(subscription->handler, "Null handler");
@@ -130,7 +130,7 @@ void eventSubscribe(const struct EventSubscription *const subscription)
 		TEST_FAIL_MESSAGE("Unknown subscription type");
 }
 
-void eventPublish(EventType type, const void *const args)
+void eventPublish(EventType type, const void *args)
 {
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(WOKEN_FROM_SLEEP, type, "Type");
 	TEST_ASSERT_NOT_NULL_MESSAGE(args, "Args");

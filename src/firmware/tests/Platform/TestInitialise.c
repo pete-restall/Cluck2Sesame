@@ -16,15 +16,15 @@ struct CallDetails
 };
 
 void eventInitialiseCallback(int numCalls);
-void eventPublishCallback(EventType type, const void *const args, int numCalls);
+void eventPublishCallback(EventType type, const void *args, int numCalls);
 
-static void clearCallsFor(struct CallDetails *const calls);
+static void clearCallsFor(struct CallDetails *calls);
 
 static void assertCalledOnceAtSequence(
-	struct CallDetails *const call,
+	struct CallDetails *call,
 	uint8_t sequence);
 
-static void registerCallFor(struct CallDetails *const calls);
+static void registerCallFor(struct CallDetails *calls);
 
 static uint8_t callSequence;
 static struct CallDetails eventInitialiseCalls;
@@ -58,7 +58,7 @@ void onBeforeTest(void)
 	eventPublish_StubWithCallback(&eventPublishCallback);
 }
 
-static void clearCallsFor(struct CallDetails *const calls)
+static void clearCallsFor(struct CallDetails *calls)
 {
 	calls->sequence = 0;
 	calls->count = 0;
@@ -75,7 +75,7 @@ void test_initialise_called_expectEventSystemIsInitialisedFirst(void)
 }
 
 static void assertCalledOnceAtSequence(
-	struct CallDetails *const call,
+	struct CallDetails *call,
 	uint8_t sequence)
 {
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, call->count, "Count");
@@ -87,7 +87,7 @@ void eventInitialiseCallback(int numCalls)
 	registerCallFor(&eventInitialiseCalls);
 }
 
-static void registerCallFor(struct CallDetails *const calls)
+static void registerCallFor(struct CallDetails *calls)
 {
 	calls->sequence = callSequence++;
 	calls->count++;
@@ -200,7 +200,7 @@ void test_initialise_called_expectSystemInitialisedEventIsPublishedLast(void)
 		callSequence - 1);
 }
 
-void eventPublishCallback(EventType type, const void *const args, int numCalls)
+void eventPublishCallback(EventType type, const void *args, int numCalls)
 {
 	if (type == SYSTEM_INITIALISED && args)
 		registerCallFor(&systemInitialisedEventPublishCalls);

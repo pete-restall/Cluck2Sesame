@@ -133,7 +133,7 @@ void stubNvmSettingsForUnspecifiedMode(void)
 	stubNvmApplicationSettings(&settings);
 }
 
-void stubAnySunEvents(struct SunEventsChanged *const eventArgs)
+void stubAnySunEvents(struct SunEventsChanged *eventArgs)
 {
 	eventArgs->sunrise.hour = anyByteLessThan(24);
 	eventArgs->sunrise.minute = anyByteLessThan(60);
@@ -155,14 +155,14 @@ void publishNvmSettingsChanged(void)
 	eventPublish(NVM_SETTINGS_CHANGED, &nvmSettingsChangedEventArgs);
 }
 
-void publishSunEventsChanged(const struct SunEventsChanged *const eventArgs)
+void publishSunEventsChanged(const struct SunEventsChanged *eventArgs)
 {
 	eventPublish(SUN_EVENTS_CHANGED, eventArgs);
 }
 
 void assertFarSchedulesAreEqualWithAnyNonNullArgs(
-	const struct FarSchedule *const expected,
-	const struct FarSchedule *const actual)
+	const struct FarSchedule *expected,
+	const struct FarSchedule *actual)
 {
 	TEST_ASSERT_NOT_NULL_MESSAGE(expected, "NULL1");
 	TEST_ASSERT_NOT_NULL_MESSAGE(actual, "NULL2");
@@ -184,14 +184,14 @@ void assertFarSchedulesAreEqualWithAnyNonNullArgs(
 		"Event");
 }
 
-void farSchedulerAdd(const struct FarSchedule *const schedule)
+void farSchedulerAdd(const struct FarSchedule *schedule)
 {
 	farSchedulerAddSequence[farSchedulerAddCalls & 7] = ++callSequence;
 	farSchedulerAddArgs[farSchedulerAddCalls & 7] = schedule;
 	farSchedulerAddCalls++;
 }
 
-void farSchedulerRemove(const struct FarSchedule *const schedule)
+void farSchedulerRemove(const struct FarSchedule *schedule)
 {
 	farSchedulerRemoveSequence[farSchedulerRemoveCalls & 7] = ++callSequence;
 	farSchedulerRemoveArgs[farSchedulerRemoveCalls & 7] = schedule;

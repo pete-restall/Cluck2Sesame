@@ -15,16 +15,16 @@ extern void stubNvmSettingsForSunEventDrivenModeWithOffsets(
 
 extern void stubNvmSettingsForUnspecifiedMode(void);
 
-extern void stubAnySunEvents(struct SunEventsChanged *const eventArgs);
+extern void stubAnySunEvents(struct SunEventsChanged *eventArgs);
 
 extern void publishDateChanged(void);
 extern void publishNvmSettingsChanged(void);
 extern void publishSunEventsChanged(
-	const struct SunEventsChanged *const eventArgs);
+	const struct SunEventsChanged *eventArgs);
 
 extern void assertFarSchedulesAreEqualWithAnyNonNullArgs(
-	const struct FarSchedule *const expected,
-	const struct FarSchedule *const actual);
+	const struct FarSchedule *expected,
+	const struct FarSchedule *actual);
 
 extern uint8_t farSchedulerAddCalls;
 extern uint8_t farSchedulerAddSequence[8];

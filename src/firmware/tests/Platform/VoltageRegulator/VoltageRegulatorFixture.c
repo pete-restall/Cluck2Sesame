@@ -33,7 +33,7 @@ static void ensureScheduleHandlerIsNotOmittedByTheCompiler(void)
 
 void assertEventPublishNotCalled(
 	EventType type,
-	const void *const args,
+	const void *args,
 	int numCalls)
 {
 	TEST_FAIL_MESSAGE("Expected eventPublish() not to be called");
@@ -45,7 +45,7 @@ void assertScheduleAddedWithHandler(void)
 	TEST_ASSERT_NOT_NULL_MESSAGE(requestedSchedule->handler, "Handler");
 }
 
-void nearSchedulerAdd(const struct NearSchedule *const schedule)
+void nearSchedulerAdd(const struct NearSchedule *schedule)
 {
 	requestedSchedule = schedule;
 }

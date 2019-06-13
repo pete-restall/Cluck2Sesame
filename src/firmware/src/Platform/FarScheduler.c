@@ -20,12 +20,12 @@ static void buggyCompilerWorkaround(void)
 	static const struct FarScheduleWithFlags dummy2 = { .data = _OMNITARGET };
 }
 
-static void onDateChanged(const struct Event *const event);
-static void onTimeChanged(const struct Event *const event);
+static void onDateChanged(const struct Event *event);
+static void onTimeChanged(const struct Event *event);
 
 static uint8_t dateDiscriminator;
 static struct FarScheduleWithFlags schedules[MAX_SCHEDULES];
-static struct FarScheduleWithFlags *const noMoreSchedules =
+static struct FarScheduleWithFlags *noMoreSchedules =
 	schedules + MAX_SCHEDULES;
 
 void farSchedulerInitialise(void)
@@ -52,12 +52,12 @@ void farSchedulerInitialise(void)
 	memset(&schedules, 0, sizeof(schedules));
 }
 
-static void onDateChanged(const struct Event *const event)
+static void onDateChanged(const struct Event *event)
 {
 	dateDiscriminator++;
 }
 
-static void onTimeChanged(const struct Event *const event)
+static void onTimeChanged(const struct Event *event)
 {
 	const struct TimeChanged *args = (const struct TimeChanged *) event->args;
 	for (struct FarScheduleWithFlags *schedule = schedules; schedule != noMoreSchedules; schedule++)
@@ -73,7 +73,7 @@ static void onTimeChanged(const struct Event *const event)
 	}
 }
 
-void farSchedulerAdd(const struct FarSchedule *const schedule)
+void farSchedulerAdd(const struct FarSchedule *schedule)
 {
 	for (struct FarScheduleWithFlags *dest = schedules; dest != noMoreSchedules; dest++)
 	{
@@ -86,7 +86,7 @@ void farSchedulerAdd(const struct FarSchedule *const schedule)
 	}
 }
 
-void farSchedulerRemove(const struct FarSchedule *const schedule)
+void farSchedulerRemove(const struct FarSchedule *schedule)
 {
 	for (struct FarScheduleWithFlags *dest = schedules; dest != noMoreSchedules; dest++)
 	{

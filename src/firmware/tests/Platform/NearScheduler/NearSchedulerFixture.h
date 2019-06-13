@@ -8,11 +8,11 @@
 extern void tick(void);
 extern void wokenFromSleep(void);
 extern void assertNoHandlersCalled(void);
-extern void assertHandlerCalledOnceWith(const void *const state);
+extern void assertHandlerCalledOnceWith(const void *state);
 extern void assertHandlerCalledTimes(uint8_t times);
-extern void assertHandlerCalledWith(const void *const state);
-extern void spyHandler(void *const state);
-extern void dummyHandler(void *const state);
+extern void assertHandlerCalledWith(const void *state);
+extern void spyHandler(void *state);
+extern void dummyHandler(void *state);
 
 extern const struct NearSchedule dummySchedule;
 

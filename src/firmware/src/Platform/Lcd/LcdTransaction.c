@@ -2,7 +2,7 @@
 
 #include "Lcd.h"
 
-void lcdTransactionCompleted(void *const unused)
+void lcdTransactionCompleted(void *unused)
 {
 	lcdState.flags.isBusy = 0;
 	if (lcdState.transaction.callback)

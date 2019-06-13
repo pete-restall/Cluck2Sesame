@@ -13,7 +13,7 @@ static int numberOfEventPublishCalls;
 
 static void eventPublishThatIncrementsCounter(
 	EventType type,
-	const void *const args,
+	const void *args,
 	int numCalls)
 {
 	numberOfEventPublishCalls++;

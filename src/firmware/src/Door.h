@@ -53,6 +53,6 @@ struct DoorState
 };
 
 extern void doorInitialise(void);
-extern void doorGetState(struct DoorState *const state);
+extern void doorGetState(struct DoorState *state);
 
 #endif

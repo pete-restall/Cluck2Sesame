@@ -228,7 +228,7 @@ int16_t anyEncoderCount(void)
 	return (int16_t) anyWordExcept(0);
 }
 
-void nearSchedulerAdd(const struct NearSchedule *const schedule)
+void nearSchedulerAdd(const struct NearSchedule *schedule)
 {
 	nearSchedulerAddArgs[
 		nearSchedulerAddCalls++ % (

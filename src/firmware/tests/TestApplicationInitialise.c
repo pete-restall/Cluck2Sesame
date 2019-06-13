@@ -14,13 +14,13 @@ struct CallDetails
 	uint8_t count;
 };
 
-static void clearCallsFor(struct CallDetails *const calls);
+static void clearCallsFor(struct CallDetails *calls);
 
 static void assertCalledOnceAtSequence(
-	struct CallDetails *const call,
+	struct CallDetails *call,
 	uint8_t sequence);
 
-static void registerCallFor(struct CallDetails *const calls);
+static void registerCallFor(struct CallDetails *calls);
 
 static uint8_t callSequence;
 static struct CallDetails sunEventsInitialiseCalls;
@@ -33,7 +33,7 @@ void onBeforeTest(void)
 	clearCallsFor(&doorInitialiseCalls);
 }
 
-static void clearCallsFor(struct CallDetails *const calls)
+static void clearCallsFor(struct CallDetails *calls)
 {
 	calls->sequence = 0;
 	calls->count = 0;
@@ -50,7 +50,7 @@ void test_applicationInitialise_called_expectEventSunEventsAreInitialisedFirst(v
 }
 
 static void assertCalledOnceAtSequence(
-	struct CallDetails *const call,
+	struct CallDetails *call,
 	uint8_t sequence)
 {
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, call->count, "Count");
@@ -62,7 +62,7 @@ void sunEventsInitialise(void)
 	registerCallFor(&sunEventsInitialiseCalls);
 }
 
-static void registerCallFor(struct CallDetails *const calls)
+static void registerCallFor(struct CallDetails *calls)
 {
 	calls->sequence = callSequence++;
 	calls->count++;

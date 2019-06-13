@@ -4,7 +4,7 @@
 
 extern void assertEventPublishNotCalled(
 	EventType type,
-	const void *const args,
+	const void *args,
 	int numCalls);
 
 extern void assertScheduleAddedWithHandler(void);

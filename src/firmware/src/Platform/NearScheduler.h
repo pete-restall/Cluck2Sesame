@@ -14,6 +14,6 @@ struct NearSchedule
 };
 
 extern void nearSchedulerInitialise(void);
-extern void nearSchedulerAdd(const struct NearSchedule *const schedule);
+extern void nearSchedulerAdd(const struct NearSchedule *schedule);
 
 #endif

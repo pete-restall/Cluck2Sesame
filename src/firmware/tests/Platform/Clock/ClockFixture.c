@@ -82,8 +82,8 @@ void stubAnyDateTime(void)
 }
 
 void assertEqualDateTime(
-	const struct DateAndTimeGet *const expected,
-	const struct DateAndTimeGet *const actual)
+	const struct DateAndTimeGet *expected,
+	const struct DateAndTimeGet *actual)
 {
 	assertEqualDateTimeExceptMinute(expected, actual);
 
@@ -92,8 +92,8 @@ void assertEqualDateTime(
 }
 
 void assertEqualDateTimeExceptMinute(
-	const struct DateAndTimeGet *const expected,
-	const struct DateAndTimeGet *const actual)
+	const struct DateAndTimeGet *expected,
+	const struct DateAndTimeGet *actual)
 {
 	assertEqualDateTimeExceptHourAndMinute(expected, actual);
 
@@ -102,8 +102,8 @@ void assertEqualDateTimeExceptMinute(
 }
 
 void assertEqualDateTimeExceptHourAndMinute(
-	const struct DateAndTimeGet *const expected,
-	const struct DateAndTimeGet *const actual)
+	const struct DateAndTimeGet *expected,
+	const struct DateAndTimeGet *actual)
 {
 	assertEqualDateTimeExceptDayAndHourAndMinute(expected, actual);
 
@@ -115,8 +115,8 @@ void assertEqualDateTimeExceptHourAndMinute(
 }
 
 void assertEqualDateTimeExceptDayAndHourAndMinute(
-	const struct DateAndTimeGet *const expected,
-	const struct DateAndTimeGet *const actual)
+	const struct DateAndTimeGet *expected,
+	const struct DateAndTimeGet *actual)
 {
 	assertEqualDateTimeExceptMonthAndDayAndHourAndMinute(expected, actual);
 
@@ -125,8 +125,8 @@ void assertEqualDateTimeExceptDayAndHourAndMinute(
 }
 
 void assertEqualDateTimeExceptMonthAndDayAndHourAndMinute(
-	const struct DateAndTimeGet *const expected,
-	const struct DateAndTimeGet *const actual)
+	const struct DateAndTimeGet *expected,
+	const struct DateAndTimeGet *actual)
 {
 	assertEqualDateTimeExceptYearAndMonthAndDayAndHourAndMinute(expected, actual);
 
@@ -135,23 +135,21 @@ void assertEqualDateTimeExceptMonthAndDayAndHourAndMinute(
 }
 
 void assertEqualDateTimeExceptYearAndMonthAndDayAndHourAndMinute(
-	const struct DateAndTimeGet *const expected,
-	const struct DateAndTimeGet *const actual)
+	const struct DateAndTimeGet *expected,
+	const struct DateAndTimeGet *actual)
 {
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(
 		expected->time.second, actual->time.second, "SS");
 }
 
-void assertEqualDate(
-	const struct Date *const expected,
-	const struct Date *const actual)
+void assertEqualDate(const struct Date *expected, const struct Date *actual)
 {
 	TEST_ASSERT_EQUAL_UINT8_ARRAY(expected, actual, sizeof(struct Date));
 }
 
 void assertEqualTime(
-	const struct Time *const expected,
-	const struct Time *const actual)
+	const struct Time *expected,
+	const struct Time *actual)
 {
 	TEST_ASSERT_EQUAL_UINT8_ARRAY(expected, actual, sizeof(struct Time));
 }
@@ -173,7 +171,7 @@ void mockOnDateChanged(void)
 	eventSubscribe(&onDateChangedSubscription);
 }
 
-void onDateChanged(const struct Event *const event)
+void onDateChanged(const struct Event *event)
 {
 	dateChanged = (const struct DateChanged *) event->args;
 	dateChangedCalls++;
@@ -191,7 +189,7 @@ void mockOnTimeChanged(void)
 	eventSubscribe(&onTimeChangedSubscription);
 }
 
-void onTimeChanged(const struct Event *const event)
+void onTimeChanged(const struct Event *event)
 {
 	timeChanged = (const struct TimeChanged *) event->args;
 	timeChangedCalls++;

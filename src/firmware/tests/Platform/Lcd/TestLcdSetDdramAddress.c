@@ -27,7 +27,7 @@ TEST_FILE("Platform/Lcd/LcdSetDdramAddress.c")
 extern void poll(void);
 
 static void sendSetDdramAddressToLcdAndWaitUntilDone(void);
-static void onAddressSet(void *const state);
+static void onAddressSet(void *state);
 
 static struct LcdSetAddressTransaction addressTransaction;
 
@@ -63,7 +63,7 @@ static void sendSetDdramAddressToLcdAndWaitUntilDone(void)
 		poll();
 }
 
-static void onAddressSet(void *const state)
+static void onAddressSet(void *state)
 {
 	TEST_ASSERT_NOT_NULL(state);
 	*((uint8_t *) state) = 1;

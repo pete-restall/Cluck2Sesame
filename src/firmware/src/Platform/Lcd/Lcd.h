@@ -28,7 +28,7 @@ struct LcdState
 extern void onVoltageRegulatorEnabled(const struct Event *event);
 extern void lcdConfigure(void);
 
-extern void lcdTransactionCompleted(void *const unused);
+extern void lcdTransactionCompleted(void *unused);
 extern void lcdWriteNybble(uint8_t nybble);
 extern void lcdWriteCommand(uint8_t byte);
 extern void lcdWriteData(uint8_t byte);

@@ -20,7 +20,7 @@ static const struct TimeChanged timeChangedEventArgs =
 	.now = &clockNow.time
 };
 
-void clockGetNowGmt(struct DateAndTimeGet *const now)
+void clockGetNowGmt(struct DateAndTimeGet *now)
 {
 	clockNow.date.flags.isLeapYear = (clockNow.date.year & 3) == 0;
 	clockNow.time.second = TMR0L;
@@ -96,7 +96,7 @@ static uint8_t daysInMonth(uint8_t month, uint8_t year)
 	return 31;
 }
 
-void clockSetNowGmt(const struct DateAndTimeSet *const now)
+void clockSetNowGmt(const struct DateAndTimeSet *now)
 {
 	memcpy(&clockNow, now, sizeof(struct DateAndTimeSet));
 	clockNow.date.flags.all = 0;

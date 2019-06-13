@@ -13,10 +13,10 @@
 static void calculateSunEvent(void);
 
 static void readLookupEntryInto(
-	struct SunEventsLookupEntry *const entry,
+	struct SunEventsLookupEntry *entry,
 	int lookupIndex);
 
-static void readFlashWordInto(uint16_t *const destination, int ptr);
+static void readFlashWordInto(uint16_t *destination, int ptr);
 
 struct SunEventsCalculationContext sunEventsCalculationContext;
 static struct SunEventsLookupEntry lookupEntries[2];
@@ -121,7 +121,7 @@ static void calculateSunEvent(void)
 }
 
 static void readLookupEntryInto(
-	struct SunEventsLookupEntry *const entry,
+	struct SunEventsLookupEntry *entry,
 	int lookupIndex)
 {
 	int lookupPtr =
@@ -140,7 +140,7 @@ static void readLookupEntryInto(
 
 // TODO: THIS CAN BE MOVED INTO SOMETHING COMMON, SINCE THE DAYLIGHT SAVINGS
 // LOOKUP WILL ALSO REQUIRE WORD-BASED FLASH READING
-static void readFlashWordInto(uint16_t *const destination, int ptr)
+static void readFlashWordInto(uint16_t *destination, int ptr)
 {
 	NVMCON1bits.NVMREGS = 0;
 	NVMADRH = (ptr >> 8) & 0xff;

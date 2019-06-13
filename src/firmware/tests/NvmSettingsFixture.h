@@ -3,6 +3,6 @@
 #include "ApplicationNvmSettings.h"
 
 extern void stubNvmApplicationSettings(
-	const union ApplicationNvmSettings *const settings);
+	const union ApplicationNvmSettings *settings);
 
 #endif

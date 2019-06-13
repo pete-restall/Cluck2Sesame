@@ -13,7 +13,7 @@ static void buggyCompilerWorkaround(void)
 	};
 }
 
-void lcdSetDdramAddress(const struct LcdSetAddressTransaction *const transaction)
+void lcdSetDdramAddress(const struct LcdSetAddressTransaction *transaction)
 {
 	if (!transaction || lcdState.flags.isBusy)
 		return;

@@ -63,7 +63,7 @@ struct DateAndTimeGet
 };
 
 extern void clockInitialise(void);
-extern void clockGetNowGmt(struct DateAndTimeGet *const now);
-extern void clockSetNowGmt(const struct DateAndTimeSet *const now);
+extern void clockGetNowGmt(struct DateAndTimeGet *now);
+extern void clockSetNowGmt(const struct DateAndTimeSet *now);
 
 #endif

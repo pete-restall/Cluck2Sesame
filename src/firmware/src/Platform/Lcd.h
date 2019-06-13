@@ -45,7 +45,7 @@ struct LcdSetAddressTransaction
 extern void lcdInitialise(void);
 extern void lcdEnable(void);
 extern void lcdDisable(void);
-extern void lcdPuts(const struct LcdPutsTransaction *const transaction);
-extern void lcdSetDdramAddress(const struct LcdSetAddressTransaction *const transaction);
+extern void lcdPuts(const struct LcdPutsTransaction *transaction);
+extern void lcdSetDdramAddress(const struct LcdSetAddressTransaction *transaction);
 
 #endif

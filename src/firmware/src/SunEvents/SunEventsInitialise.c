@@ -7,8 +7,8 @@
 
 #include "SunEvents.h"
 
-static void onLocationChanged(const struct Event *const event);
-static void onDateChanged(const struct Event *const event);
+static void onLocationChanged(const struct Event *event);
+static void onDateChanged(const struct Event *event);
 
 void sunEventsInitialise(void)
 {
@@ -32,7 +32,7 @@ void sunEventsInitialise(void)
 	eventSubscribe(&onDateChangedSubscription);
 }
 
-static void onLocationChanged(const struct Event *const event)
+static void onLocationChanged(const struct Event *event)
 {
 	const struct Location *args =
 		((const struct LocationChanged *) event->args)->location;
@@ -43,7 +43,7 @@ static void onLocationChanged(const struct Event *const event)
 	sunEventsCalculate();
 }
 
-static void onDateChanged(const struct Event *const event)
+static void onDateChanged(const struct Event *event)
 {
 	sunEventsCalculationContext.inputs.dayOfYear =
 		((const struct DateChanged *) event->args)->today->dayOfYear;
