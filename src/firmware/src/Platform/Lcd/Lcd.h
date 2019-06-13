@@ -1,5 +1,6 @@
 #ifndef __CLUCK3SESAME_SRC_PLATFORM_LCD_LCD_H
 #define __CLUCK3SESAME_SRC_PLATFORM_LCD_LCD_H
+#include <stdint.h>
 #include "../Event.h"
 #include "../Lcd.h"
 
@@ -28,7 +29,7 @@ struct LcdState
 extern void onVoltageRegulatorEnabled(const struct Event *event);
 extern void lcdConfigure(void);
 
-extern void lcdTransactionCompleted(void *unused);
+extern void __reentrant lcdTransactionCompleted(void *unused);
 extern void lcdWriteNybble(uint8_t nybble);
 extern void lcdWriteCommand(uint8_t byte);
 extern void lcdWriteData(uint8_t byte);
