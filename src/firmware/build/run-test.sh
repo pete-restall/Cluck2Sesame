@@ -30,6 +30,8 @@ set breakoptions.peripheralwarnings Break
 set breakoptions.stimulusmessags.errors Break
 set breakoptions.stimulusmessags.warnings Break
 
+set oscillator.auxfrequency 32
+set oscillator.auxfrequencyunit Mega
 set oscillator.rcfrequency 32
 set oscillator.rcfrequencyunit Mega
 set oscillator.frequency 8
@@ -39,13 +41,17 @@ set uart1io.uartioenabled true
 set uart2io.uartioenabled true
 set uart2io.output window
 
+set periphADC1.altscl true
+set periphADC1.minTacq 5
+set periphADC1.tacqunits microseconds
+
 program "${TEST_FILENAME}"
 break unityBeforeRunHook
 break unityBreakpointHook
 break fpbase
 
 reset
-write rngSeed ${RNG_SEED_LOW} ${RNG_SEED_HIGH}
+write 0x0420 ${RNG_SEED_LOW} ${RNG_SEED_HIGH}
 run
 wait
 

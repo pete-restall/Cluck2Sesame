@@ -8,6 +8,7 @@
 #include "PowerManagement.h"
 #include "VoltageRegulator.h"
 #include "PwmTimer.h"
+#include "Adc.h"
 #include "Lcd.h"
 #include "Motor.h"
 
@@ -21,6 +22,7 @@ void initialise(void)
 	farSchedulerInitialise();
 	voltageRegulatorInitialise();
 	pwmTimerInitialise();
+	adcInitialise();
 	lcdInitialise();
 	motorInitialise();
 	applicationInitialise();

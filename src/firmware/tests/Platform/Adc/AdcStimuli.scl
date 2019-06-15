@@ -1,0 +1,145 @@
+configuration for "PIC16F15355" is
+	shared variable isInvalidSession;
+	shared variable adcon0BeforeConversion;
+	shared variable adcon1BeforeConversion;
+	shared variable adactBeforeConversion;
+	shared variable stubAdcResultIndex;
+	shared variable stubAdcResult0l;
+	shared variable stubAdcResult0h;
+	shared variable stubAdcResult1l;
+	shared variable stubAdcResult1h;
+	shared variable stubAdcResult2l;
+	shared variable stubAdcResult2h;
+	shared variable stubAdcResult3l;
+	shared variable stubAdcResult3h;
+	shared variable stubAdcResult4l;
+	shared variable stubAdcResult4h;
+	shared variable stubAdcResult5l;
+	shared variable stubAdcResult5h;
+	shared variable stubAdcResult6l;
+	shared variable stubAdcResult6h;
+	shared variable stubAdcResult7l;
+	shared variable stubAdcResult7h;
+end configuration;
+
+testbench for "PIC16F15355" is
+begin
+	clearSfrsOnModuleDisable: process is
+		variable alreadyDisabled : boolean;
+	begin
+		loop
+			if PMD2.ADCMD != '0' then
+				alreadyDisabled := true;
+			else
+				alreadyDisabled := false;
+			end if;
+
+			wait on PMD2;
+			if alreadyDisabled == false then
+				if PMD2.ADCMD != '0' then
+					ADCON0 := 0;
+					ADCON1 := 0;
+					ADACT := 0;
+					ADRESH := 0;
+					ADRESL := 0;
+				end if;
+			end if;
+		end loop;
+	end process;
+
+	assertAcquisitionTime: process is
+		variable channelSelectTime : cycle;
+		variable cyclesIn5_5us : cycle;
+		variable lastChannel : integer;
+		variable channel : integer;
+	begin
+		cyclesIn5_5us := 44 ic;
+		channelSelectTime := 0 ic;
+		channel := 0;
+
+		loop
+			lastChannel := channel;
+			wait on ADCON0;
+			if PMD2.ADCMD == '0' then
+				channel := ADCON0 / 4;
+				if channel != lastChannel then
+					if ADCON0.GOnDONE != '0' then
+						report("[ADC ASSERT] Channel changed while conversion in progress !");
+						isInvalidSession := 1;
+					end if;
+					channelSelectTime := now();
+				elsif ADCON0.GOnDONE != '0' then
+					if (now() < channelSelectTime + cyclesIn5_5us) then
+						report("[ADC ASSERT] Conversion started less than 5us+10% after channel selection !");
+						isInvalidSession := 1;
+					end if;
+				end if;
+			end if;
+		end loop;
+	end process;
+
+	stubConversions: process is
+	begin
+		loop
+			wait on ADCON0;
+			if PMD2.ADCMD == '0' then
+				if ADCON0.ADON != '0' then
+					if ADCON0.GOnDONE != '0' then
+						report("[ADC] Starting conversion");
+
+						adcon0BeforeConversion := ADCON0;
+						adcon1BeforeConversion := ADCON1;
+						adactBeforeConversion := ADACT;
+
+						if ADCON0.GOnDONE != '0' then
+							wait until ADCON0.GOnDONE == '0' for 20 us;
+							ADCON0.GOnDONE := '0';
+						end if;
+
+						if ADCON0.ADON == '0' then
+							report("[ADC] Conversion result not stored (ADON was cleared)");
+						else
+							if stubAdcResultIndex == 0 then
+								report("[ADC] Storing conversion result 0");
+								ADRESH := stubAdcResult0h;
+								ADRESL := stubAdcResult0l;
+							elsif stubAdcResultIndex == 1 then
+								report("[ADC] Storing conversion result 1");
+								ADRESH := stubAdcResult1h;
+								ADRESL := stubAdcResult1l;
+							elsif stubAdcResultIndex == 2 then
+								report("[ADC] Storing conversion result 2");
+								ADRESH := stubAdcResult2h;
+								ADRESL := stubAdcResult2l;
+							elsif stubAdcResultIndex == 3 then
+								report("[ADC] Storing conversion result 3");
+								ADRESH := stubAdcResult3h;
+								ADRESL := stubAdcResult3l;
+							elsif stubAdcResultIndex == 4 then
+								report("[ADC] Storing conversion result 4");
+								ADRESH := stubAdcResult4h;
+								ADRESL := stubAdcResult4l;
+							elsif stubAdcResultIndex == 5 then
+								report("[ADC] Storing conversion result 5");
+								ADRESH := stubAdcResult5h;
+								ADRESL := stubAdcResult5l;
+							elsif stubAdcResultIndex == 6 then
+								report("[ADC] Storing conversion result 6");
+								ADRESH := stubAdcResult6h;
+								ADRESL := stubAdcResult6l;
+							elsif stubAdcResultIndex == 7 then
+								report("[ADC] Storing conversion result 7");
+								ADRESH := stubAdcResult7h;
+								ADRESL := stubAdcResult7l;
+							else
+								report("[ADC ASSERT] Invalid ADC result index");
+								isInvalidSession := 1;
+							end if;
+							stubAdcResultIndex := stubAdcResultIndex + 1;
+						end if;
+					end if;
+				end if;
+			end if;
+		end loop;
+	end process;
+end testbench;

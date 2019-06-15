@@ -34,6 +34,7 @@ static struct CallDetails nearSchedulerInitialiseCalls;
 static struct CallDetails farSchedulerInitialiseCalls;
 static struct CallDetails voltageRegulatorInitialiseCalls;
 static struct CallDetails pwmTimerInitialiseCalls;
+static struct CallDetails adcInitialiseCalls;
 static struct CallDetails lcdInitialiseCalls;
 static struct CallDetails motorInitialiseCalls;
 static struct CallDetails applicationInitialiseCalls;
@@ -49,6 +50,7 @@ void onBeforeTest(void)
 	clearCallsFor(&farSchedulerInitialiseCalls);
 	clearCallsFor(&voltageRegulatorInitialiseCalls);
 	clearCallsFor(&pwmTimerInitialiseCalls);
+	clearCallsFor(&adcInitialiseCalls);
 	clearCallsFor(&lcdInitialiseCalls);
 	clearCallsFor(&motorInitialiseCalls);
 	clearCallsFor(&applicationInitialiseCalls);
@@ -159,10 +161,21 @@ void pwmTimerInitialise(void)
 	registerCallFor(&pwmTimerInitialiseCalls);
 }
 
-void test_initialise_called_expectLcdIsInitialisedAfterPwmTimer(void)
+void test_initialise_called_expectAdcIsInitialisedAfterPwmTimer(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&lcdInitialiseCalls, 8);
+	assertCalledOnceAtSequence(&adcInitialiseCalls, 8);
+}
+
+void adcInitialise(void)
+{
+	registerCallFor(&adcInitialiseCalls);
+}
+
+void test_initialise_called_expectLcdIsInitialisedAfterAdc(void)
+{
+	initialise();
+	assertCalledOnceAtSequence(&lcdInitialiseCalls, 9);
 }
 
 void lcdInitialise(void)
@@ -173,7 +186,7 @@ void lcdInitialise(void)
 void test_initialise_called_expectMotorIsInitialisedAfterLcd(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&motorInitialiseCalls, 9);
+	assertCalledOnceAtSequence(&motorInitialiseCalls, 10);
 }
 
 void motorInitialise(void)
@@ -184,7 +197,7 @@ void motorInitialise(void)
 void test_initialise_called_expectApplicationIsInitialisedAfterMotor(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&applicationInitialiseCalls, 10);
+	assertCalledOnceAtSequence(&applicationInitialiseCalls, 11);
 }
 
 void applicationInitialise(void)

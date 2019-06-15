@@ -4,12 +4,11 @@
 
 #include "NonDeterminism.h"
 
-volatile int rngSeed = 0;
+volatile int rngSeed __at(0x0420) = 0;
 
 static void ensureSeedIsInitialised(void)
 {
 	static uint8_t isInitialised = 0;
-
 	if (isInitialised)
 		return;
 
