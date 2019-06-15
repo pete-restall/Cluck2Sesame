@@ -59,7 +59,7 @@ void nearSchedulerAdd(const struct NearSchedule *schedule)
 	}
 
 	if (ptr == noMoreSchedules)
-		return;
+		return; // TODO: THIS SHOULD REGISTER A FAULT
 
 	ptr->ticks = ticks + schedule->ticks + 1;
 	ptr->handler = schedule->handler;

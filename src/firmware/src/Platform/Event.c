@@ -40,6 +40,8 @@ void eventSubscribe(const struct EventSubscription *subscription)
 
 	if (freeIndex >= 0)
 		subscriptions[freeIndex] = subscription;
+	// else
+	// TODO: THIS SHOULD REGISTER A FAULT
 }
 
 void eventUnsubscribe(const struct EventSubscription *subscription)

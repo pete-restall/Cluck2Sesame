@@ -84,6 +84,8 @@ void farSchedulerAdd(const struct FarSchedule *schedule)
 			return;
 		}
 	}
+
+	// TODO: THIS SHOULD REGISTER A FAULT
 }
 
 void farSchedulerRemove(const struct FarSchedule *schedule)
