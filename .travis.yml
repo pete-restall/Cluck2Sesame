@@ -16,6 +16,7 @@ addons:
 
 install:
   - src/firmware/build/install-mplabx.sh
+  - gem install rake
   - gem install ceedling
 
 script:
