@@ -1,0 +1,13 @@
+language: ruby
+rvm:
+  - "2.6"
+
+build:
+  pre_ci:
+    - sudo yum install libc6-dev libx11-6 libext libstdc++ libexpat
+    - src/firmware/build/install-mplabx.sh
+    - gem install rake
+    - gem install ceedling
+
+  ci:
+    - src/firmware/ceedling test && src/firmware/ceedling verbosity[4] release
