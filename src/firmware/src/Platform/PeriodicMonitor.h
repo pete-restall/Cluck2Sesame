@@ -5,7 +5,17 @@
 #define MONITORED_PARAMETERS_SAMPLED ((EventType) 0x38)
 struct MonitoredParametersSampled
 {
-	uint8_t whatever;
+	uint8_t timestamp;
+	union
+	{
+		uint8_t all;
+		struct
+		{
+			unsigned int isVddRegulated : 1;
+		};
+	} flags;
+	uint16_t fvr;
+	uint16_t temperature;
 };
 
 extern void periodicMonitorInitialise(void);

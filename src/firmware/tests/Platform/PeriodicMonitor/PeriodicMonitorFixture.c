@@ -61,6 +61,7 @@ static void onMonitoredParametersSampled(const struct Event *event)
 
 void publishTimeChanged(const struct Time *now)
 {
-	struct TimeChanged eventArgs = { .now = now };
+	static struct TimeChanged eventArgs;
+	eventArgs.now = now;
 	eventPublish(TIME_CHANGED, &eventArgs);
 }

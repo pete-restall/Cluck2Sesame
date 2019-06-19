@@ -25,6 +25,9 @@ static void onTimeChanged(const struct Event *event)
 	if ((args->now->minute & 0x03) != 1)
 		return;
 
-	static const struct MonitoredParametersSampled eventArgs = { };
+	static struct MonitoredParametersSampled eventArgs;
+	eventArgs.timestamp = TMR0L;
+	eventArgs.flags.isVddRegulated = (PORTBbits.RB0 == 0 ? 0 : 1);
+
 	eventPublish(MONITORED_PARAMETERS_SAMPLED, &eventArgs);
 }

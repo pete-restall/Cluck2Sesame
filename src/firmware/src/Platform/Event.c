@@ -16,6 +16,25 @@ static struct EventQueueEntry
 
 static uint8_t eventsReadIndex, eventsWriteIndex;
 
+static void buggyCompilerWorkaround(void)
+{
+	static const struct Event dummy1 =
+	{
+		.state = _OMNITARGET,
+		.args = _OMNITARGET
+	};
+
+	static const struct EventSubscription dummy2 =
+	{
+		.state = _OMNITARGET
+	};
+
+	static const struct EventQueueEntry dummy3 =
+	{
+		.args = _OMNITARGET
+	};
+}
+
 void eventInitialise(void)
 {
 	uint8_t i;
