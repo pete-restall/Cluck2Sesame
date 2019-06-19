@@ -37,6 +37,7 @@ static struct CallDetails pwmTimerInitialiseCalls;
 static struct CallDetails adcInitialiseCalls;
 static struct CallDetails lcdInitialiseCalls;
 static struct CallDetails motorInitialiseCalls;
+static struct CallDetails periodicMonitorInitialiseCalls;
 static struct CallDetails applicationInitialiseCalls;
 static struct CallDetails systemInitialisedEventPublishCalls;
 
@@ -53,6 +54,7 @@ void onBeforeTest(void)
 	clearCallsFor(&adcInitialiseCalls);
 	clearCallsFor(&lcdInitialiseCalls);
 	clearCallsFor(&motorInitialiseCalls);
+	clearCallsFor(&periodicMonitorInitialiseCalls);
 	clearCallsFor(&applicationInitialiseCalls);
 	clearCallsFor(&systemInitialisedEventPublishCalls);
 
@@ -194,10 +196,21 @@ void motorInitialise(void)
 	registerCallFor(&motorInitialiseCalls);
 }
 
-void test_initialise_called_expectApplicationIsInitialisedAfterMotor(void)
+void test_initialise_called_expectPeriodicMonitorIsInitialisedAfterMotor(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&applicationInitialiseCalls, 11);
+	assertCalledOnceAtSequence(&periodicMonitorInitialiseCalls, 11);
+}
+
+void periodicMonitorInitialise(void)
+{
+	registerCallFor(&periodicMonitorInitialiseCalls);
+}
+
+void test_initialise_called_expectApplicationIsInitialisedAfterPeriodicMonitor(void)
+{
+	initialise();
+	assertCalledOnceAtSequence(&applicationInitialiseCalls, 12);
 }
 
 void applicationInitialise(void)
