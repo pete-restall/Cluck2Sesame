@@ -3,7 +3,7 @@ rvm:
   - "2.6"
 
 build:
-  pre_ci:
+  ci:
     - sudo sudo dpkg --add-architecture i386
     - sudo apt-get update
     - sudo apt-get install libc6:i386 libx11-6:i386 libxext6:i386 libstdc++6:i386 libexpat1:i386 rubygems
@@ -11,6 +11,4 @@ build:
     - gem install rake
     - gem install constructor
     - gem install ceedling
-
-  ci:
     - src/firmware/ceedling test && src/firmware/ceedling verbosity[4] release
