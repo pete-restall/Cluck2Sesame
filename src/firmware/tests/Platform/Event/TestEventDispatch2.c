@@ -20,6 +20,11 @@ static uint8_t eventState;
 static struct EventSubscription anotherSubscription;
 static uint8_t anotherEventState;
 
+static void buggyCompilerWorkaround(void)
+{
+	eventPublish(0, _OMNITARGET);
+}
+
 void onBeforeTest(void)
 {
 	eventState = anyByte();

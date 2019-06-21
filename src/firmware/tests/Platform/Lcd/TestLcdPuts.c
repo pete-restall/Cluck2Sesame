@@ -30,7 +30,7 @@ static void sendLineToLcdAndWaitUntilDone(void);
 static void sendOffsetLineToLcdAndWaitUntilDone(uint8_t offset);
 static void onLineDisplayed(void *state);
 
-static uint8_t screen[sizeof(fakeLcdDram) + 1];
+static char screen[sizeof(fakeLcdDram) + 1];
 
 static const struct LcdPutsTransaction dummyTransaction = { .buffer = "\0" };
 
@@ -38,7 +38,7 @@ void onBeforeTest(void)
 {
 	lcdFixtureInitialise();
 	for (uint8_t i = 0; i < sizeof(screen); i++)
-		screen[i] = anyByteExcept('\0');
+		screen[i] = (char) anyByteExcept('\0'); // TODO: CGPIC CORE DUMP !
 
 	screen[sizeof(screen) - 1] = '\0';
 }
@@ -168,7 +168,7 @@ void test_lcdPuts_calledWithNullBuffer_expectLcdIsNotSentCommand(void)
 
 	static const struct LcdPutsTransaction withNullBuffer =
 	{
-		.buffer = (const uint8_t *) 0
+		.buffer = (const char *) 0
 	};
 
 	lcdPuts(&withNullBuffer);
@@ -181,7 +181,7 @@ void test_lcdPuts_calledWithNullBuffer_expectNearSchedulerIsIdle(void)
 
 	static const struct LcdPutsTransaction withNullBuffer =
 	{
-		.buffer = (const uint8_t *) 0
+		.buffer = (const char *) 0
 	};
 
 	lcdPuts(&withNullBuffer);
@@ -195,7 +195,7 @@ void test_lcdPuts_calledWithNullBuffer_expectCallbackIsStillCalled(void)
 	static uint8_t callbackWasCalled = 0;
 	static const struct LcdPutsTransaction withNullBuffer =
 	{
-		.buffer = (const uint8_t *) 0,
+		.buffer = (const char *) 0,
 		.callback = &onLineDisplayed,
 		.state = &callbackWasCalled
 	};

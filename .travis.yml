@@ -20,4 +20,4 @@ install:
   - gem install ceedling
 
 script:
-  - src/firmware/ceedling test #&& src/firmware/ceedling verbosity[4] release
+  - src/firmware/ceedling test && src/firmware/ceedling verbosity[4] release

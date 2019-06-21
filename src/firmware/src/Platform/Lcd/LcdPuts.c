@@ -30,11 +30,11 @@ void lcdPuts(const struct LcdPutsTransaction *transaction)
 
 static void __reentrant lcdPutsStateMachine(void *state)
 {
-	const uint8_t *buffer = (const uint8_t *) state;
+	const char *buffer = (const char *) state;
 
 	if (buffer && *buffer)
 	{
-		lcdWriteData(*buffer);
+		lcdWriteData((uint8_t) *buffer);
 
 		struct NearSchedule waitForLcdCommand =
 		{

@@ -30,7 +30,7 @@ typedef void (*LcdTransactionCallback)(void *state);
 
 struct LcdPutsTransaction
 {
-	const uint8_t *buffer;
+	const char *buffer;
 	LcdTransactionCallback callback;
 	void *state;
 };

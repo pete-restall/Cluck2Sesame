@@ -14,6 +14,11 @@ TEST_FILE("Platform/Event.c")
 
 #define MAX_SUBSCRIPTIONS 32
 
+static void buggyCompilerWorkaround(void)
+{
+	eventPublish(0, _OMNITARGET);
+}
+
 static struct EventSubscription subscription;
 static uint8_t eventState;
 

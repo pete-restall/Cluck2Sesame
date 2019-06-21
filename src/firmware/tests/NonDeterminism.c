@@ -1,10 +1,9 @@
 #include <xc.h>
 #include <stdint.h>
-#include <stdlib.h>
 
 #include "NonDeterminism.h"
 
-volatile int rngSeed __at(0x0420) = 0;
+volatile int16_t rngSeed __at(0x0420) = 0;
 
 static void ensureSeedIsInitialised(void)
 {
@@ -13,7 +12,10 @@ static void ensureSeedIsInitialised(void)
 		return;
 
 	isInitialised = 1;
-	srand(rngSeed);
+	if (rngSeed == 0)
+		rngSeed = 1;
+
+	rngSeed = rngSeed;
 }
 
 uint8_t anyBoolean(void)
@@ -24,7 +26,13 @@ uint8_t anyBoolean(void)
 uint8_t anyByte(void)
 {
 	ensureSeedIsInitialised();
-	return (uint8_t) rand();
+
+	uint8_t msb = rngSeed < 0 ? 1 : 0;
+	rngSeed <<= 1;
+	if (msb)
+		rngSeed ^= 0x002d;
+
+	return (uint8_t) rngSeed;
 }
 
 uint8_t anyByteExcept(uint8_t except)
