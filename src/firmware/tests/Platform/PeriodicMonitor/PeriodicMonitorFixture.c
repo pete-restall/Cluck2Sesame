@@ -4,6 +4,7 @@
 
 #include "Platform/Event.h"
 #include "Platform/Clock.h"
+#include "Platform/Adc.h"
 
 #include "PeriodicMonitorFixture.h"
 #include "../../NonDeterminism.h"
@@ -21,6 +22,10 @@ const struct MonitoredParametersSampled *monitoredParametersSampled;
 uint8_t monitoredParametersSampledCalls;
 uint8_t monitoredParametersSampledSequence;
 
+static struct AdcSample *expectedAdcSampleArg;
+uint8_t adcSampleCalls;
+uint8_t adcSampleSequence;
+
 void periodicMonitorFixtureSetUp(void)
 {
 	eventInitialise();
@@ -35,6 +40,10 @@ void periodicMonitorFixtureSetUp(void)
 	monitoredParametersSampled = (const struct MonitoredParametersSampled *) 0;
 	monitoredParametersSampledCalls = 0;
 	monitoredParametersSampledSequence = 0;
+
+	expectedAdcSampleArg = (struct AdcSample *) 0;
+	adcSampleCalls = 0;
+	adcSampleSequence = 0;
 }
 
 void periodicMonitorFixtureTearDown(void)
@@ -64,4 +73,25 @@ void publishTimeChanged(const struct Time *now)
 	static struct TimeChanged eventArgs;
 	eventArgs.now = now;
 	eventPublish(TIME_CHANGED, &eventArgs);
+}
+
+void stubAdcSampleFor(struct AdcSample *sample)
+{
+	expectedAdcSampleArg = sample;
+}
+
+void adcSample(struct AdcSample *sample)
+{
+	adcSampleCalls++;
+	adcSampleSequence = stubCallSequence++;
+	if (!expectedAdcSampleArg || !sample)
+		return;
+
+	if (sample->channel != expectedAdcSampleArg->channel)
+		return;
+
+	if (sample->count != expectedAdcSampleArg->count)
+		return;
+
+	sample->result = expectedAdcSampleArg->result;
 }

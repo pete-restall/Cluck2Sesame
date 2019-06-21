@@ -114,3 +114,45 @@ void test_timeChanged_onPublishedWhenRb0IsHigh_expectIsVddRegulatedIsTrue(void)
 	TEST_ASSERT_NOT_NULL(monitoredParametersSampled);
 	TEST_ASSERT_TRUE(monitoredParametersSampled->flags.isVddRegulated);
 }
+
+void test_timeChanged_onPublished_expectFixedVoltageReferenceIsSampled(void)
+{
+	mockOnMonitoredParametersSampled();
+
+	struct AdcSample sample =
+	{
+		.channel = ADC_CHANNEL_ADCFVR,
+		.count = 8,
+		.result = anyWord()
+	};
+
+	stubAdcSampleFor(&sample);
+
+	static const struct Time now = { .minute = 1 };
+	publishTimeChanged(&now);
+	dispatchAllEvents();
+	TEST_ASSERT_NOT_NULL(monitoredParametersSampled);
+	TEST_ASSERT_TRUE(adcSampleCalls >= 1);
+	TEST_ASSERT_EQUAL_UINT8(sample.result, monitoredParametersSampled->fvr);
+}
+
+void test_timeChanged_onPublished_expectTemperatureSensorIsSampled(void)
+{
+	mockOnMonitoredParametersSampled();
+
+	struct AdcSample sample =
+	{
+		.channel = ADC_CHANNEL_TEMPERATURE,
+		.count = 8,
+		.result = anyWord()
+	};
+
+	stubAdcSampleFor(&sample);
+
+	static const struct Time now = { .minute = 1 };
+	publishTimeChanged(&now);
+	dispatchAllEvents();
+	TEST_ASSERT_NOT_NULL(monitoredParametersSampled);
+	TEST_ASSERT_TRUE(adcSampleCalls >= 1);
+	TEST_ASSERT_EQUAL_UINT8(sample.result, monitoredParametersSampled->temperature);
+}
