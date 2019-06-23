@@ -20,7 +20,8 @@ __section("NvmSettings") const volatile union NvmSettings nvmSettings =
 		},
 		.motor =
 		{
-			.currentLimit = DAC_AMPS(1.2)
+			.currentLimitNoLoad = DAC_AMPS(0.24),
+			.currentLimitMaximumLoad = DAC_AMPS(1.2)
 		}
 	}
 };

@@ -4,16 +4,16 @@
 
 #include "NvmSettingsFixture.h"
 
-#include "NvmSettings.h"
+#include "Platform/NvmSettings.h"
 #include "ApplicationNvmSettings.h"
 
 #define RETLW_HIGH 0b110100
 
 static void nvmUnlockSequence(void);
 
-void stubNvmApplicationSettings(const union ApplicationNvmSettings *settings)
+void stubNvmApplicationSettings(const union ApplicationNvmSettings *stubbed)
 {
-	static union NvmSettings replacementSettings;
+	union NvmSettings replacementSettings;
 	memcpy(
 		&replacementSettings.platform,
 		(const void *) &nvmSettings.platform,
@@ -21,9 +21,14 @@ void stubNvmApplicationSettings(const union ApplicationNvmSettings *settings)
 
 	memcpy(
 		&replacementSettings.application,
-		settings,
+		stubbed,
 		sizeof(nvmSettings.application));
 
+	stubNvmSettings(&replacementSettings);
+}
+
+void stubNvmSettings(const union NvmSettings *stubbed)
+{
 	static const uint8_t *dest = (const uint8_t *) &nvmSettings;
 	NVMADR = ((uint16_t) dest) & 0x7fff;
 	NVMCON1bits.NVMREGS = 0;
@@ -33,7 +38,7 @@ void stubNvmApplicationSettings(const union ApplicationNvmSettings *settings)
 
 	NVMCON1bits.LWLO = 1;
 	NVMDATH = RETLW_HIGH;
-	const uint8_t *src = (const uint8_t *) &replacementSettings;
+	const uint8_t *src = (const uint8_t *) stubbed;
 	for (uint8_t i = 0; i < sizeof(nvmSettings) - 1; i++)
 	{
 		NVMDATL = *(src++);

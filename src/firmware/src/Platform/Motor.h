@@ -38,5 +38,7 @@ extern uint8_t motorIsEnabled(void);
 extern void motorDisable(void);
 extern void motorOn(int16_t count);
 extern void motorOff(void);
+extern void motorLimitIsNoLoad(void);
+extern void motorLimitIsMaximumLoad(void);
 
 #endif

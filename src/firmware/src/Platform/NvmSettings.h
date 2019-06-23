@@ -25,7 +25,8 @@ union NvmSettings
 
 				struct
 				{
-					uint8_t currentLimit;
+					uint8_t currentLimitNoLoad;
+					uint8_t currentLimitMaximumLoad;
 				} motor;
 			};
 		} platform;

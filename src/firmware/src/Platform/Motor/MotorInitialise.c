@@ -88,7 +88,7 @@ static void onVoltageRegulatorEnabled(const struct Event *event)
 {
 	// TODO: THE NVM_SETTINGS_CHANGED EVENT SHOULD BE HANDLED
 	PMD2bits.DAC1MD = 0;
-	DAC1CON1 = nvmSettings.platform.motor.currentLimit;
+	DAC1CON1 = nvmSettings.platform.motor.currentLimitMaximumLoad;
 	DAC1CON0 = _DAC1CON0_EN_MASK;
 
 	TRISBbits.TRISB1 = 1;

@@ -25,9 +25,14 @@ void test_nvmSettings_getLcdBacklightBrightness_expectDefaultValue(void)
 	TEST_ASSERT_EQUAL_UINT8(0x80, nvmSettings.platform.lcd.backlightBrightness);
 }
 
-void test_nvmSettings_getMotorCurrentLimit_expectDefaultValue(void)
+void test_nvmSettings_getMotorCurrentLimitNoLoad_expectDefaultValue(void)
 {
-	TEST_ASSERT_EQUAL_UINT8(0x13, nvmSettings.platform.motor.currentLimit);
+	TEST_ASSERT_EQUAL_UINT8(0x04, nvmSettings.platform.motor.currentLimitNoLoad);
+}
+
+void test_nvmSettings_getMotorCurrentLimitMaximumLoad_expectDefaultValue(void)
+{
+	TEST_ASSERT_EQUAL_UINT8(0x13, nvmSettings.platform.motor.currentLimitMaximumLoad);
 }
 
 void test_nvmSettings_getLatitudeOffset_expectDefaultValue(void)
