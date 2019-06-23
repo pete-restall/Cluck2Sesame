@@ -34,6 +34,23 @@ struct DoorAborted
 	union DoorFaults fault;
 };
 
+enum DoorTargetState
+{
+	DoorTargetState_Unchanged,
+	DoorTargetState_Opened,
+	DoorTargetState_Closed
+};
+
+enum DoorActualState
+{
+	DoorActualState_Unknown,
+	DoorActualState_Fault,
+	DoorActualState_Opening,
+	DoorActualState_Opened,
+	DoorActualState_Closing,
+	DoorActualState_Closed
+};
+
 struct DoorState
 {
 	union
@@ -50,6 +67,8 @@ struct DoorState
 	struct Time autoOpenTime;
 	struct Time autoCloseTime;
 	union DoorFaults fault;
+	enum DoorTargetState targetState;
+	enum DoorActualState actualState;
 };
 
 extern void doorInitialise(void);
