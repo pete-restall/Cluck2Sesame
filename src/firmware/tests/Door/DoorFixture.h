@@ -19,6 +19,9 @@ extern void stubDoorWithState(
 	enum DoorState state,
 	enum DoorTransition transition);
 
+extern void stubMotorIsEnabled(void);
+extern void stubMotorIsDisabled(void);
+
 extern void publishDateChanged(void);
 extern void publishNvmSettingsChanged(void);
 extern void publishSunEventsChanged(
@@ -39,5 +42,8 @@ extern const struct FarSchedule *farSchedulerAddArgs[8];
 extern uint8_t farSchedulerRemoveCalls;
 extern uint8_t farSchedulerRemoveSequence[8];
 extern const struct FarSchedule *farSchedulerRemoveArgs[8];
+
+extern uint8_t motorEnableCalls;
+extern uint8_t motorDisableCalls;
 
 #endif

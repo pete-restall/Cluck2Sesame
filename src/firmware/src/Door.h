@@ -47,6 +47,7 @@ enum DoorState
 	DoorState_Fault,
 	DoorState_FindBottom,
 	DoorState_Opening,
+	DoorState_Opening_WaitingForEnabledMotor,
 	DoorState_Opened,
 	DoorState_Closing,
 	DoorState_Closed

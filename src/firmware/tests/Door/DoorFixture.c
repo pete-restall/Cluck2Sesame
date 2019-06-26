@@ -25,11 +25,19 @@ uint8_t farSchedulerRemoveCalls;
 uint8_t farSchedulerRemoveSequence[8];
 const struct FarSchedule *farSchedulerRemoveArgs[8];
 
+uint8_t motorEnableCalls;
+uint8_t motorDisableCalls;
+
+static uint8_t motorIsEnabledReturns;
+
 void doorFixtureInitialise(void)
 {
 	callSequence = 0;
 	farSchedulerAddCalls = 0;
 	farSchedulerRemoveCalls = 0;
+	motorIsEnabledReturns = 0;
+	motorEnableCalls = 0;
+	motorDisableCalls = 0;
 	eventInitialise();
 	doorInitialise();
 }
@@ -150,6 +158,31 @@ void stubDoorWithState(
 	extern struct DoorStateInternal doorState;
 	doorState.current = state;
 	doorState.transition = transition;
+}
+
+void stubMotorIsEnabled(void)
+{
+	motorIsEnabledReturns = 1;
+}
+
+void stubMotorIsDisabled(void)
+{
+	motorIsEnabledReturns = 0;
+}
+
+uint8_t motorIsEnabled(void)
+{
+	return motorIsEnabledReturns;
+}
+
+void motorEnable(void)
+{
+	motorEnableCalls++;
+}
+
+void motorDisable(void)
+{
+	motorDisableCalls++;
 }
 
 void publishDoorAbortedWithAnyFault(void)
