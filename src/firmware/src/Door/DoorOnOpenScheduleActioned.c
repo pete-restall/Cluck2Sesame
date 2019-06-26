@@ -1,9 +1,15 @@
 #include <xc.h>
 #include <stdint.h>
 
+#include "../Platform/NvmSettings.h"
+#include "../ApplicationNvmSettings.h"
 #include "../Motor.h"
 
 #include "Door.h"
+
+static void doorStartOpening(
+	enum DoorState motorEnabledState,
+	enum DoorState motorDisabledState);
 
 void onDoorOpenScheduleActioned(const struct Event *event)
 {
@@ -14,21 +20,35 @@ void onDoorOpenScheduleActioned(const struct Event *event)
 			break;
 
 		case DoorState_Closed:
-			motorEnable();
-// TODO: IF ENABLED, SWITCH TO HIGH CURRENT MODE AND MOVE DOOR UP...
-			doorState.current = motorIsEnabled()
-				? DoorState_Opening
-				: DoorState_Opening_WaitingForEnabledMotor;
-
-			doorState.transition = DoorTransition_Open;
+			doorStartOpening(
+				DoorState_Opening,
+				DoorState_Opening_WaitingForEnabledMotor);
 			break;
 
 		case DoorState_Unknown:
-			motorEnable();
-// TODO: IF ENABLED, SWITCH TO LOW CURRENT MODE AND MOVE DOOR DOWN...
-			doorState.current = DoorState_FindBottom;
+			doorStartOpening(
+				DoorState_FindBottom,
+				DoorState_FindBottom_WaitingForEnabledMotor);
+			break;
 
 		default:
 			doorState.transition = DoorTransition_Open;
 	};
+}
+
+static void doorStartOpening(
+	enum DoorState motorEnabledState,
+	enum DoorState motorDisabledState)
+{
+	motorEnable();
+	if (motorIsEnabled())
+	{
+		motorLimitIsMaximumLoad();
+		motorOn(nvmSettings.application.door.height);
+		doorState.current = motorEnabledState;
+	}
+	else
+		doorState.current = motorDisabledState;
+
+	doorState.transition = DoorTransition_Open;
 }

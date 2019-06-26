@@ -26,7 +26,9 @@ uint8_t farSchedulerRemoveSequence[8];
 const struct FarSchedule *farSchedulerRemoveArgs[8];
 
 uint8_t motorEnableCalls;
+uint8_t motorEnableSequence;
 uint8_t motorDisableCalls;
+uint8_t motorDisableSequence;
 uint8_t motorOnCalls;
 uint8_t motorOnSequence;
 int16_t motorOnArgs[8];
@@ -46,7 +48,9 @@ void doorFixtureInitialise(void)
 	farSchedulerRemoveCalls = 0;
 	motorIsEnabledReturns = 0;
 	motorEnableCalls = 0;
+	motorEnableSequence = 0;
 	motorDisableCalls = 0;
+	motorDisableSequence = 0;
 	motorOnCalls = 0;
 	motorOnSequence = 0;
 	motorOffCalls = 0;
@@ -196,11 +200,13 @@ uint8_t motorIsEnabled(void)
 void motorEnable(void)
 {
 	motorEnableCalls++;
+	motorEnableSequence = ++callSequence;
 }
 
 void motorDisable(void)
 {
 	motorDisableCalls++;
+	motorDisableSequence = ++callSequence;
 }
 
 void motorOn(int16_t count)

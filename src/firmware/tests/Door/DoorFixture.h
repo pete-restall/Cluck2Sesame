@@ -44,7 +44,9 @@ extern uint8_t farSchedulerRemoveSequence[8];
 extern const struct FarSchedule *farSchedulerRemoveArgs[8];
 
 extern uint8_t motorEnableCalls;
+extern uint8_t motorEnableSequence;
 extern uint8_t motorDisableCalls;
+extern uint8_t motorDisableSequence;
 extern uint8_t motorOnCalls;
 extern uint8_t motorOnSequence;
 extern int16_t motorOnArgs[8];

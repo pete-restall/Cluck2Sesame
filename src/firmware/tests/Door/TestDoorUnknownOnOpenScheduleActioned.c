@@ -28,7 +28,7 @@ void onAfterTest(void)
 	doorFixtureShutdown();
 }
 
-void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknown_expectStateIsFindBottomWithOpenTransition(void)
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnabled_expectStateIsFindBottomWithOpenTransition(void)
 {
 	struct DoorStateWithContext state =
 	{
@@ -36,6 +36,7 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknown_expectStateIsFi
 		.transition = anyByteExcept(DoorTransition_Open)
 	};
 
+	stubMotorIsEnabled();
 	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
@@ -62,6 +63,97 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnable
 	TEST_ASSERT_EQUAL_UINT8(1, motorEnableCalls);
 }
 
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnabled_expectMotorIsTurnedOn(void)
+{
+	struct DoorStateWithContext state =
+	{
+		.current = DoorState_Unknown,
+		.transition = anyByte()
+	};
+
+	stubMotorIsEnabled();
+	stubDoorWithState(state.current, state.transition);
+	publishDoorOpenScheduleActioned();
+	dispatchAllEvents();
+	doorGetState(&state);
+
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, motorOnCalls, "Calls");
+	TEST_ASSERT_EQUAL_INT16_MESSAGE(
+		nvmSettings.application.door.height,
+		motorOnArgs[0],
+		"Height");
+}
+
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnabled_expectMotorCurrentLimitIsMaximumLoad(void)
+{
+	struct DoorStateWithContext state =
+	{
+		.current = DoorState_Unknown,
+		.transition = anyByte()
+	};
+
+	stubMotorIsEnabled();
+	stubDoorWithState(state.current, state.transition);
+	publishDoorOpenScheduleActioned();
+	dispatchAllEvents();
+	doorGetState(&state);
+
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, motorLimitIsNoLoadCalls, "N");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, motorLimitIsMaximumLoadCalls, "M");
+}
+
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnabled_expectMotorIsEnabledBeforeCurrentLimitIsChanged(void)
+{
+	struct DoorStateWithContext state =
+	{
+		.current = DoorState_Unknown,
+		.transition = anyByte()
+	};
+
+	stubMotorIsEnabled();
+	stubDoorWithState(state.current, state.transition);
+	publishDoorOpenScheduleActioned();
+	dispatchAllEvents();
+	doorGetState(&state);
+
+	TEST_ASSERT_TRUE(motorEnableSequence < motorLimitIsMaximumLoadSequence);
+}
+
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnabled_expectMotorCurrentLimitIsChangedBeforeMotorIsTurnedOn(void)
+{
+	struct DoorStateWithContext state =
+	{
+		.current = DoorState_Unknown,
+		.transition = anyByte()
+	};
+
+	stubMotorIsEnabled();
+	stubDoorWithState(state.current, state.transition);
+	publishDoorOpenScheduleActioned();
+	dispatchAllEvents();
+	doorGetState(&state);
+
+	TEST_ASSERT_TRUE(motorLimitIsMaximumLoadSequence < motorOnSequence);
+}
+
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsDisabled_expectStateIsFindBottomWaitingForEnabledMotorWithOpenTransition(void)
+{
+	struct DoorStateWithContext state =
+	{
+		.current = DoorState_Unknown,
+		.transition = anyByteExcept(DoorTransition_Open)
+	};
+
+	stubMotorIsDisabled();
+	stubDoorWithState(state.current, state.transition);
+	publishDoorOpenScheduleActioned();
+	dispatchAllEvents();
+	doorGetState(&state);
+
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorState_FindBottom_WaitingForEnabledMotor, state.current, "A");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorTransition_Open, state.transition, "T");
+}
+
 void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsDisabled_expectMotorIsEnabled(void)
 {
 	struct DoorStateWithContext state =
@@ -77,4 +169,39 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsDisabl
 	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8(1, motorEnableCalls);
+}
+
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsDisabled_expectMotorIsNotTurnedOn(void)
+{
+	struct DoorStateWithContext state =
+	{
+		.current = DoorState_Unknown,
+		.transition = anyByte()
+	};
+
+	stubMotorIsDisabled();
+	stubDoorWithState(state.current, state.transition);
+	publishDoorOpenScheduleActioned();
+	dispatchAllEvents();
+	doorGetState(&state);
+
+	TEST_ASSERT_EQUAL_UINT8(0, motorOnCalls);
+}
+
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsDisabled_expectMotorCurrentLimitIsNotChanged(void)
+{
+	struct DoorStateWithContext state =
+	{
+		.current = DoorState_Unknown,
+		.transition = anyByte()
+	};
+
+	stubMotorIsDisabled();
+	stubDoorWithState(state.current, state.transition);
+	publishDoorOpenScheduleActioned();
+	dispatchAllEvents();
+	doorGetState(&state);
+
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, motorLimitIsNoLoadCalls, "N");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, motorLimitIsMaximumLoadCalls, "M");
 }
