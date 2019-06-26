@@ -29,7 +29,7 @@ struct DoorStateInternal doorState;
 
 void doorInitialise(void)
 {
-	doorState.actualState = DoorActualState_Unknown;
+	doorState.current = DoorState_Unknown;
 	doorState.transition = DoorTransition_Unchanged;
 
 	static const struct EventSubscription onDoorAbortedSubscription =

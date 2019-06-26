@@ -41,18 +41,18 @@ enum DoorTransition
 	DoorTransition_Close
 };
 
-enum DoorActualState
+enum DoorState
 {
-	DoorActualState_Unknown,
-	DoorActualState_Fault,
-	DoorActualState_FindBottom,
-	DoorActualState_Opening,
-	DoorActualState_Opened,
-	DoorActualState_Closing,
-	DoorActualState_Closed
+	DoorState_Unknown,
+	DoorState_Fault,
+	DoorState_FindBottom,
+	DoorState_Opening,
+	DoorState_Opened,
+	DoorState_Closing,
+	DoorState_Closed
 };
 
-struct DoorState
+struct DoorStateWithContext
 {
 	union
 	{
@@ -69,10 +69,10 @@ struct DoorState
 	struct Time autoCloseTime;
 	union DoorFaults fault;
 	enum DoorTransition transition;
-	enum DoorActualState actualState;
+	enum DoorState current;
 };
 
 extern void doorInitialise(void);
-extern void doorGetState(struct DoorState *state);
+extern void doorGetState(struct DoorStateWithContext *state);
 
 #endif

@@ -5,7 +5,7 @@
 
 struct DoorStateInternal
 {
-	enum DoorActualState actualState;
+	enum DoorState current;
 	enum DoorTransition transition;
 };
 

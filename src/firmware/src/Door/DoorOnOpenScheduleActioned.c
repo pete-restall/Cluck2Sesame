@@ -5,15 +5,15 @@
 
 void onDoorOpenScheduleActioned(const struct Event *event)
 {
-	switch (doorState.actualState)
+	switch (doorState.current)
 	{
-		case DoorActualState_Opened:
-		case DoorActualState_Fault:
+		case DoorState_Opened:
+		case DoorState_Fault:
 			doorState.transition = DoorTransition_Unchanged;
 			break;
 
-		case DoorActualState_Unknown:
-			doorState.actualState = DoorActualState_FindBottom;
+		case DoorState_Unknown:
+			doorState.current = DoorState_FindBottom;
 
 		default:
 			doorState.transition = DoorTransition_Open;

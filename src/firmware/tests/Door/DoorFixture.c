@@ -144,11 +144,11 @@ void stubAnySunEvents(struct SunEventsChanged *eventArgs)
 }
 
 void stubDoorWithState(
-	enum DoorActualState actualState,
+	enum DoorState state,
 	enum DoorTransition transition)
 {
 	extern struct DoorStateInternal doorState;
-	doorState.actualState = actualState;
+	doorState.current = state;
 	doorState.transition = transition;
 }
 

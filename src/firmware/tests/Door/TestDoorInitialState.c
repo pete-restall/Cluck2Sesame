@@ -28,20 +28,20 @@ void onAfterTest(void)
 	doorFixtureShutdown();
 }
 
-void test_doorGetState_calledAfterInitialised_expectActualStateIsUnknown(void)
+void test_doorGetState_calledAfterInitialised_expectStateIsUnknown(void)
 {
-	struct DoorState state =
+	struct DoorStateWithContext state =
 	{
-		.actualState = anyByteExcept(DoorActualState_Unknown)
+		.current = anyByteExcept(DoorState_Unknown)
 	};
 	doorGetState(&state);
 
-	TEST_ASSERT_EQUAL_UINT8(DoorActualState_Unknown, state.actualState);
+	TEST_ASSERT_EQUAL_UINT8(DoorState_Unknown, state.current);
 }
 
 void test_doorGetState_calledAfterInitialised_expectTransitionIsUnchanged(void)
 {
-	struct DoorState state =
+	struct DoorStateWithContext state =
 	{
 		.transition = anyByteExcept(DoorTransition_Unchanged)
 	};
@@ -55,7 +55,7 @@ void test_doorGetState_calledWhenDoorIsTimeDriven_expectCorrectModeFlags(void)
 	stubNvmSettingsForTimeDrivenMode();
 	doorInitialise();
 
-	struct DoorState state = { .flags = anyByte() };
+	struct DoorStateWithContext state = { .flags = anyByte() };
 	doorGetState(&state);
 
 	TEST_ASSERT_TRUE_MESSAGE(state.flags.isTimeDriven, "T");
@@ -68,7 +68,7 @@ void test_doorGetState_calledWhenDoorIsSunEventDriven_expectCorrectModeFlags(voi
 	stubNvmSettingsForSunEventDrivenMode();
 	doorInitialise();
 
-	struct DoorState state = { .flags = anyByte() };
+	struct DoorStateWithContext state = { .flags = anyByte() };
 	doorGetState(&state);
 
 	TEST_ASSERT_FALSE_MESSAGE(state.flags.isTimeDriven, "T");
@@ -81,7 +81,7 @@ void test_doorGetState_calledWhenDoorIsManuallyOverridden_expectCorrectModeFlags
 	stubNvmSettingsForManuallyDrivenMode();
 	doorInitialise();
 
-	struct DoorState state = { .flags = anyByte() };
+	struct DoorStateWithContext state = { .flags = anyByte() };
 	doorGetState(&state);
 
 	TEST_ASSERT_FALSE_MESSAGE(state.flags.isTimeDriven, "T");
@@ -94,7 +94,7 @@ void test_doorGetState_calledWhenDoorIsInUnspecifiedMode_expectCorrectModeFlags(
 	stubNvmSettingsForUnspecifiedMode();
 	doorInitialise();
 
-	struct DoorState state = { .flags = anyByte() };
+	struct DoorStateWithContext state = { .flags = anyByte() };
 	doorGetState(&state);
 
 	TEST_ASSERT_FALSE_MESSAGE(state.flags.isTimeDriven, "T");

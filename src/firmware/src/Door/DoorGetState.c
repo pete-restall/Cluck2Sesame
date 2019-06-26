@@ -1,13 +1,14 @@
 #include <xc.h>
+#include <stdint.h>
 
 #include "../Platform/NvmSettings.h"
 #include "../ApplicationNvmSettings.h"
 
 #include "Door.h"
 
-void doorGetState(struct DoorState *state)
+void doorGetState(struct DoorStateWithContext *state)
 {
-	state->actualState = doorState.actualState;
+	state->current = doorState.current;
 	state->transition = doorState.transition;
 	state->flags.isTimeDriven =
 		nvmSettings.application.door.mode.isTimeDriven ? 1 : 0;

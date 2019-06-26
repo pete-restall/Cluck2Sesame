@@ -28,104 +28,104 @@ void onAfterTest(void)
 	doorFixtureShutdown();
 }
 
-void test_doorOpenScheduleActioned_onPublishedWhenActualStateIsFault_expectSameStateWithUnchangedTransition(void)
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsFault_expectSameStateWithUnchangedTransition(void)
 {
-	struct DoorState state =
+	struct DoorStateWithContext state =
 	{
-		.actualState = DoorActualState_Fault,
+		.current = DoorState_Fault,
 		.transition = anyByteExcept(DoorTransition_Unchanged)
 	};
 
-	stubDoorWithState(state.actualState, state.transition);
+	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
 	doorGetState(&state);
 
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorActualState_Fault, state.actualState, "A");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorState_Fault, state.current, "A");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorTransition_Unchanged, state.transition, "T");
 }
 
-void test_doorOpenScheduleActioned_onPublishedWhenActualStateIsOpened_expectSameStateWithUnchangedTransition(void)
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsOpened_expectSameStateWithUnchangedTransition(void)
 {
-	struct DoorState state =
+	struct DoorStateWithContext state =
 	{
-		.actualState = DoorActualState_Opened,
+		.current = DoorState_Opened,
 		.transition = anyByteExcept(DoorTransition_Unchanged)
 	};
 
-	stubDoorWithState(state.actualState, state.transition);
+	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
 	doorGetState(&state);
 
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorActualState_Opened, state.actualState, "A");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorState_Opened, state.current, "A");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorTransition_Unchanged, state.transition, "T");
 }
 
-void test_doorOpenScheduleActioned_onPublishedWhenActualStateIsOpening_expectSameStateWithOpenTransition(void)
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsOpening_expectSameStateWithOpenTransition(void)
 {
-	struct DoorState state =
+	struct DoorStateWithContext state =
 	{
-		.actualState = DoorActualState_Opening,
+		.current = DoorState_Opening,
 		.transition = anyByteExcept(DoorTransition_Open)
 	};
 
-	stubDoorWithState(state.actualState, state.transition);
+	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
 	doorGetState(&state);
 
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorActualState_Opening, state.actualState, "A");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorState_Opening, state.current, "A");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorTransition_Open, state.transition, "T");
 }
 
-void test_doorOpenScheduleActioned_onPublishedWhenActualStateIsClosed_expectSameStateWithOpenTransition(void)
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsClosed_expectSameStateWithOpenTransition(void)
 {
-	struct DoorState state =
+	struct DoorStateWithContext state =
 	{
-		.actualState = DoorActualState_Closed,
+		.current = DoorState_Closed,
 		.transition = anyByteExcept(DoorTransition_Open)
 	};
 
-	stubDoorWithState(state.actualState, state.transition);
+	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
 	doorGetState(&state);
 
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorActualState_Closed, state.actualState, "A");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorState_Closed, state.current, "A");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorTransition_Open, state.transition, "T");
 }
 
-void test_doorOpenScheduleActioned_onPublishedWhenActualStateIsClosing_expectSameStateWithOpenTransition(void)
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsClosing_expectSameStateWithOpenTransition(void)
 {
-	struct DoorState state =
+	struct DoorStateWithContext state =
 	{
-		.actualState = DoorActualState_Closing,
+		.current = DoorState_Closing,
 		.transition = anyByteExcept(DoorTransition_Open)
 	};
 
-	stubDoorWithState(state.actualState, state.transition);
+	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
 	doorGetState(&state);
 
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorActualState_Closing, state.actualState, "A");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorState_Closing, state.current, "A");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorTransition_Open, state.transition, "T");
 }
 
-void test_doorOpenScheduleActioned_onPublishedWhenActualStateIsUnknown_expectStateIsFindBottomWithOpenTransition(void)
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknown_expectStateIsFindBottomWithOpenTransition(void)
 {
-	struct DoorState state =
+	struct DoorStateWithContext state =
 	{
-		.actualState = DoorActualState_Unknown,
+		.current = DoorState_Unknown,
 		.transition = anyByteExcept(DoorTransition_Open)
 	};
 
-	stubDoorWithState(state.actualState, state.transition);
+	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
 	doorGetState(&state);
 
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorActualState_FindBottom, state.actualState, "A");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorState_FindBottom, state.current, "A");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorTransition_Open, state.transition, "T");
 }

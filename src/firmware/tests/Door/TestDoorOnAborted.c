@@ -28,19 +28,19 @@ void onAfterTest(void)
 	doorFixtureShutdown();
 }
 
-void test_doorAborted_onPublished_expectActualStateIsFaultAndTargetIsUnchanged(void)
+void test_doorAborted_onPublished_expectStateIsFaultAndTargetIsUnchanged(void)
 {
-	struct DoorState state =
+	struct DoorStateWithContext state =
 	{
-		.actualState = anyByteExcept(DoorActualState_Fault),
+		.current = anyByteExcept(DoorState_Fault),
 		.transition = anyByteExcept(DoorTransition_Unchanged)
 	};
 
-	stubDoorWithState(state.actualState, state.transition);
+	stubDoorWithState(state.current, state.transition);
 	publishDoorAbortedWithAnyFault();
 	dispatchAllEvents();
 	doorGetState(&state);
 
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorActualState_Fault, state.actualState, "A");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorState_Fault, state.current, "A");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorTransition_Unchanged, state.transition, "T");
 }

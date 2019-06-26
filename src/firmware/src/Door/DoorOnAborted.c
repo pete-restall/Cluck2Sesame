@@ -5,6 +5,6 @@
 
 void onDoorAborted(const struct Event *event)
 {
-	doorState.actualState = DoorActualState_Fault;
+	doorState.current = DoorState_Fault;
 	doorState.transition = DoorTransition_Unchanged;
 }
