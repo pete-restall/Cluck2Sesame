@@ -45,6 +45,7 @@ enum DoorActualState
 {
 	DoorActualState_Unknown,
 	DoorActualState_Fault,
+	DoorActualState_FindBottom,
 	DoorActualState_Opening,
 	DoorActualState_Opened,
 	DoorActualState_Closing,

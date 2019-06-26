@@ -112,3 +112,20 @@ void test_doorOpenScheduleActioned_onPublishedWhenActualStateIsClosing_expectSam
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorActualState_Closing, state.actualState, "A");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorTransition_Open, state.transition, "T");
 }
+
+void test_doorOpenScheduleActioned_onPublishedWhenActualStateIsUnknown_expectStateIsFindBottomWithOpenTransition(void)
+{
+	struct DoorState state =
+	{
+		.actualState = DoorActualState_Unknown,
+		.transition = anyByteExcept(DoorTransition_Open)
+	};
+
+	stubDoorWithState(state.actualState, state.transition);
+	publishDoorOpenScheduleActioned();
+	dispatchAllEvents();
+	doorGetState(&state);
+
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorActualState_FindBottom, state.actualState, "A");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorTransition_Open, state.transition, "T");
+}
