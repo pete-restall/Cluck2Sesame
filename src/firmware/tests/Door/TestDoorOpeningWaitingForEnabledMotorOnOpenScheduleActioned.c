@@ -48,7 +48,7 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsOpeningWaitingForEnable
 {
 	struct DoorStateWithContext state =
 	{
-		.current = DoorState_OpeningWaitingForEnabledMotor,
+		.current = DoorState_Opening_WaitingForEnabledMotor,
 		.transition = anyByte()
 	};
 
@@ -64,7 +64,7 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsOpeningWaitingForEnable
 {
 	struct DoorStateWithContext state =
 	{
-		.current = DoorState_OpeningWaitingForEnabledMotor,
+		.current = DoorState_Opening_WaitingForEnabledMotor,
 		.transition = anyByte()
 	};
 
