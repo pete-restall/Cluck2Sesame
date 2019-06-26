@@ -14,6 +14,8 @@
 #include "../NvmSettingsFixture.h"
 
 TEST_FILE("Door/DoorInitialise.c")
+TEST_FILE("Door/DoorOnAborted.c")
+TEST_FILE("Door/DoorOnOpenScheduleActioned.c")
 
 static void publishAnySunEventsChanged(void);
 

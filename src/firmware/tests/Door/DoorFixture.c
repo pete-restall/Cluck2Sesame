@@ -6,6 +6,7 @@
 #include "Platform/NvmSettings.h"
 #include "ApplicationNvmSettings.h"
 #include "SunEvents.h"
+#include "Door/Door.h"
 #include "Door.h"
 
 #include "DoorFixture.h"
@@ -142,6 +143,21 @@ void stubAnySunEvents(struct SunEventsChanged *eventArgs)
 	eventArgs->sunset.minute = anyByteLessThan(60);
 }
 
+void stubDoorWithState(
+	enum DoorActualState actualState,
+	enum DoorTransition transition)
+{
+	extern struct DoorStateInternal doorState;
+	doorState.actualState = actualState;
+	doorState.transition = transition;
+}
+
+void publishDoorAbortedWithAnyFault(void)
+{
+	static const struct DoorAborted eventArgs = { };
+	eventPublish(DOOR_ABORTED, &eventArgs);
+}
+
 void publishDateChanged(void)
 {
 	static const struct DateWithFlags today = { };
@@ -158,6 +174,18 @@ void publishNvmSettingsChanged(void)
 void publishSunEventsChanged(const struct SunEventsChanged *eventArgs)
 {
 	eventPublish(SUN_EVENTS_CHANGED, eventArgs);
+}
+
+void publishDoorOpenScheduleActioned(void)
+{
+	static const struct DoorOpenScheduleActioned eventArgs = { };
+	eventPublish(DOOR_OPEN_SCHEDULE_ACTIONED, &eventArgs);
+}
+
+void publishDoorCloseScheduleActioned(void)
+{
+	static const struct DoorCloseScheduleActioned eventArgs = { };
+	eventPublish(DOOR_CLOSE_SCHEDULE_ACTIONED, &eventArgs);
 }
 
 void assertFarSchedulesAreEqualWithAnyNonNullArgs(

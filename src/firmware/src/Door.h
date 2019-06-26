@@ -34,11 +34,11 @@ struct DoorAborted
 	union DoorFaults fault;
 };
 
-enum DoorTargetState
+enum DoorTransition
 {
-	DoorTargetState_Unchanged,
-	DoorTargetState_Opened,
-	DoorTargetState_Closed
+	DoorTransition_Unchanged,
+	DoorTransition_Open,
+	DoorTransition_Close
 };
 
 enum DoorActualState
@@ -67,7 +67,7 @@ struct DoorState
 	struct Time autoOpenTime;
 	struct Time autoCloseTime;
 	union DoorFaults fault;
-	enum DoorTargetState targetState;
+	enum DoorTransition transition;
 	enum DoorActualState actualState;
 };
 

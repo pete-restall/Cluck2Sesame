@@ -1,4 +1,5 @@
 #include <xc.h>
+#include <stdint.h>
 
 #include "../Platform/FarScheduler.h"
 #include "../Platform/NvmSettings.h"
@@ -24,8 +25,22 @@ static struct FarSchedule closingSchedule =
 	.eventArgs = &closingScheduleEventArgs
 };
 
+struct DoorStateInternal doorState;
+
 void doorInitialise(void)
 {
+	doorState.actualState = DoorActualState_Unknown;
+	doorState.transition = DoorTransition_Unchanged;
+
+	static const struct EventSubscription onDoorAbortedSubscription =
+	{
+		.type = DOOR_ABORTED,
+		.handler = &onDoorAborted,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onDoorAbortedSubscription);
+
 	static const struct EventSubscription onDateChangedSubscription =
 	{
 		.type = DATE_CHANGED,
@@ -52,6 +67,15 @@ void doorInitialise(void)
 	};
 
 	eventSubscribe(&onSunEventsChangedSubscription);
+
+	static const struct EventSubscription onDoorOpenScheduleActionedSubscription =
+	{
+		.type = DOOR_OPEN_SCHEDULE_ACTIONED,
+		.handler = &onDoorOpenScheduleActioned,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onDoorOpenScheduleActionedSubscription);
 }
 
 static void onDateOrNvmSettingsChanged(const struct Event *event)

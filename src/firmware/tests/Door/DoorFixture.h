@@ -14,13 +14,19 @@ extern void stubNvmSettingsForSunEventDrivenModeWithOffsets(
 	int8_t sunsetMinutes);
 
 extern void stubNvmSettingsForUnspecifiedMode(void);
-
 extern void stubAnySunEvents(struct SunEventsChanged *eventArgs);
+extern void stubDoorWithState(
+	enum DoorActualState actualState,
+	enum DoorTransition transition);
 
 extern void publishDateChanged(void);
 extern void publishNvmSettingsChanged(void);
 extern void publishSunEventsChanged(
 	const struct SunEventsChanged *eventArgs);
+
+extern void publishDoorOpenScheduleActioned(void);
+extern void publishDoorCloseScheduleActioned(void);
+extern void publishDoorAbortedWithAnyFault(void);
 
 extern void assertFarSchedulesAreEqualWithAnyNonNullArgs(
 	const struct FarSchedule *expected,

@@ -7,8 +7,8 @@
 
 void doorGetState(struct DoorState *state)
 {
-	state->actualState = DoorActualState_Unknown;
-	state->targetState = DoorTargetState_Unchanged;
+	state->actualState = doorState.actualState;
+	state->transition = doorState.transition;
 	state->flags.isTimeDriven =
 		nvmSettings.application.door.mode.isTimeDriven ? 1 : 0;
 

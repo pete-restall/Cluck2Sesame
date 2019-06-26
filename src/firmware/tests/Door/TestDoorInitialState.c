@@ -15,6 +15,8 @@
 
 TEST_FILE("Door/DoorInitialise.c")
 TEST_FILE("Door/DoorGetState.c")
+TEST_FILE("Door/DoorOnAborted.c")
+TEST_FILE("Door/DoorOnOpenScheduleActioned.c")
 
 void onBeforeTest(void)
 {
@@ -37,15 +39,15 @@ void test_doorGetState_calledAfterInitialised_expectActualStateIsUnknown(void)
 	TEST_ASSERT_EQUAL_UINT8(DoorActualState_Unknown, state.actualState);
 }
 
-void test_doorGetState_calledAfterInitialised_expectTargetStateIsUnchanged(void)
+void test_doorGetState_calledAfterInitialised_expectTransitionIsUnchanged(void)
 {
 	struct DoorState state =
 	{
-		.targetState = anyByteExcept(DoorTargetState_Unchanged)
+		.transition = anyByteExcept(DoorTransition_Unchanged)
 	};
 	doorGetState(&state);
 
-	TEST_ASSERT_EQUAL_UINT8(DoorTargetState_Unchanged, state.targetState);
+	TEST_ASSERT_EQUAL_UINT8(DoorTransition_Unchanged, state.transition);
 }
 
 void test_doorGetState_calledWhenDoorIsTimeDriven_expectCorrectModeFlags(void)
