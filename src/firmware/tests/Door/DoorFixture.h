@@ -45,5 +45,14 @@ extern const struct FarSchedule *farSchedulerRemoveArgs[8];
 
 extern uint8_t motorEnableCalls;
 extern uint8_t motorDisableCalls;
+extern uint8_t motorOnCalls;
+extern uint8_t motorOnSequence;
+extern int16_t motorOnArgs[8];
+extern uint8_t motorOffCalls;
+extern uint8_t motorOffSequence;
+extern uint8_t motorLimitIsNoLoadCalls;
+extern uint8_t motorLimitIsNoLoadSequence;
+extern uint8_t motorLimitIsMaximumLoadCalls;
+extern uint8_t motorLimitIsMaximumLoadSequence;
 
 #endif

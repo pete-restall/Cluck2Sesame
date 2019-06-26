@@ -27,6 +27,15 @@ const struct FarSchedule *farSchedulerRemoveArgs[8];
 
 uint8_t motorEnableCalls;
 uint8_t motorDisableCalls;
+uint8_t motorOnCalls;
+uint8_t motorOnSequence;
+int16_t motorOnArgs[8];
+uint8_t motorOffCalls;
+uint8_t motorOffSequence;
+uint8_t motorLimitIsNoLoadCalls;
+uint8_t motorLimitIsNoLoadSequence;
+uint8_t motorLimitIsMaximumLoadCalls;
+uint8_t motorLimitIsMaximumLoadSequence;
 
 static uint8_t motorIsEnabledReturns;
 
@@ -38,6 +47,15 @@ void doorFixtureInitialise(void)
 	motorIsEnabledReturns = 0;
 	motorEnableCalls = 0;
 	motorDisableCalls = 0;
+	motorOnCalls = 0;
+	motorOnSequence = 0;
+	motorOffCalls = 0;
+	motorOffSequence = 0;
+	motorLimitIsNoLoadCalls = 0;
+	motorLimitIsNoLoadSequence = 0;
+	motorLimitIsMaximumLoadCalls = 0;
+	motorLimitIsMaximumLoadSequence = 0;
+
 	eventInitialise();
 	doorInitialise();
 }
@@ -183,6 +201,31 @@ void motorEnable(void)
 void motorDisable(void)
 {
 	motorDisableCalls++;
+}
+
+void motorOn(int16_t count)
+{
+	motorOnCalls++;
+	motorOnSequence = ++callSequence;
+	motorOnArgs[motorOnCalls & 7] = count;
+}
+
+void motorOff(void)
+{
+	motorOffCalls++;
+	motorOffSequence = ++callSequence;
+}
+
+void motorLimitIsNoLoad(void)
+{
+	motorLimitIsNoLoadCalls++;
+	motorLimitIsNoLoadSequence = ++callSequence;
+}
+
+void motorLimitIsMaximumLoad(void)
+{
+	motorLimitIsMaximumLoadCalls++;
+	motorLimitIsMaximumLoadSequence = ++callSequence;
 }
 
 void publishDoorAbortedWithAnyFault(void)

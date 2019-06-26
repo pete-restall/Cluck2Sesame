@@ -15,6 +15,7 @@ void onDoorOpenScheduleActioned(const struct Event *event)
 
 		case DoorState_Closed:
 			motorEnable();
+// TODO: IF ENABLED, SWITCH TO HIGH CURRENT MODE AND MOVE DOOR UP...
 			doorState.current = motorIsEnabled()
 				? DoorState_Opening
 				: DoorState_Opening_WaitingForEnabledMotor;
@@ -24,6 +25,7 @@ void onDoorOpenScheduleActioned(const struct Event *event)
 
 		case DoorState_Unknown:
 			motorEnable();
+// TODO: IF ENABLED, SWITCH TO LOW CURRENT MODE AND MOVE DOOR DOWN...
 			doorState.current = DoorState_FindBottom;
 
 		default:
