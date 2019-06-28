@@ -23,6 +23,7 @@ struct MotorStopped
 	union
 	{
 		uint8_t all;
+		uint8_t any;
 		struct
 		{
 			unsigned int currentLimited : 1;

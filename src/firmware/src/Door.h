@@ -7,6 +7,7 @@
 union DoorFaults
 {
 	uint8_t all;
+	uint8_t any;
 	struct
 	{
 		unsigned int isJammed : 1;
@@ -60,6 +61,7 @@ struct DoorStateWithContext
 	union
 	{
 		uint8_t all;
+		uint8_t any;
 		struct
 		{
 			unsigned int isManuallyOverridden : 1;
