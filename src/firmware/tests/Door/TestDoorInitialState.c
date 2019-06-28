@@ -18,6 +18,7 @@ TEST_FILE("Door/DoorGetState.c")
 TEST_FILE("Door/DoorOnAborted.c")
 TEST_FILE("Door/DoorOnOpenScheduleActioned.c")
 TEST_FILE("Door/DoorOnCloseScheduleActioned.c")
+TEST_FILE("Door/DoorOnMotorStopped.c")
 
 void onBeforeTest(void)
 {

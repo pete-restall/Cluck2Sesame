@@ -4,6 +4,7 @@
 
 #include "Platform/Event.h"
 #include "Platform/NvmSettings.h"
+#include "Platform/Motor.h"
 #include "ApplicationNvmSettings.h"
 #include "SunEvents.h"
 #include "Door/Door.h"
@@ -268,6 +269,30 @@ void publishDoorCloseScheduleActioned(void)
 {
 	static const struct DoorCloseScheduleActioned eventArgs = { };
 	eventPublish(DOOR_CLOSE_SCHEDULE_ACTIONED, &eventArgs);
+}
+
+void publishMotorStoppedWithNoFaults(void)
+{
+	static const struct MotorStopped eventArgs =
+	{
+		.actualCount = 123,
+		.requestedCount = 456,
+		.fault = 0
+	};
+
+	eventPublish(MOTOR_STOPPED, &eventArgs);
+}
+
+void publishMotorStoppedWithFaults(void)
+{
+	static const struct MotorStopped eventArgs =
+	{
+		.actualCount = 123,
+		.requestedCount = 456,
+		.fault = 0xff
+	};
+
+	eventPublish(MOTOR_STOPPED, &eventArgs);
 }
 
 void assertFarSchedulesAreEqualWithAnyNonNullArgs(

@@ -11,7 +11,7 @@ static void doorStartClosing(
 	enum DoorState motorEnabledState,
 	enum DoorState motorDisabledState);
 
-void onDoorCloseScheduleActioned(const struct Event *event)
+void doorOnCloseScheduleActioned(const struct Event *event)
 {
 	switch (doorState.current)
 	{

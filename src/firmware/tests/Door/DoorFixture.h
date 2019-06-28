@@ -1,6 +1,7 @@
 #ifndef __CLUCK3SESAME_TESTS_DOOR_DOORFIXTURE_H
 #define __CLUCK3SESAME_TESTS_DOOR_DOORFIXTURE_H
 #include "Platform/FarScheduler.h"
+#include "Platform/Motor.h"
 #include "SunEvents.h"
 
 extern void doorFixtureInitialise(void);
@@ -30,6 +31,8 @@ extern void publishSunEventsChanged(
 extern void publishDoorOpenScheduleActioned(void);
 extern void publishDoorCloseScheduleActioned(void);
 extern void publishDoorAbortedWithAnyFault(void);
+extern void publishMotorStoppedWithNoFaults(void);
+extern void publishMotorStoppedWithFaults(void);
 
 extern void assertFarSchedulesAreEqualWithAnyNonNullArgs(
 	const struct FarSchedule *expected,

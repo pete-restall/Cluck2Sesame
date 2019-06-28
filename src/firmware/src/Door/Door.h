@@ -11,8 +11,9 @@ struct DoorStateInternal
 
 extern struct DoorStateInternal doorState;
 
-extern void onDoorAborted(const struct Event *event);
-extern void onDoorOpenScheduleActioned(const struct Event *event);
-extern void onDoorCloseScheduleActioned(const struct Event *event);
+extern void doorOnAborted(const struct Event *event);
+extern void doorOnOpenScheduleActioned(const struct Event *event);
+extern void doorOnCloseScheduleActioned(const struct Event *event);
+extern void doorOnMotorStopped(const struct Event *event);
 
 #endif

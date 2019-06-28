@@ -3,6 +3,7 @@
 
 #include "../Platform/FarScheduler.h"
 #include "../Platform/NvmSettings.h"
+#include "../Platform/Motor.h"
 #include "../ApplicationNvmSettings.h"
 #include "../SunEvents.h"
 
@@ -35,7 +36,7 @@ void doorInitialise(void)
 	static const struct EventSubscription onDoorAbortedSubscription =
 	{
 		.type = DOOR_ABORTED,
-		.handler = &onDoorAborted,
+		.handler = &doorOnAborted,
 		.state = (void *) 0
 	};
 
@@ -71,7 +72,7 @@ void doorInitialise(void)
 	static const struct EventSubscription onDoorOpenScheduleActionedSubscription =
 	{
 		.type = DOOR_OPEN_SCHEDULE_ACTIONED,
-		.handler = &onDoorOpenScheduleActioned,
+		.handler = &doorOnOpenScheduleActioned,
 		.state = (void *) 0
 	};
 
@@ -80,11 +81,24 @@ void doorInitialise(void)
 	static const struct EventSubscription onDoorCloseScheduleActionedSubscription =
 	{
 		.type = DOOR_CLOSE_SCHEDULE_ACTIONED,
-		.handler = &onDoorCloseScheduleActioned,
+		.handler = &doorOnCloseScheduleActioned,
 		.state = (void *) 0
 	};
 
 	eventSubscribe(&onDoorCloseScheduleActionedSubscription);
+
+	static const struct EventSubscription onMotorStoppedSubscription =
+	{
+		.type = MOTOR_STOPPED,
+		.handler = &doorOnMotorStopped,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onMotorStoppedSubscription);
+
+	// TODO: MotorEnabled - changes state to Opening or Closing if {Opening,Closing}_WaitingForEnabledMotor, and starts the motor turning
+	// TODO: MotorStopped - changes state to Fault if faulted (and raises DoorAborted; current DoorAborted should be handled by a FaultMonitoring module), and disables the motor
+	// TODO: MotorStopped - changes state to Opened or Closed if end-of-travel and no fault, and disables the motor
 }
 
 static void onDateOrNvmSettingsChanged(const struct Event *event)
