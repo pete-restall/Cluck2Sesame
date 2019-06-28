@@ -13,5 +13,6 @@ extern struct DoorStateInternal doorState;
 
 extern void onDoorAborted(const struct Event *event);
 extern void onDoorOpenScheduleActioned(const struct Event *event);
+extern void onDoorCloseScheduleActioned(const struct Event *event);
 
 #endif

@@ -17,6 +17,7 @@ TEST_FILE("Door/DoorInitialise.c")
 TEST_FILE("Door/DoorGetState.c")
 TEST_FILE("Door/DoorOnAborted.c")
 TEST_FILE("Door/DoorOnOpenScheduleActioned.c")
+TEST_FILE("Door/DoorOnCloseScheduleActioned.c")
 
 void onBeforeTest(void)
 {
@@ -26,6 +27,23 @@ void onBeforeTest(void)
 void onAfterTest(void)
 {
 	doorFixtureShutdown();
+}
+
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsOpeningWaitingForEnabledMotor_expectSameStateWithOpenTransition(void)
+{
+	struct DoorStateWithContext state =
+	{
+		.current = DoorState_Opening_WaitingForEnabledMotor,
+		.transition = anyByteExcept(DoorTransition_Open)
+	};
+
+	stubDoorWithState(state.current, state.transition);
+	publishDoorOpenScheduleActioned();
+	dispatchAllEvents();
+	doorGetState(&state);
+
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorState_Opening_WaitingForEnabledMotor, state.current, "A");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorTransition_Open, state.transition, "T");
 }
 
 void test_doorOpenScheduleActioned_onPublishedWhenStateIsOpeningWaitingForEnabledMotor_expectMotorIsNotEnabled(void)

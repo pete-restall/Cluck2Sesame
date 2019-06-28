@@ -29,65 +29,48 @@ void onAfterTest(void)
 	doorFixtureShutdown();
 }
 
-void test_doorOpenScheduleActioned_onPublishedWhenStateIsClosing_expectSameStateWithOpenTransition(void)
+void test_doorCloseScheduleActioned_onPublishedWhenStateIsFindBottomWaitingForEnabledMotor_expectMotorIsNotEnabled(void)
 {
 	struct DoorStateWithContext state =
 	{
-		.current = DoorState_Closing,
-		.transition = anyByteExcept(DoorTransition_Open)
-	};
-
-	stubDoorWithState(state.current, state.transition);
-	publishDoorOpenScheduleActioned();
-	dispatchAllEvents();
-	doorGetState(&state);
-
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorState_Closing, state.current, "A");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorTransition_Open, state.transition, "T");
-}
-
-void test_doorOpenScheduleActioned_onPublishedWhenStateIsClosing_expectMotorIsNotEnabled(void)
-{
-	struct DoorStateWithContext state =
-	{
-		.current = DoorState_Closing,
+		.current = DoorState_FindBottom_WaitingForEnabledMotor,
 		.transition = anyByte()
 	};
 
 	stubDoorWithState(state.current, state.transition);
-	publishDoorOpenScheduleActioned();
+	publishDoorCloseScheduleActioned();
 	dispatchAllEvents();
 	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8(0, motorEnableCalls);
 }
 
-void test_doorOpenScheduleActioned_onPublishedWhenStateIsClosing_expectMotorIsNotTurnedOn(void)
+void test_doorCloseScheduleActioned_onPublishedWhenStateIsFindBottomWaitingForEnabledMotor_expectMotorIsNotTurnedOn(void)
 {
 	struct DoorStateWithContext state =
 	{
-		.current = DoorState_Closing,
+		.current = DoorState_FindBottom_WaitingForEnabledMotor,
 		.transition = anyByte()
 	};
 
 	stubDoorWithState(state.current, state.transition);
-	publishDoorOpenScheduleActioned();
+	publishDoorCloseScheduleActioned();
 	dispatchAllEvents();
 	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8(0, motorOnCalls);
 }
 
-void test_doorOpenScheduleActioned_onPublishedWhenStateIsClosing_expectMotorCurrentLimitIsNotChanged(void)
+void test_doorCloseScheduleActioned_onPublishedWhenStateIsFindBottomWaitingForEnabledMotor_expectMotorCurrentLimitIsNotChanged(void)
 {
 	struct DoorStateWithContext state =
 	{
-		.current = DoorState_Closing,
+		.current = DoorState_FindBottom_WaitingForEnabledMotor,
 		.transition = anyByte()
 	};
 
 	stubDoorWithState(state.current, state.transition);
-	publishDoorOpenScheduleActioned();
+	publishDoorCloseScheduleActioned();
 	dispatchAllEvents();
 	doorGetState(&state);
 

@@ -51,6 +51,7 @@ enum DoorState
 	DoorState_Opening_WaitingForEnabledMotor,
 	DoorState_Opened,
 	DoorState_Closing,
+	DoorState_Closing_WaitingForEnabledMotor,
 	DoorState_Closed
 };
 

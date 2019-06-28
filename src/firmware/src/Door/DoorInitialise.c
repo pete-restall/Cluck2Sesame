@@ -76,6 +76,15 @@ void doorInitialise(void)
 	};
 
 	eventSubscribe(&onDoorOpenScheduleActionedSubscription);
+
+	static const struct EventSubscription onDoorCloseScheduleActionedSubscription =
+	{
+		.type = DOOR_CLOSE_SCHEDULE_ACTIONED,
+		.handler = &onDoorCloseScheduleActioned,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onDoorCloseScheduleActionedSubscription);
 }
 
 static void onDateOrNvmSettingsChanged(const struct Event *event)
