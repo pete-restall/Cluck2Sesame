@@ -156,3 +156,66 @@ void test_motorStopped_onPublishedWithEncoderTimeoutFault_expectDoorAbortedIsPub
 	TEST_ASSERT_TRUE_MESSAGE(onDoorAbortedArgs[0]->fault.isEncoderBroken, "E");
 	TEST_ASSERT_FALSE_MESSAGE(onDoorAbortedArgs[0]->fault.isInsufficientPower, "P");
 }
+
+void test_motorStopped_onPublishedWithCurrentUnknownFault_expectDoorAbortedIsPublishedWithNoFaultFlags(void)
+{
+	uint8_t anyTransition = anyByte();
+	stubDoorWithState(DoorState_Opening, anyTransition);
+
+	struct MotorStopped unknown =
+	{
+		.actualCount = 123,
+		.requestedCount = 456,
+		.fault = { .all = anyByteWithMaskClear(0b00000111) }
+	};
+
+	publishMotorStopped(&unknown);
+	mockOnDoorAborted();
+	dispatchAllEvents();
+
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, onDoorAbortedCalls, "Calls");
+	TEST_ASSERT_NOT_NULL(onDoorAbortedArgs[0]);
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, onDoorAbortedArgs[0]->fault.all, "F");
+}
+
+void test_motorStopped_onPublishedWithNoFaultsAndTransitionOfOpen_expectDoorOpenedIsPublished(void)
+{
+	stubDoorWithState(DoorState_Opening, DoorTransition_Open);
+	publishMotorStoppedWithNoFaults();
+	mockOnDoorOpened();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, onDoorOpenedCalls, "Calls");
+	TEST_ASSERT_NOT_NULL(onDoorOpenedArgs[0]);
+}
+
+void test_motorStopped_onPublishedWithNoFaultsAndTransitionOfUnchanged_expectDoorOpenedIsPublished(void)
+{
+	stubDoorWithState(DoorState_Opening, DoorTransition_Unchanged);
+	publishMotorStoppedWithNoFaults();
+	mockOnDoorOpened();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, onDoorOpenedCalls, "Calls");
+	TEST_ASSERT_NOT_NULL(onDoorOpenedArgs[0]);
+}
+
+void test_motorStopped_onPublishedWithNoFaultsAndTransitionOfClose_expectDoorOpenedIsPublished(void)
+{
+	stubDoorWithState(DoorState_Opening, DoorTransition_Close);
+	publishMotorStoppedWithNoFaults();
+	mockOnDoorOpened();
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, onDoorOpenedCalls, "Calls");
+	TEST_ASSERT_NOT_NULL(onDoorOpenedArgs[0]);
+}
+
+void test_motorStopped_onPublishedWithNoFaults_expectDoorAbortedIsNotPublished(void)
+{
+	uint8_t anyTransition = anyByte();
+	stubDoorWithState(DoorState_Opening, anyTransition);
+
+	publishMotorStoppedWithNoFaults();
+	mockOnDoorAborted();
+	dispatchAllEvents();
+
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, onDoorAbortedCalls, "Calls");
+}

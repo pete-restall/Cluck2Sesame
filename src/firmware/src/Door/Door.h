@@ -7,6 +7,8 @@ struct DoorStateInternal
 {
 	enum DoorState current;
 	enum DoorTransition transition;
+	struct DoorOpened opened;
+	struct DoorClosed closed;
 	struct DoorAborted aborted;
 };
 
