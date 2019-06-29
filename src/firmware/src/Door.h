@@ -11,6 +11,7 @@ union DoorFaults
 	struct
 	{
 		unsigned int isJammed : 1;
+		unsigned int isReversed : 1;
 		unsigned int isLineSnapped : 1;
 		unsigned int isLineTooLong : 1;
 		unsigned int isEncoderBroken : 1;

@@ -30,12 +30,12 @@ void onAfterTest(void)
 	doorFixtureShutdown();
 }
 
-void test_motorStopped_onPublishedWithNoFaultsWhenStateIsOpeningAndTransitionIsOpen_expectOpenedStateWithUnchangedTransition(void)
+void test_motorStopped_onPublishedWithNoFaultsWhenStateIsClosingAndTransitionIsClose_expectClosedStateWithUnchangedTransition(void)
 {
 	struct DoorStateWithContext state =
 	{
-		.current = DoorState_Opening,
-		.transition = DoorTransition_Open
+		.current = DoorState_Closing,
+		.transition = DoorTransition_Close
 	};
 
 	stubDoorWithState(state.current, state.transition);
@@ -43,15 +43,15 @@ void test_motorStopped_onPublishedWithNoFaultsWhenStateIsOpeningAndTransitionIsO
 	dispatchAllEvents();
 	doorGetState(&state);
 
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorState_Opened, state.current, "A");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorState_Closed, state.current, "A");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorTransition_Unchanged, state.transition, "T");
 }
 
-void test_motorStopped_onPublishedWithNoFaultsWhenStateIsOpeningAndTransitionIsUnchanged_expectOpenedStateWithUnchangedTransition(void)
+void test_motorStopped_onPublishedWithNoFaultsWhenStateIsClosingAndTransitionIsUnchanged_expectClosedStateWithUnchangedTransition(void)
 {
 	struct DoorStateWithContext state =
 	{
-		.current = DoorState_Opening,
+		.current = DoorState_Closing,
 		.transition = DoorTransition_Unchanged
 	};
 
@@ -60,16 +60,16 @@ void test_motorStopped_onPublishedWithNoFaultsWhenStateIsOpeningAndTransitionIsU
 	dispatchAllEvents();
 	doorGetState(&state);
 
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorState_Opened, state.current, "A");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorState_Closed, state.current, "A");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(DoorTransition_Unchanged, state.transition, "T");
 }
 
-void test_motorStopped_onPublishedWithFaultsWhenStateIsOpening_expectFaultStateWithUnmodifiedTransition(void)
+void test_motorStopped_onPublishedWithFaultsWhenStateIsClosing_expectFaultStateWithUnmodifiedTransition(void)
 {
 	uint8_t initialTransition = anyByte();
 	struct DoorStateWithContext state =
 	{
-		.current = DoorState_Opening,
+		.current = DoorState_Closing,
 		.transition = initialTransition
 	};
 
@@ -82,26 +82,26 @@ void test_motorStopped_onPublishedWithFaultsWhenStateIsOpening_expectFaultStateW
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(initialTransition, state.transition, "T");
 }
 
-void test_motorStopped_onPublishedWithCurrentLimitFault_expectDoorAbortedIsPublishedWithJammedFlag(void)
+void test_motorStopped_onPublishedWithCurrentLimitFault_expectDoorAbortedIsPublishedWithReversedFlag(void)
 {
 	uint8_t anyTransition = anyByte();
-	stubDoorWithState(DoorState_Opening, anyTransition);
+	stubDoorWithState(DoorState_Closing, anyTransition);
 
-	static const struct MotorStopped jammed =
+	static const struct MotorStopped reversed =
 	{
 		.actualCount = 123,
 		.requestedCount = 456,
 		.fault = { .currentLimited = 1 }
 	};
 
-	publishMotorStopped(&jammed);
+	publishMotorStopped(&reversed);
 	mockOnDoorAborted();
 	dispatchAllEvents();
 
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, onDoorAbortedCalls, "Calls");
 	TEST_ASSERT_NOT_NULL(onDoorAbortedArgs[0]);
-	TEST_ASSERT_TRUE_MESSAGE(onDoorAbortedArgs[0]->fault.isJammed, "J");
-	TEST_ASSERT_FALSE_MESSAGE(onDoorAbortedArgs[0]->fault.isReversed, "R");
+	TEST_ASSERT_FALSE_MESSAGE(onDoorAbortedArgs[0]->fault.isJammed, "J");
+	TEST_ASSERT_TRUE_MESSAGE(onDoorAbortedArgs[0]->fault.isReversed, "R");
 	TEST_ASSERT_FALSE_MESSAGE(onDoorAbortedArgs[0]->fault.isLineSnapped, "S");
 	TEST_ASSERT_FALSE_MESSAGE(onDoorAbortedArgs[0]->fault.isLineTooLong, "L");
 	TEST_ASSERT_FALSE_MESSAGE(onDoorAbortedArgs[0]->fault.isEncoderBroken, "E");
@@ -111,7 +111,7 @@ void test_motorStopped_onPublishedWithCurrentLimitFault_expectDoorAbortedIsPubli
 void test_motorStopped_onPublishedWithEncoderOverflowFault_expectDoorAbortedIsPublishedWithLineTooLongFlag(void)
 {
 	uint8_t anyTransition = anyByte();
-	stubDoorWithState(DoorState_Opening, anyTransition);
+	stubDoorWithState(DoorState_Closing, anyTransition);
 
 	static const struct MotorStopped tooLong =
 	{
@@ -137,7 +137,7 @@ void test_motorStopped_onPublishedWithEncoderOverflowFault_expectDoorAbortedIsPu
 void test_motorStopped_onPublishedWithEncoderTimeoutFault_expectDoorAbortedIsPublishedWithEncoderBrokenFlag(void)
 {
 	uint8_t anyTransition = anyByte();
-	stubDoorWithState(DoorState_Opening, anyTransition);
+	stubDoorWithState(DoorState_Closing, anyTransition);
 
 	static const struct MotorStopped timeout =
 	{
@@ -163,7 +163,7 @@ void test_motorStopped_onPublishedWithEncoderTimeoutFault_expectDoorAbortedIsPub
 void test_motorStopped_onPublishedWithCurrentUnknownFault_expectDoorAbortedIsPublishedWithNoFaultFlags(void)
 {
 	uint8_t anyTransition = anyByte();
-	stubDoorWithState(DoorState_Opening, anyTransition);
+	stubDoorWithState(DoorState_Closing, anyTransition);
 
 	struct MotorStopped unknown =
 	{
@@ -181,40 +181,40 @@ void test_motorStopped_onPublishedWithCurrentUnknownFault_expectDoorAbortedIsPub
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, onDoorAbortedArgs[0]->fault.all, "F");
 }
 
-void test_motorStopped_onPublishedWithNoFaultsAndTransitionOfOpen_expectDoorOpenedIsPublished(void)
+void test_motorStopped_onPublishedWithNoFaultsAndTransitionOfClose_expectDoorClosedIsPublished(void)
 {
-	stubDoorWithState(DoorState_Opening, DoorTransition_Open);
+	stubDoorWithState(DoorState_Closing, DoorTransition_Close);
 	publishMotorStoppedWithNoFaults();
-	mockOnDoorOpened();
+	mockOnDoorClosed();
 	dispatchAllEvents();
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, onDoorOpenedCalls, "Calls");
-	TEST_ASSERT_NOT_NULL(onDoorOpenedArgs[0]);
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, onDoorClosedCalls, "Calls");
+	TEST_ASSERT_NOT_NULL(onDoorClosedArgs[0]);
 }
 
-void test_motorStopped_onPublishedWithNoFaultsAndTransitionOfUnchanged_expectDoorOpenedIsPublished(void)
+void test_motorStopped_onPublishedWithNoFaultsAndTransitionOfUnchanged_expectDoorClosedIsPublished(void)
 {
-	stubDoorWithState(DoorState_Opening, DoorTransition_Unchanged);
+	stubDoorWithState(DoorState_Closing, DoorTransition_Unchanged);
 	publishMotorStoppedWithNoFaults();
-	mockOnDoorOpened();
+	mockOnDoorClosed();
 	dispatchAllEvents();
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, onDoorOpenedCalls, "Calls");
-	TEST_ASSERT_NOT_NULL(onDoorOpenedArgs[0]);
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, onDoorClosedCalls, "Calls");
+	TEST_ASSERT_NOT_NULL(onDoorClosedArgs[0]);
 }
 
-void test_motorStopped_onPublishedWithNoFaultsAndTransitionOfClose_expectDoorOpenedIsPublished(void)
+void test_motorStopped_onPublishedWithNoFaultsAndTransitionOfOpen_expectDoorClosedIsPublished(void)
 {
-	stubDoorWithState(DoorState_Opening, DoorTransition_Close);
+	stubDoorWithState(DoorState_Closing, DoorTransition_Open);
 	publishMotorStoppedWithNoFaults();
-	mockOnDoorOpened();
+	mockOnDoorClosed();
 	dispatchAllEvents();
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, onDoorOpenedCalls, "Calls");
-	TEST_ASSERT_NOT_NULL(onDoorOpenedArgs[0]);
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, onDoorClosedCalls, "Calls");
+	TEST_ASSERT_NOT_NULL(onDoorClosedArgs[0]);
 }
 
 void test_motorStopped_onPublishedWithNoFaults_expectDoorAbortedIsNotPublished(void)
 {
 	uint8_t anyTransition = anyByte();
-	stubDoorWithState(DoorState_Opening, anyTransition);
+	stubDoorWithState(DoorState_Closing, anyTransition);
 
 	publishMotorStoppedWithNoFaults();
 	mockOnDoorAborted();

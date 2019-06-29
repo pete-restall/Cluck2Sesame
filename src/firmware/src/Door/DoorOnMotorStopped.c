@@ -6,9 +6,10 @@
 #include "Door.h"
 
 #define DOOR_JAMMED 1
-#define LINE_SNAPPED 2
-#define LINE_TOO_LONG 4
-#define ENCODER_BROKEN 8
+#define DOOR_REVERSED 2
+#define LINE_SNAPPED 4
+#define LINE_TOO_LONG 8
+#define ENCODER_BROKEN 16
 
 void doorOnMotorStopped(const struct Event *event)
 {
@@ -42,6 +43,37 @@ void doorOnMotorStopped(const struct Event *event)
 			{
 				eventPublish(DOOR_OPENED, &doorState.opened);
 				doorStartClosing(DoorState_Closing, DoorState_Closing);
+			}
+
+			break;
+
+		case DoorState_Closing:
+			if (args->fault.any)
+			{
+				motorDisable();
+				doorState.current = DoorState_Fault;
+				doorState.aborted.fault.all =
+					args->fault.currentLimited
+						? DOOR_REVERSED
+						: args->fault.encoderTimeout
+							? ENCODER_BROKEN
+							: args->fault.encoderOverflow
+								? LINE_TOO_LONG
+								: 0;
+
+				eventPublish(DOOR_ABORTED, &doorState.aborted);
+			}
+			else if (doorState.transition != DoorTransition_Open)
+			{
+				motorDisable();
+				doorState.current = DoorState_Closed;
+				doorState.transition = DoorTransition_Unchanged;
+				eventPublish(DOOR_CLOSED, &doorState.closed);
+			}
+			else
+			{
+				eventPublish(DOOR_CLOSED, &doorState.closed);
+				doorStartOpening(DoorState_Opening, DoorState_Opening);
 			}
 
 			break;
