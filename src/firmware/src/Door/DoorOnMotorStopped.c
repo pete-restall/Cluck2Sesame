@@ -41,9 +41,7 @@ void doorOnMotorStopped(const struct Event *event)
 			else
 			{
 				eventPublish(DOOR_OPENED, &doorState.opened);
-				motorLimitIsNoLoad();
-				// TODO: TURN THE MOTOR ON TO CLOSE THE DOOR (AFTER THE LIMIT)
-				// TODO: SET THE STATE TO DoorState_Closing
+				doorStartClosing(DoorState_Closing, DoorState_Closing);
 			}
 
 			break;

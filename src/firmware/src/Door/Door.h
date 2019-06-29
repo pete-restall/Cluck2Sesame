@@ -15,7 +15,15 @@ struct DoorStateInternal
 extern struct DoorStateInternal doorState;
 
 extern void doorOnOpenScheduleActioned(const struct Event *event);
+extern void doorStartOpening(
+	enum DoorState motorEnabledState,
+	enum DoorState motorDisabledState);
+
 extern void doorOnCloseScheduleActioned(const struct Event *event);
+extern void doorStartClosing(
+	enum DoorState motorEnabledState,
+	enum DoorState motorDisabledState);
+
 extern void doorOnMotorStopped(const struct Event *event);
 
 #endif

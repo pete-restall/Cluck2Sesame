@@ -7,10 +7,6 @@
 
 #include "Door.h"
 
-static void doorStartClosing(
-	enum DoorState motorEnabledState,
-	enum DoorState motorDisabledState);
-
 void doorOnCloseScheduleActioned(const struct Event *event)
 {
 	switch (doorState.current)
@@ -20,12 +16,14 @@ void doorOnCloseScheduleActioned(const struct Event *event)
 			break;
 
 		case DoorState_Opened:
+			motorEnable();
 			doorStartClosing(
 				DoorState_Closing,
 				DoorState_Closing_WaitingForEnabledMotor);
 			break;
 
 		case DoorState_Unknown:
+			motorEnable();
 			doorStartClosing(
 				DoorState_FindBottom,
 				DoorState_FindBottom_WaitingForEnabledMotor);
@@ -36,11 +34,10 @@ void doorOnCloseScheduleActioned(const struct Event *event)
 	};
 }
 
-static void doorStartClosing(
+void doorStartClosing(
 	enum DoorState motorEnabledState,
 	enum DoorState motorDisabledState)
 {
-	motorEnable();
 	if (motorIsEnabled())
 	{
 		motorLimitIsNoLoad();

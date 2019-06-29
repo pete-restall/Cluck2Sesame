@@ -42,119 +42,64 @@ void test_motorStopped_onPublishedWithFaults_expectDoorOpenedIsNotPublished(void
 
 void test_motorStopped_onPublishedWithNoFaultsWhenStateIsOpeningAndTransitionIsOpen_expectMotorIsDisabled(void)
 {
-	struct DoorStateWithContext state =
-	{
-		.current = DoorState_Opening,
-		.transition = DoorTransition_Open
-	};
-
 	stubMotorIsEnabled();
-	stubDoorWithState(state.current, state.transition);
+	stubDoorWithState(DoorState_Opening, DoorTransition_Open);
 	publishMotorStoppedWithNoFaults();
 	dispatchAllEvents();
-	doorGetState(&state);
-
 	TEST_ASSERT_EQUAL_UINT8(1, motorDisableCalls);
 }
 
 void test_motorStopped_onPublishedWithNoFaultsWhenStateIsOpeningAndTransitionIsUnchanged_expectMotorIsDisabled(void)
 {
-	struct DoorStateWithContext state =
-	{
-		.current = DoorState_Opening,
-		.transition = DoorTransition_Unchanged
-	};
-
 	stubMotorIsEnabled();
-	stubDoorWithState(state.current, state.transition);
+	stubDoorWithState(DoorState_Opening, DoorTransition_Unchanged);
 	publishMotorStoppedWithNoFaults();
 	dispatchAllEvents();
-	doorGetState(&state);
-
 	TEST_ASSERT_EQUAL_UINT8(1, motorDisableCalls);
 }
 
 void test_motorStopped_onPublishedWithNoFaultsWhenStateIsOpeningAndTransitionIsClose_expectMotorIsNotDisabled(void)
 {
-	struct DoorStateWithContext state =
-	{
-		.current = DoorState_Opening,
-		.transition = DoorTransition_Close
-	};
-
 	stubMotorIsEnabled();
-	stubDoorWithState(state.current, state.transition);
+	stubDoorWithState(DoorState_Opening, DoorTransition_Close);
 	publishMotorStoppedWithNoFaults();
 	dispatchAllEvents();
-	doorGetState(&state);
-
 	TEST_ASSERT_EQUAL_UINT8(0, motorDisableCalls);
 }
 
 void test_motorStopped_onPublishedWithFaultsWhenStateIsOpeningAndTransitionIsOpen_expectMotorIsDisabled(void)
 {
-	struct DoorStateWithContext state =
-	{
-		.current = DoorState_Opening,
-		.transition = DoorTransition_Open
-	};
-
 	stubMotorIsEnabled();
-	stubDoorWithState(state.current, state.transition);
+	stubDoorWithState(DoorState_Opening, DoorTransition_Open);
 	publishMotorStoppedWithFaults();
 	dispatchAllEvents();
-	doorGetState(&state);
-
 	TEST_ASSERT_EQUAL_UINT8(1, motorDisableCalls);
 }
 
 void test_motorStopped_onPublishedWithFaultsWhenStateIsOpeningAndTransitionIsUnchanged_expectMotorIsDisabled(void)
 {
-	struct DoorStateWithContext state =
-	{
-		.current = DoorState_Opening,
-		.transition = DoorTransition_Unchanged
-	};
-
 	stubMotorIsEnabled();
-	stubDoorWithState(state.current, state.transition);
+	stubDoorWithState(DoorState_Opening, DoorTransition_Unchanged);
 	publishMotorStoppedWithFaults();
 	dispatchAllEvents();
-	doorGetState(&state);
-
 	TEST_ASSERT_EQUAL_UINT8(1, motorDisableCalls);
 }
 
 void test_motorStopped_onPublishedWithFaultsWhenStateIsOpeningAndTransitionIsClose_expectMotorIsDisabled(void)
 {
-	struct DoorStateWithContext state =
-	{
-		.current = DoorState_Opening,
-		.transition = DoorTransition_Close
-	};
-
 	stubMotorIsEnabled();
-	stubDoorWithState(state.current, state.transition);
+	stubDoorWithState(DoorState_Opening, DoorTransition_Close);
 	publishMotorStoppedWithFaults();
 	dispatchAllEvents();
-	doorGetState(&state);
-
 	TEST_ASSERT_EQUAL_UINT8(1, motorDisableCalls);
 }
 
 void test_motorStopped_onPublishedWithNoFaultsWhenStateIsOpeningAndTransitionIsOpen_expectMotorCurrentLimitIsUnchanged(void)
 {
-	struct DoorStateWithContext state =
-	{
-		.current = DoorState_Opening,
-		.transition = DoorTransition_Open
-	};
-
 	stubMotorIsEnabled();
-	stubDoorWithState(state.current, state.transition);
+	stubDoorWithState(DoorState_Opening, DoorTransition_Open);
 	publishMotorStoppedWithNoFaults();
 	dispatchAllEvents();
-	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8(0, motorLimitIsNoLoadCalls);
 	TEST_ASSERT_EQUAL_UINT8(0, motorLimitIsMaximumLoadCalls);
@@ -162,17 +107,10 @@ void test_motorStopped_onPublishedWithNoFaultsWhenStateIsOpeningAndTransitionIsO
 
 void test_motorStopped_onPublishedWithNoFaultsWhenStateIsOpeningAndTransitionIsUnchanged_expectMotorCurrentLimitIsUnchanged(void)
 {
-	struct DoorStateWithContext state =
-	{
-		.current = DoorState_Opening,
-		.transition = DoorTransition_Unchanged
-	};
-
 	stubMotorIsEnabled();
-	stubDoorWithState(state.current, state.transition);
+	stubDoorWithState(DoorState_Opening, DoorTransition_Unchanged);
 	publishMotorStoppedWithNoFaults();
 	dispatchAllEvents();
-	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8(0, motorLimitIsNoLoadCalls);
 	TEST_ASSERT_EQUAL_UINT8(0, motorLimitIsMaximumLoadCalls);
@@ -180,17 +118,10 @@ void test_motorStopped_onPublishedWithNoFaultsWhenStateIsOpeningAndTransitionIsU
 
 void test_motorStopped_onPublishedWithNoFaultsWhenStateIsOpeningAndTransitionIsClose_expectMotorCurrentLimitIsNoLoad(void)
 {
-	struct DoorStateWithContext state =
-	{
-		.current = DoorState_Opening,
-		.transition = DoorTransition_Close
-	};
-
 	stubMotorIsEnabled();
-	stubDoorWithState(state.current, state.transition);
+	stubDoorWithState(DoorState_Opening, DoorTransition_Close);
 	publishMotorStoppedWithNoFaults();
 	dispatchAllEvents();
-	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8(1, motorLimitIsNoLoadCalls);
 	TEST_ASSERT_EQUAL_UINT8(0, motorLimitIsMaximumLoadCalls);
@@ -198,17 +129,10 @@ void test_motorStopped_onPublishedWithNoFaultsWhenStateIsOpeningAndTransitionIsC
 
 void test_motorStopped_onPublishedWithFaultsWhenStateIsOpeningAndTransitionIsOpen_expectMotorCurrentLimitIsUnchanged(void)
 {
-	struct DoorStateWithContext state =
-	{
-		.current = DoorState_Opening,
-		.transition = DoorTransition_Open
-	};
-
 	stubMotorIsEnabled();
-	stubDoorWithState(state.current, state.transition);
+	stubDoorWithState(DoorState_Opening, DoorTransition_Open);
 	publishMotorStoppedWithFaults();
 	dispatchAllEvents();
-	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8(0, motorLimitIsNoLoadCalls);
 	TEST_ASSERT_EQUAL_UINT8(0, motorLimitIsMaximumLoadCalls);
@@ -216,17 +140,10 @@ void test_motorStopped_onPublishedWithFaultsWhenStateIsOpeningAndTransitionIsOpe
 
 void test_motorStopped_onPublishedWithFaultsWhenStateIsOpeningAndTransitionIsUnchanged_expectMotorCurrentLimitIsUnchanged(void)
 {
-	struct DoorStateWithContext state =
-	{
-		.current = DoorState_Opening,
-		.transition = DoorTransition_Unchanged
-	};
-
 	stubMotorIsEnabled();
-	stubDoorWithState(state.current, state.transition);
+	stubDoorWithState(DoorState_Opening, DoorTransition_Unchanged);
 	publishMotorStoppedWithFaults();
 	dispatchAllEvents();
-	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8(0, motorLimitIsNoLoadCalls);
 	TEST_ASSERT_EQUAL_UINT8(0, motorLimitIsMaximumLoadCalls);
@@ -234,17 +151,10 @@ void test_motorStopped_onPublishedWithFaultsWhenStateIsOpeningAndTransitionIsUnc
 
 void test_motorStopped_onPublishedWithFaultsWhenStateIsOpeningAndTransitionIsClose_expectMotorCurrentLimitIsUnchanged(void)
 {
-	struct DoorStateWithContext state =
-	{
-		.current = DoorState_Opening,
-		.transition = DoorTransition_Close
-	};
-
 	stubMotorIsEnabled();
-	stubDoorWithState(state.current, state.transition);
+	stubDoorWithState(DoorState_Opening, DoorTransition_Close);
 	publishMotorStoppedWithFaults();
 	dispatchAllEvents();
-	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8(0, motorLimitIsNoLoadCalls);
 	TEST_ASSERT_EQUAL_UINT8(0, motorLimitIsMaximumLoadCalls);
