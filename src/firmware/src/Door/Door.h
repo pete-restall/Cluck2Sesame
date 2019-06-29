@@ -7,11 +7,11 @@ struct DoorStateInternal
 {
 	enum DoorState current;
 	enum DoorTransition transition;
+	struct DoorAborted aborted;
 };
 
 extern struct DoorStateInternal doorState;
 
-extern void doorOnAborted(const struct Event *event);
 extern void doorOnOpenScheduleActioned(const struct Event *event);
 extern void doorOnCloseScheduleActioned(const struct Event *event);
 extern void doorOnMotorStopped(const struct Event *event);

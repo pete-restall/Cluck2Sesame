@@ -31,12 +31,17 @@ extern void publishSunEventsChanged(
 extern void publishDoorOpenScheduleActioned(void);
 extern void publishDoorCloseScheduleActioned(void);
 extern void publishDoorAbortedWithAnyFault(void);
+extern void publishMotorStopped(const struct MotorStopped *eventArgs);
 extern void publishMotorStoppedWithNoFaults(void);
 extern void publishMotorStoppedWithFaults(void);
 
 extern void assertFarSchedulesAreEqualWithAnyNonNullArgs(
 	const struct FarSchedule *expected,
 	const struct FarSchedule *actual);
+
+void mockOnDoorAborted(void);
+void mockOnDoorOpened(void);
+void mockOnDoorClosed(void);
 
 extern uint8_t farSchedulerAddCalls;
 extern uint8_t farSchedulerAddSequence[8];
@@ -45,6 +50,15 @@ extern const struct FarSchedule *farSchedulerAddArgs[8];
 extern uint8_t farSchedulerRemoveCalls;
 extern uint8_t farSchedulerRemoveSequence[8];
 extern const struct FarSchedule *farSchedulerRemoveArgs[8];
+
+extern uint8_t onDoorAbortedCalls;
+extern const struct DoorAborted *onDoorAbortedArgs[8];
+
+extern uint8_t onDoorOpenedCalls;
+extern const struct DoorOpened *onDoorOpenedArgs[8];
+
+extern uint8_t onDoorClosedCalls;
+extern const struct DoorClosed *onDoorClosedArgs[8];
 
 extern uint8_t motorEnableCalls;
 extern uint8_t motorEnableSequence;

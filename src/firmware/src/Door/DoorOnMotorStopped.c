@@ -5,6 +5,11 @@
 
 #include "Door.h"
 
+#define DOOR_JAMMED 1
+#define LINE_SNAPPED 2
+#define LINE_TOO_LONG 4
+#define ENCODER_BROKEN 8
+
 void doorOnMotorStopped(const struct Event *event)
 {
 	const struct MotorStopped *args = (const struct MotorStopped *) event->args;
@@ -15,7 +20,16 @@ void doorOnMotorStopped(const struct Event *event)
 			{
 				motorDisable();
 				doorState.current = DoorState_Fault;
-				// TODO: PUBLISH DOOR_ABORTED
+				doorState.aborted.fault.all =
+					args->fault.currentLimited
+						? DOOR_JAMMED
+						: args->fault.encoderTimeout
+							? ENCODER_BROKEN
+							: args->fault.encoderOverflow
+								? LINE_TOO_LONG
+								: 0;
+
+				eventPublish(DOOR_ABORTED, &doorState.aborted);
 			}
 			else if (doorState.transition != DoorTransition_Close)
 			{

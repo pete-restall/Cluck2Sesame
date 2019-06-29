@@ -33,15 +33,6 @@ void doorInitialise(void)
 	doorState.current = DoorState_Unknown;
 	doorState.transition = DoorTransition_Unchanged;
 
-	static const struct EventSubscription onDoorAbortedSubscription =
-	{
-		.type = DOOR_ABORTED,
-		.handler = &doorOnAborted,
-		.state = (void *) 0
-	};
-
-	eventSubscribe(&onDoorAbortedSubscription);
-
 	static const struct EventSubscription onDateChangedSubscription =
 	{
 		.type = DATE_CHANGED,
@@ -97,8 +88,6 @@ void doorInitialise(void)
 	eventSubscribe(&onMotorStoppedSubscription);
 
 	// TODO: MotorEnabled - changes state to Opening or Closing if {Opening,Closing}_WaitingForEnabledMotor, and starts the motor turning
-	// TODO: MotorStopped - changes state to Fault if faulted (and raises DoorAborted; current DoorAborted should be handled by a FaultMonitoring module), and disables the motor
-	// TODO: MotorStopped - changes state to Opened or Closed if end-of-travel and no fault, and disables the motor
 }
 
 static void onDateOrNvmSettingsChanged(const struct Event *event)

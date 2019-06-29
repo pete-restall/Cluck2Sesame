@@ -16,6 +16,10 @@
 #include "../NonDeterminism.h"
 #include "../NvmSettingsFixture.h"
 
+static void onDoorAborted(const struct Event *event);
+static void onDoorOpened(const struct Event *event);
+static void onDoorClosed(const struct Event *event);
+
 static uint8_t callSequence;
 
 uint8_t farSchedulerAddCalls;
@@ -25,6 +29,15 @@ const struct FarSchedule *farSchedulerAddArgs[8];
 uint8_t farSchedulerRemoveCalls;
 uint8_t farSchedulerRemoveSequence[8];
 const struct FarSchedule *farSchedulerRemoveArgs[8];
+
+uint8_t onDoorAbortedCalls;
+const struct DoorAborted *onDoorAbortedArgs[8];
+
+uint8_t onDoorOpenedCalls;
+const struct DoorOpened *onDoorOpenedArgs[8];
+
+uint8_t onDoorClosedCalls;
+const struct DoorClosed *onDoorClosedArgs[8];
 
 uint8_t motorEnableCalls;
 uint8_t motorEnableSequence;
@@ -47,6 +60,9 @@ void doorFixtureInitialise(void)
 	callSequence = 0;
 	farSchedulerAddCalls = 0;
 	farSchedulerRemoveCalls = 0;
+	onDoorAbortedCalls = 0;
+	onDoorOpenedCalls = 0;
+	onDoorClosedCalls = 0;
 	motorIsEnabledReturns = 0;
 	motorEnableCalls = 0;
 	motorEnableSequence = 0;
@@ -271,6 +287,11 @@ void publishDoorCloseScheduleActioned(void)
 	eventPublish(DOOR_CLOSE_SCHEDULE_ACTIONED, &eventArgs);
 }
 
+void publishMotorStopped(const struct MotorStopped *eventArgs)
+{
+	eventPublish(MOTOR_STOPPED, eventArgs);
+}
+
 void publishMotorStoppedWithNoFaults(void)
 {
 	static const struct MotorStopped eventArgs =
@@ -331,4 +352,76 @@ void farSchedulerRemove(const struct FarSchedule *schedule)
 	farSchedulerRemoveSequence[farSchedulerRemoveCalls & 7] = ++callSequence;
 	farSchedulerRemoveArgs[farSchedulerRemoveCalls & 7] = schedule;
 	farSchedulerRemoveCalls++;
+}
+
+void mockOnDoorAborted(void)
+{
+	static const struct EventSubscription onDoorAbortedSubscription =
+	{
+		.type = DOOR_ABORTED,
+		.handler = &onDoorAborted,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onDoorAbortedSubscription);
+	onDoorAbortedCalls = 0;
+}
+
+static void onDoorAborted(const struct Event *event)
+{
+	TEST_ASSERT_NOT_NULL_MESSAGE(event, "Event");
+	TEST_ASSERT_NOT_NULL_MESSAGE(event->args, "Event Args");
+
+	onDoorAbortedArgs[onDoorAbortedCalls & 7] =
+		(const struct DoorAborted *) event->args;
+
+	onDoorAbortedCalls++;
+}
+
+void mockOnDoorOpened(void)
+{
+	static const struct EventSubscription onDoorOpenedSubscription =
+	{
+		.type = DOOR_OPENED,
+		.handler = &onDoorOpened,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onDoorOpenedSubscription);
+	onDoorOpenedCalls = 0;
+}
+
+static void onDoorOpened(const struct Event *event)
+{
+	TEST_ASSERT_NOT_NULL_MESSAGE(event, "Event");
+	TEST_ASSERT_NOT_NULL_MESSAGE(event->args, "Event Args");
+
+	onDoorOpenedArgs[onDoorOpenedCalls & 7] =
+		(const struct DoorOpened *) event->args;
+
+	onDoorOpenedCalls++;
+}
+
+void mockOnDoorClosed(void)
+{
+	static const struct EventSubscription onDoorClosedSubscription =
+	{
+		.type = DOOR_CLOSED,
+		.handler = &onDoorClosed,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onDoorClosedSubscription);
+	onDoorClosedCalls = 0;
+}
+
+static void onDoorClosed(const struct Event *event)
+{
+	TEST_ASSERT_NOT_NULL_MESSAGE(event, "Event");
+	TEST_ASSERT_NOT_NULL_MESSAGE(event->args, "Event Args");
+
+	onDoorClosedArgs[onDoorClosedCalls & 7] =
+		(const struct DoorClosed *) event->args;
+
+	onDoorClosedCalls++;
 }
