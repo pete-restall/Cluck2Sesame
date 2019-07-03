@@ -80,6 +80,24 @@ void doorOnMotorStopped(const struct Event *event)
 
 			break;
 
+		case DoorState_FindBottom:
+			if (args->fault.any)
+			{
+				motorDisable();
+				doorState.current = DoorState_Fault;
+				doorState.aborted.fault.all =
+					args->fault.currentLimited
+						? DOOR_REVERSED
+						: args->fault.encoderTimeout
+							? ENCODER_BROKEN
+							: args->fault.encoderOverflow
+								? LINE_TOO_LONG
+								: 0;
+
+				eventPublish(DOOR_ABORTED, &doorState.aborted);
+			}
+			break;
+
 		case DoorState_Fault:
 		case DoorState_Unknown:
 			break;
