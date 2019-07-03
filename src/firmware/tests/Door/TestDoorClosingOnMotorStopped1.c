@@ -160,7 +160,7 @@ void test_motorStopped_onPublishedWithEncoderTimeoutFault_expectDoorAbortedIsPub
 	TEST_ASSERT_FALSE_MESSAGE(onDoorAbortedArgs[0]->fault.isInsufficientPower, "P");
 }
 
-void test_motorStopped_onPublishedWithCurrentUnknownFault_expectDoorAbortedIsPublishedWithNoFaultFlags(void)
+void test_motorStopped_onPublishedWithUnknownFault_expectDoorAbortedIsPublishedWithNoFaultFlags(void)
 {
 	uint8_t anyTransition = anyByte();
 	stubDoorWithState(DoorState_Closing, anyTransition);
