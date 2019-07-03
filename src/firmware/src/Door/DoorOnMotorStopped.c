@@ -1,6 +1,8 @@
 #include <xc.h>
 #include <stdint.h>
 
+#include "../Platform/NvmSettings.h"
+#include "../ApplicationNvmSettings.h"
 #include "../Motor.h"
 
 #include "Door.h"

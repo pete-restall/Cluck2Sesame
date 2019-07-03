@@ -20,6 +20,8 @@ TEST_FILE("Door/DoorOnOpenScheduleActioned.c")
 TEST_FILE("Door/DoorOnCloseScheduleActioned.c")
 TEST_FILE("Door/DoorOnMotorStopped.c")
 
+#define PULSES_PER_10CM 1576
+
 void onBeforeTest(void)
 {
 	doorFixtureInitialise();
@@ -65,7 +67,7 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnable
 	TEST_ASSERT_EQUAL_UINT8(1, motorEnableCalls);
 }
 
-void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnabled_expectMotorIsTurnedOn(void)
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnabled_expectMotorIsLoweredAbout10cm(void)
 {
 	struct DoorStateWithContext state =
 	{
@@ -80,13 +82,10 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnable
 	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, motorOnCalls, "Calls");
-	TEST_ASSERT_EQUAL_INT16_MESSAGE(
-		nvmSettings.application.door.height,
-		motorOnArgs[0],
-		"Height");
+	TEST_ASSERT_EQUAL_INT16_MESSAGE(-PULSES_PER_10CM, motorOnArgs[0], "Arg");
 }
 
-void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnabled_expectMotorCurrentLimitIsMaximumLoad(void)
+void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnabled_expectMotorCurrentLimitIsNoLoad(void)
 {
 	struct DoorStateWithContext state =
 	{
@@ -100,8 +99,8 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnable
 	dispatchAllEvents();
 	doorGetState(&state);
 
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, motorLimitIsNoLoadCalls, "N");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, motorLimitIsMaximumLoadCalls, "M");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, motorLimitIsNoLoadCalls, "N");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, motorLimitIsMaximumLoadCalls, "M");
 }
 
 void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnabled_expectMotorIsEnabledBeforeCurrentLimitIsChanged(void)
@@ -118,7 +117,7 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnable
 	dispatchAllEvents();
 	doorGetState(&state);
 
-	TEST_ASSERT_TRUE(motorEnableSequence < motorLimitIsMaximumLoadSequence);
+	TEST_ASSERT_TRUE(motorEnableSequence < motorLimitIsNoLoadSequence);
 }
 
 void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnabled_expectMotorCurrentLimitIsChangedBeforeMotorIsTurnedOn(void)
@@ -135,7 +134,7 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnable
 	dispatchAllEvents();
 	doorGetState(&state);
 
-	TEST_ASSERT_TRUE(motorLimitIsMaximumLoadSequence < motorOnSequence);
+	TEST_ASSERT_TRUE(motorLimitIsNoLoadSequence < motorOnSequence);
 }
 
 void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsDisabled_expectStateIsFindBottomWaitingForEnabledMotorWithOpenTransition(void)

@@ -228,9 +228,9 @@ void motorDisable(void)
 
 void motorOn(int16_t count)
 {
-	motorOnCalls++;
 	motorOnSequence = ++callSequence;
 	motorOnArgs[motorOnCalls & 7] = count;
+	motorOnCalls++;
 }
 
 void motorOff(void)

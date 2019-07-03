@@ -24,10 +24,7 @@ void doorOnOpenScheduleActioned(const struct Event *event)
 
 		case DoorState_Unknown:
 			motorEnable();
-			doorStartOpening(
-				DoorState_FindBottom,
-				DoorState_FindBottom_WaitingForEnabledMotor);
-			break;
+			doorStartFindingBottom();
 
 		default:
 			doorState.transition = DoorTransition_Open;
@@ -41,7 +38,7 @@ void doorStartOpening(
 	if (motorIsEnabled())
 	{
 		motorLimitIsMaximumLoad();
-		// TODO: SUSPECT THAT COASTING THE MOTOR WILL HAVE OVERRUN SLIGHTLY ON THE DOWNWARD LEG.  BETTER TO RAISE BY THE LAST LOWERING-COUNT.
+		// TODO: SUSPECT THAT COASTING THE MOTOR WILL HAVE OVERRUN SLIGHTLY ON THE DOWNWARD LEG.  BETTER TO RAISE BY THE LAST LOWERING-COUNT.  SAME GOES FOR THE REVERSAL CODE, WHEN JUST CLOSED.
 		motorOn(nvmSettings.application.door.height);
 		doorState.current = motorEnabledState;
 	}
@@ -49,4 +46,16 @@ void doorStartOpening(
 		doorState.current = motorDisabledState;
 
 	doorState.transition = DoorTransition_Open;
+}
+
+void doorStartFindingBottom(void)
+{
+	if (motorIsEnabled())
+	{
+		motorLimitIsNoLoad();
+		motorOn(FIND_BOTTOM_LOWERING);
+		doorState.current = DoorState_FindBottom;
+	}
+	else
+		doorState.current = DoorState_FindBottom_WaitingForEnabledMotor;
 }
