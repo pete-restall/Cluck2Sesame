@@ -2,11 +2,7 @@
 #define __CLUCK3SESAME_SRC_PLATFORM_EVENT_H
 #include <stdint.h>
 
-#ifdef TEST
-#define EMPTY_EVENT_ARGS uint8_t nothingForCmock;
-#else
-#define EMPTY_EVENT_ARGS
-#endif
+#define EMPTY_EVENT_ARGS uint8_t emptiness;
 
 typedef uint8_t EventType;
 

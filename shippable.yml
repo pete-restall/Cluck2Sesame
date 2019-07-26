@@ -11,4 +11,4 @@ build:
     - gem install rake
     - gem install constructor
     - gem install ceedling
-    - src/firmware/ceedling test # && src/firmware/ceedling verbosity[4] release
+    - src/firmware/ceedling test && src/firmware/ceedling verbosity[4] release
