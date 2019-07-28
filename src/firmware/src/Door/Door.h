@@ -1,10 +1,17 @@
 #ifndef __CLUCK3SESAME_SRC_DOOR_DOOR_H
 #define __CLUCK3SESAME_SRC_DOOR_DOOR_H
-#include "../Event.h"
+#include "../Platform/Event.h"
 #include "../Door.h"
 
 #define FIND_BOTTOM_LOWERING -1576
 #define FIND_BOTTOM_RAISING 15756
+#define FIND_BOTTOM_THRESHOLD 3
+
+#define DOOR_JAMMED 1
+#define DOOR_REVERSED 2
+#define LINE_SNAPPED 4
+#define LINE_TOO_LONG 8
+#define ENCODER_BROKEN 16
 
 struct DoorStateInternal
 {

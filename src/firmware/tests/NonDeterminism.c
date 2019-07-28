@@ -76,3 +76,8 @@ uint16_t anyWord(void)
 
 	return word;
 }
+
+uint16_t anyWordLessThan(uint16_t value)
+{
+	return anyWord() % value;
+}

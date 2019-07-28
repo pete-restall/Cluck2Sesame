@@ -2,8 +2,8 @@
 #include <stdint.h>
 
 #include "../Platform/NvmSettings.h"
+#include "../Platform/Motor.h"
 #include "../ApplicationNvmSettings.h"
-#include "../Motor.h"
 
 #include "Door.h"
 

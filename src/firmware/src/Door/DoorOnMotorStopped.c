@@ -2,16 +2,10 @@
 #include <stdint.h>
 
 #include "../Platform/NvmSettings.h"
+#include "../Platform/Motor.h"
 #include "../ApplicationNvmSettings.h"
-#include "../Motor.h"
 
 #include "Door.h"
-
-#define DOOR_JAMMED 1
-#define DOOR_REVERSED 2
-#define LINE_SNAPPED 4
-#define LINE_TOO_LONG 8
-#define ENCODER_BROKEN 16
 
 void doorOnMotorStopped(const struct Event *event)
 {
@@ -81,21 +75,61 @@ void doorOnMotorStopped(const struct Event *event)
 			break;
 
 		case DoorState_FindBottom:
-			if (args->fault.any)
+			if (args->requestedCount < 0)
 			{
-				motorDisable();
-				doorState.current = DoorState_Fault;
-				doorState.aborted.fault.all =
-					args->fault.currentLimited
-						? DOOR_REVERSED
-						: args->fault.encoderTimeout
-							? ENCODER_BROKEN
-							: args->fault.encoderOverflow
-								? LINE_TOO_LONG
-								: 0;
+				if (args->fault.any)
+				{
+					motorDisable();
+					doorState.current = DoorState_Fault;
+					doorState.aborted.fault.all =
+						args->fault.currentLimited
+							? DOOR_REVERSED
+							: args->fault.encoderTimeout
+								? ENCODER_BROKEN
+								: args->fault.encoderOverflow
+									? LINE_TOO_LONG
+									: 0;
 
-				eventPublish(DOOR_ABORTED, &doorState.aborted);
+					eventPublish(DOOR_ABORTED, &doorState.aborted);
+				}
+				else
+				{
+					motorOn(FIND_BOTTOM_RAISING);
+				}
 			}
+			else
+			{
+				if (args->fault.any)
+				{
+// TODO: NON-CURRENT-LIMITED FAULT TESTING / REACTION GOES HERE
+					if (args->actualCount > FIND_BOTTOM_THRESHOLD)
+					{
+// TODO: PUBLISH DOOR_CLOSED EVENT GOES HERE
+						if (doorState.transition != DoorTransition_Open)
+						{
+							motorDisable();
+							doorState.current = DoorState_Closed;
+							doorState.transition = DoorTransition_Unchanged;
+						}
+						else
+						{
+							doorStartOpening(DoorState_Opening, DoorState_Opening);
+						}
+					}
+					else
+					{
+						motorOn(FIND_BOTTOM_LOWERING);
+					}
+				}
+				else
+				{
+					motorDisable();
+					doorState.current = DoorState_Fault;
+					doorState.aborted.fault.all = LINE_SNAPPED;
+					eventPublish(DOOR_ABORTED, &doorState.aborted);
+				}
+			}
+
 			break;
 
 		case DoorState_Fault:

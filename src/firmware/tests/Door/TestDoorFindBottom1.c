@@ -8,6 +8,7 @@
 #include "Door.h"
 
 #include "DoorFixture.h"
+#include "DoorFindBottomFixture.h"
 
 #include "../Fixture.h"
 #include "../NonDeterminism.h"
@@ -20,20 +21,6 @@ TEST_FILE("Door/DoorOnOpenScheduleActioned.c")
 TEST_FILE("Door/DoorOnCloseScheduleActioned.c")
 TEST_FILE("Door/DoorOnMotorStopped.c")
 
-#define PULSES_PER_10CM 1576
-
-static void enterFindBottomState(void);
-
-void onBeforeTest(void)
-{
-	doorFixtureInitialise();
-}
-
-void onAfterTest(void)
-{
-	doorFixtureShutdown();
-}
-
 void test_findBottom_expectDoorIsFirstLoweredAbout10cm(void)
 {
 	enterFindBottomState();
@@ -41,33 +28,20 @@ void test_findBottom_expectDoorIsFirstLoweredAbout10cm(void)
 	TEST_ASSERT_EQUAL_INT16_MESSAGE(motorOnArgs[0], -PULSES_PER_10CM, "Arg");
 }
 
-static void enterFindBottomState(void)
-{
-	uint8_t anyTransition = anyByte();
-	stubDoorWithState(DoorState_Unknown, anyTransition);
-	stubMotorIsEnabled();
-	publishDoorCloseScheduleActioned();
-	dispatchAllEvents();
-
-	struct DoorStateWithContext state;
-	doorGetState(&state);
-	TEST_ASSERT_EQUAL_UINT8(DoorState_FindBottom, state.current);
-}
-
-void test_findBottomAfterFirstStop_expectMotorIsNotDisabled(void)
+void test_findBottomAfterLoweringStop_expectMotorIsNotDisabled(void)
 {
 	enterFindBottomState();
-	publishMotorStoppedWithNoFaults();
+	publishMotorStoppedWithNoFaultsOnLowering();
 	dispatchAllEvents();
 	TEST_ASSERT_EQUAL_UINT8(0, motorDisableCalls);
 }
 
-void test_findBottomWhenFirstStopHasFaults_expectFaultStateWithUnmodifiedTransition(void)
+void test_findBottomWhenLoweringStopHasFaults_expectFaultStateWithUnmodifiedTransition(void)
 {
 	enterFindBottomState();
 	uint8_t anyTransition = anyByte();
 	stubDoorWithState(DoorState_FindBottom, anyTransition);
-	publishMotorStoppedWithFaults();
+	publishMotorStoppedWithFaultsOnLowering();
 	dispatchAllEvents();
 
 	struct DoorStateWithContext state;
@@ -76,22 +50,22 @@ void test_findBottomWhenFirstStopHasFaults_expectFaultStateWithUnmodifiedTransit
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(anyTransition, state.transition, "T");
 }
 
-void test_findBottomWhenFirstStopHasFaults_expectMotorIsDisabled(void)
+void test_findBottomWhenLoweringStopHasFaults_expectMotorIsDisabled(void)
 {
 	enterFindBottomState();
-	publishMotorStoppedWithFaults();
+	publishMotorStoppedWithFaultsOnLowering();
 	dispatchAllEvents();
 	TEST_ASSERT_EQUAL_UINT8(1, motorDisableCalls);
 }
 
-void test_findBottomWhenFirstStopCurrentLimitFault_expectMotorDoorAbortedIsPublishedWithReversedFlag(void)
+void test_findBottomWhenLoweringStopCurrentLimitFault_expectDoorAbortedIsPublishedWithReversedFlag(void)
 {
 	enterFindBottomState();
 
 	static const struct MotorStopped reversed =
 	{
-		.actualCount = 123,
-		.requestedCount = 456,
+		.actualCount = -123,
+		.requestedCount = -456,
 		.fault = { .currentLimited = 1 }
 	};
 
@@ -109,14 +83,14 @@ void test_findBottomWhenFirstStopCurrentLimitFault_expectMotorDoorAbortedIsPubli
 	TEST_ASSERT_FALSE_MESSAGE(onDoorAbortedArgs[0]->fault.isInsufficientPower, "P");
 }
 
-void test_findBottomWhenFirstStopEncoderOverflowFault_expectMotorDoorAbortedIsPublishedWithLineTooLongFlag(void)
+void test_findBottomWhenLoweringStopEncoderOverflowFault_expectDoorAbortedIsPublishedWithLineTooLongFlag(void)
 {
 	enterFindBottomState();
 
 	static const struct MotorStopped tooLong =
 	{
-		.actualCount = 123,
-		.requestedCount = 456,
+		.actualCount = -123,
+		.requestedCount = -456,
 		.fault = { .encoderOverflow = 1 }
 	};
 
@@ -134,14 +108,14 @@ void test_findBottomWhenFirstStopEncoderOverflowFault_expectMotorDoorAbortedIsPu
 	TEST_ASSERT_FALSE_MESSAGE(onDoorAbortedArgs[0]->fault.isInsufficientPower, "P");
 }
 
-void test_findBottomWhenFirstStopEncoderTimeoutFault_expectMotorDoorAbortedIsPublishedWithEncoderBrokenFlag(void)
+void test_findBottomWhenLoweringStopEncoderTimeoutFault_expectDoorAbortedIsPublishedWithEncoderBrokenFlag(void)
 {
 	enterFindBottomState();
 
 	static const struct MotorStopped timeout =
 	{
-		.actualCount = 123,
-		.requestedCount = 456,
+		.actualCount = -123,
+		.requestedCount = -456,
 		.fault = { .encoderTimeout = 1 }
 	};
 
@@ -159,15 +133,15 @@ void test_findBottomWhenFirstStopEncoderTimeoutFault_expectMotorDoorAbortedIsPub
 	TEST_ASSERT_FALSE_MESSAGE(onDoorAbortedArgs[0]->fault.isInsufficientPower, "P");
 }
 
-void test_findBottomWhenFirstStopUnknownFault_expectDoorAbortedIsPublishedWithNoFaultFlags(void)
+void test_findBottomWhenLoweringStopUnknownFault_expectDoorAbortedIsPublishedWithNoFaultFlags(void)
 {
 	enterFindBottomState();
 
 	struct MotorStopped unknown =
 	{
-		.actualCount = 123,
-		.requestedCount = 456,
-		.fault = { .all = anyByteWithMaskClear(0b00000111) }
+		.actualCount = -123,
+		.requestedCount = -456,
+		.fault = { .all = anyUnknownMotorFault() }
 	};
 
 	publishMotorStopped(&unknown);

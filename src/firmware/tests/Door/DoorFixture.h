@@ -4,6 +4,10 @@
 #include "Platform/Motor.h"
 #include "SunEvents.h"
 
+#define PULSES_PER_10CM 1576
+#define PULSES_PER_1M 15756
+#define PULSES_PER_2MM 3
+
 extern void doorFixtureInitialise(void);
 extern void doorFixtureShutdown(void);
 
@@ -33,15 +37,23 @@ extern void publishDoorCloseScheduleActioned(void);
 extern void publishDoorAbortedWithAnyFault(void);
 extern void publishMotorStopped(const struct MotorStopped *eventArgs);
 extern void publishMotorStoppedWithNoFaults(void);
+extern void publishMotorStoppedWithNoFaultsOnRaising(void);
+extern void publishMotorStoppedWithNoFaultsOnLowering(void);
 extern void publishMotorStoppedWithFaults(void);
+extern void publishMotorStoppedWithFaultsOnRaising(void);
+extern void publishMotorStoppedWithFaultsOnLowering(void);
 
 extern void assertFarSchedulesAreEqualWithAnyNonNullArgs(
 	const struct FarSchedule *expected,
 	const struct FarSchedule *actual);
 
-void mockOnDoorAborted(void);
-void mockOnDoorOpened(void);
-void mockOnDoorClosed(void);
+extern void mockOnDoorAborted(void);
+extern void mockOnDoorOpened(void);
+extern void mockOnDoorClosed(void);
+
+extern void enterFindBottomState(void);
+
+extern uint8_t anyUnknownMotorFault(void);
 
 extern uint8_t farSchedulerAddCalls;
 extern uint8_t farSchedulerAddSequence[8];

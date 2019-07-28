@@ -8,6 +8,7 @@
 #include "Door.h"
 
 #include "DoorFixture.h"
+#include "DoorFindBottomFixture.h"
 
 #include "../Fixture.h"
 #include "../NonDeterminism.h"
@@ -19,16 +20,6 @@ TEST_FILE("Door/DoorOnAborted.c")
 TEST_FILE("Door/DoorOnOpenScheduleActioned.c")
 TEST_FILE("Door/DoorOnCloseScheduleActioned.c")
 TEST_FILE("Door/DoorOnMotorStopped.c")
-
-void onBeforeTest(void)
-{
-	doorFixtureInitialise();
-}
-
-void onAfterTest(void)
-{
-	doorFixtureShutdown();
-}
 
 void test_doorOpenScheduleActioned_onPublishedWhenStateIsFindBottom_expectSameStateWithOpenTransition(void)
 {

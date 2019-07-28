@@ -304,12 +304,60 @@ void publishMotorStoppedWithNoFaults(void)
 	eventPublish(MOTOR_STOPPED, &eventArgs);
 }
 
+void publishMotorStoppedWithNoFaultsOnRaising(void)
+{
+	static const struct MotorStopped eventArgs =
+	{
+		.actualCount = 123,
+		.requestedCount = 456,
+		.fault = 0
+	};
+
+	eventPublish(MOTOR_STOPPED, &eventArgs);
+}
+
+void publishMotorStoppedWithNoFaultsOnLowering(void)
+{
+	static const struct MotorStopped eventArgs =
+	{
+		.actualCount = -123,
+		.requestedCount = -456,
+		.fault = 0
+	};
+
+	eventPublish(MOTOR_STOPPED, &eventArgs);
+}
+
 void publishMotorStoppedWithFaults(void)
 {
 	static const struct MotorStopped eventArgs =
 	{
 		.actualCount = 123,
 		.requestedCount = 456,
+		.fault = 0xff
+	};
+
+	eventPublish(MOTOR_STOPPED, &eventArgs);
+}
+
+void publishMotorStoppedWithFaultsOnRaising(void)
+{
+	static const struct MotorStopped eventArgs =
+	{
+		.actualCount = 123,
+		.requestedCount = 456,
+		.fault = 0xff
+	};
+
+	eventPublish(MOTOR_STOPPED, &eventArgs);
+}
+
+void publishMotorStoppedWithFaultsOnLowering(void)
+{
+	static const struct MotorStopped eventArgs =
+	{
+		.actualCount = -123,
+		.requestedCount = -456,
 		.fault = 0xff
 	};
 
@@ -424,4 +472,27 @@ static void onDoorClosed(const struct Event *event)
 		(const struct DoorClosed *) event->args;
 
 	onDoorClosedCalls++;
+}
+
+void enterFindBottomState(void)
+{
+	uint8_t anyTransition = anyByte();
+	stubDoorWithState(DoorState_Unknown, anyTransition);
+	stubMotorIsEnabled();
+	publishDoorCloseScheduleActioned();
+	dispatchAllEvents();
+
+	struct DoorStateWithContext state;
+	doorGetState(&state);
+	TEST_ASSERT_EQUAL_UINT8(DoorState_FindBottom, state.current);
+}
+
+uint8_t anyUnknownMotorFault(void)
+{
+	while (1)
+	{
+		uint8_t fault = anyByteWithMaskClear(0b00000111);
+		if (fault != 0)
+			return fault;
+	}
 }

@@ -169,7 +169,7 @@ void test_motorStopped_onPublishedWithUnknownFault_expectDoorAbortedIsPublishedW
 	{
 		.actualCount = 123,
 		.requestedCount = 456,
-		.fault = { .all = anyByteWithMaskClear(0b00000111) }
+		.fault = { .all = anyUnknownMotorFault() }
 	};
 
 	publishMotorStopped(&unknown);

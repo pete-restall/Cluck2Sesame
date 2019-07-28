@@ -20,8 +20,6 @@ TEST_FILE("Door/DoorOnOpenScheduleActioned.c")
 TEST_FILE("Door/DoorOnCloseScheduleActioned.c")
 TEST_FILE("Door/DoorOnMotorStopped.c")
 
-#define PULSES_PER_10CM 1576
-
 void onBeforeTest(void)
 {
 	doorFixtureInitialise();
@@ -62,7 +60,6 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnable
 	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
-	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8(1, motorEnableCalls);
 }
@@ -79,7 +76,6 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnable
 	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
-	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, motorOnCalls, "Calls");
 	TEST_ASSERT_EQUAL_INT16_MESSAGE(-PULSES_PER_10CM, motorOnArgs[0], "Arg");
@@ -97,7 +93,6 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnable
 	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
-	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, motorLimitIsNoLoadCalls, "N");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, motorLimitIsMaximumLoadCalls, "M");
@@ -115,7 +110,6 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnable
 	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
-	doorGetState(&state);
 
 	TEST_ASSERT_TRUE(motorEnableSequence < motorLimitIsNoLoadSequence);
 }
@@ -132,7 +126,6 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsEnable
 	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
-	doorGetState(&state);
 
 	TEST_ASSERT_TRUE(motorLimitIsNoLoadSequence < motorOnSequence);
 }
@@ -167,7 +160,6 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsDisabl
 	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
-	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8(1, motorEnableCalls);
 }
@@ -184,7 +176,6 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsDisabl
 	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
-	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8(0, motorOnCalls);
 }
@@ -201,7 +192,6 @@ void test_doorOpenScheduleActioned_onPublishedWhenStateIsUnknownAndMotorIsDisabl
 	stubDoorWithState(state.current, state.transition);
 	publishDoorOpenScheduleActioned();
 	dispatchAllEvents();
-	doorGetState(&state);
 
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, motorLimitIsNoLoadCalls, "N");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0, motorLimitIsMaximumLoadCalls, "M");

@@ -87,7 +87,7 @@ void doorInitialise(void)
 
 	eventSubscribe(&onMotorStoppedSubscription);
 
-	// TODO: MotorEnabled - changes state to Opening or Closing if {Opening,Closing}_WaitingForEnabledMotor, and starts the motor turning; DOES *NOT* MODIFY THE TRANSITION, HOWEVER...
+	// TODO: MotorEnabled - changes state to Opening, Closing, FindBottom if {Opening,Closing,FindBottom}_WaitingForEnabledMotor, and starts the motor turning; DOES *NOT* MODIFY THE TRANSITION, HOWEVER...
 }
 
 static void onDateOrNvmSettingsChanged(const struct Event *event)
