@@ -1,16 +1,20 @@
 {
-	// See https://go.microsoft.com/fwlink/?LinkId=733558
-	// for the documentation about the tasks.json format
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "test",
+			"label": "Test All",
 			"type": "shell",
 			"command": "src/firmware/ceedling test",
 			"group": "build"
 		},
 		{
-			"label": "release",
+			"label": "Test Current",
+			"type": "shell",
+			"command": "src/firmware/ceedling verbosity[4] test:${file}",
+			"group": "build"
+		},
+		{
+			"label": "Release Build",
 			"type": "shell",
 			"command": "src/firmware/ceedling verbosity[4] release",
 			"group": {
