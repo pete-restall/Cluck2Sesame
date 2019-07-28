@@ -26,7 +26,7 @@ struct LcdState
 	} transaction;
 };
 
-extern void onVoltageRegulatorEnabled(const struct Event *event);
+extern void lcdOnVoltageRegulatorEnabled(const struct Event *event);
 extern void lcdConfigure(void);
 
 extern void __reentrant lcdTransactionCompleted(void *unused);

@@ -1,9 +1,9 @@
 #include <xc.h>
 #include <stdint.h>
 
-#include "Event.h"
-#include "NvmSettings.h"
-#include "VoltageRegulator.h"
+#include "../Event.h"
+#include "../NvmSettings.h"
+#include "../VoltageRegulator.h"
 #include "Lcd.h"
 
 #define PORTA_PIN_MASK 0b00000011
@@ -56,7 +56,7 @@ void lcdInitialise(void)
 	static const struct EventSubscription onVoltageRegulatorEnabledSubscription =
 	{
 		.type = VOLTAGE_REGULATOR_ENABLED,
-		.handler = &onVoltageRegulatorEnabled,
+		.handler = &lcdOnVoltageRegulatorEnabled,
 		.state = (void *) 0
 	};
 

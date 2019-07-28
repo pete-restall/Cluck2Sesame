@@ -14,7 +14,7 @@ void lcdEnable(void)
 		lcdConfigure();
 }
 
-void onVoltageRegulatorEnabled(const struct Event *event)
+void lcdOnVoltageRegulatorEnabled(const struct Event *event)
 {
 	if (lcdState.enableCount != 0)
 		lcdConfigure();
