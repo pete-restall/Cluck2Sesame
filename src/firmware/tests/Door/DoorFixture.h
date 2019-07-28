@@ -42,6 +42,7 @@ extern void publishMotorStoppedWithNoFaultsOnLowering(void);
 extern void publishMotorStoppedWithFaults(void);
 extern void publishMotorStoppedWithFaultsOnRaising(void);
 extern void publishMotorStoppedWithFaultsOnLowering(void);
+extern void publishMotorStoppedWithNonCurrentLimitFaultOnRaising(void);
 
 extern void assertFarSchedulesAreEqualWithAnyNonNullArgs(
 	const struct FarSchedule *expected,

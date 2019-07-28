@@ -99,12 +99,11 @@ void doorOnMotorStopped(const struct Event *event)
 			}
 			else
 			{
-				if (args->fault.any)
+				if (args->fault.currentLimited)
 				{
-// TODO: NON-CURRENT-LIMITED FAULT TESTING / REACTION GOES HERE
 					if (args->actualCount > FIND_BOTTOM_THRESHOLD)
 					{
-// TODO: PUBLISH DOOR_CLOSED EVENT GOES HERE
+						eventPublish(DOOR_CLOSED, &doorState.closed);
 						if (doorState.transition != DoorTransition_Open)
 						{
 							motorDisable();
@@ -125,7 +124,13 @@ void doorOnMotorStopped(const struct Event *event)
 				{
 					motorDisable();
 					doorState.current = DoorState_Fault;
-					doorState.aborted.fault.all = LINE_SNAPPED;
+					doorState.aborted.fault.all =
+						args->fault.encoderOverflow
+							? LINE_SNAPPED
+							: args->fault.encoderTimeout
+								? ENCODER_BROKEN
+								: 0;
+
 					eventPublish(DOOR_ABORTED, &doorState.aborted);
 				}
 			}
