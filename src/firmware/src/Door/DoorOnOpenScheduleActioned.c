@@ -58,4 +58,6 @@ void doorStartFindingBottom(void)
 	}
 	else
 		doorState.current = DoorState_FindBottom_WaitingForEnabledMotor;
+
+	doorState.findBottomIterations = 0;
 }

@@ -95,6 +95,7 @@ void doorOnMotorStopped(const struct Event *event)
 				else
 				{
 					motorOn(FIND_BOTTOM_RAISING);
+					doorState.findBottomIterations++;
 				}
 			}
 			else
@@ -117,7 +118,15 @@ void doorOnMotorStopped(const struct Event *event)
 					}
 					else
 					{
-						motorOn(FIND_BOTTOM_LOWERING);
+						if (doorState.findBottomIterations == MAX_FIND_BOTTOM_ITERATIONS)
+						{
+							motorDisable();
+							doorState.current = DoorState_Fault;
+							doorState.aborted.fault.all = LINE_TOO_LONG;
+							eventPublish(DOOR_ABORTED, &doorState.aborted);
+						}
+						else
+							motorOn(FIND_BOTTOM_LOWERING);
 					}
 				}
 				else

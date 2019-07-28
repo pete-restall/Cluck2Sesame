@@ -6,6 +6,7 @@
 #define FIND_BOTTOM_LOWERING -1576
 #define FIND_BOTTOM_RAISING 15756
 #define FIND_BOTTOM_THRESHOLD 3
+#define MAX_FIND_BOTTOM_ITERATIONS 10
 
 #define DOOR_JAMMED 1
 #define DOOR_REVERSED 2
@@ -20,6 +21,7 @@ struct DoorStateInternal
 	struct DoorOpened opened;
 	struct DoorClosed closed;
 	struct DoorAborted aborted;
+	uint8_t findBottomIterations;
 };
 
 extern struct DoorStateInternal doorState;

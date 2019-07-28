@@ -143,5 +143,3 @@ void test_findBottomAfterRaisingStopWithUnknownFault_expectDoorAbortedIsPublishe
 	TEST_ASSERT_FALSE_MESSAGE(onDoorAbortedArgs[0]->fault.isEncoderBroken, "E");
 	TEST_ASSERT_FALSE_MESSAGE(onDoorAbortedArgs[0]->fault.isInsufficientPower, "P");
 }
-
-// TODO: WHEN DOOR RAISING / LOWERING SEQUENCE HAS GONE ON MORE THAN 10 TIMES (IE. 1m) THEN ABORT...(FAULT = LINE_TOO_LONG)
