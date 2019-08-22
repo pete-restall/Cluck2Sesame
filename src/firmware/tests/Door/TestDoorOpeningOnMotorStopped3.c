@@ -57,7 +57,7 @@ void test_motorStopped_onPublishedWithNoFaultsWhenStateIsOpeningAndTransitionIsC
 
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, motorOnCalls, "Calls");
 	TEST_ASSERT_TRUE_MESSAGE(motorOnSequence > motorLimitIsNoLoadSequence, "Seq");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(-nvmSettings.application.door.height, motorOnArgs[0], "Arg");
+	TEST_ASSERT_EQUAL_INT16_MESSAGE(-nvmSettings.application.door.height, motorOnArgs[0], "Arg");
 }
 
 void test_motorStopped_onPublishedWithFaultsWhenStateIsOpeningAndTransitionIsOpen_expectMotorIsNotTurnedOn(void)
