@@ -134,7 +134,7 @@ void doorOnMotorStopped(const struct Event *event)
 					motorDisable();
 					doorState.current = DoorState_Fault;
 					doorState.aborted.fault.all =
-						args->fault.encoderOverflow
+						(args->fault.all == 0 || args->fault.encoderOverflow)
 							? LINE_SNAPPED
 							: args->fault.encoderTimeout
 								? ENCODER_BROKEN

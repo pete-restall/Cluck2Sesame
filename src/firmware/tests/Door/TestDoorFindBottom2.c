@@ -81,7 +81,7 @@ void test_findBottomWhenRaisingStopHasNoFaults_expectMotorIsNotTurnedOn(void)
 	TEST_ASSERT_EQUAL_UINT8(0, motorOnCalls);
 }
 
-void test_findBottomAfterRaisingStopWithNoFaults_expectDoorAbortedIsPublishedWithLineSnappedFlag(void)
+void test_findBottomAfterRaisingStopHasNoFaults_expectDoorAbortedIsPublishedWithLineSnappedFlag(void)
 {
 	enterFindBottomState();
 	publishMotorStoppedWithNoFaultsOnLowering();
