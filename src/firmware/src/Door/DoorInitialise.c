@@ -87,6 +87,15 @@ void doorInitialise(void)
 
 	eventSubscribe(&onMotorStoppedSubscription);
 
+	static const struct EventSubscription onMotorEnabledSubscription =
+	{
+		.type = MOTOR_ENABLED,
+		.handler = &doorOnMotorEnabled,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onMotorEnabledSubscription);
+
 	// TODO: MotorEnabled - changes state to Opening, Closing, FindBottom if {Opening,Closing,FindBottom}_WaitingForEnabledMotor, and starts the motor turning; DOES *NOT* MODIFY THE TRANSITION, HOWEVER...
 }
 

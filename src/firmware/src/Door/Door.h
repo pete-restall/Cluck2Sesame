@@ -39,5 +39,6 @@ extern void doorStartClosing(
 	enum DoorState motorDisabledState);
 
 extern void doorOnMotorStopped(const struct Event *event);
+extern void doorOnMotorEnabled(const struct Event *event);
 
 #endif

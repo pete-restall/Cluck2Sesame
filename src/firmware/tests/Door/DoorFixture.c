@@ -376,6 +376,12 @@ void publishMotorStoppedWithNonCurrentLimitFaultOnRaising(void)
 	eventPublish(MOTOR_STOPPED, &eventArgs);
 }
 
+void publishMotorEnabled(void)
+{
+	static const struct MotorEnabled eventArgs = { };
+	eventPublish(MOTOR_ENABLED, &eventArgs);
+}
+
 void assertFarSchedulesAreEqualWithAnyNonNullArgs(
 	const struct FarSchedule *expected,
 	const struct FarSchedule *actual)

@@ -18,6 +18,7 @@ TEST_FILE("Door/DoorOnAborted.c")
 TEST_FILE("Door/DoorOnOpenScheduleActioned.c")
 TEST_FILE("Door/DoorOnCloseScheduleActioned.c")
 TEST_FILE("Door/DoorOnMotorStopped.c")
+TEST_FILE("Door/DoorOnMotorEnabled.c")
 
 static void publishAnySunEventsChanged(void);
 
