@@ -13,6 +13,8 @@
 TEST_FILE("Platform/VoltageRegulator.c")
 TEST_FILE("Platform/VoltageRegulatorFixture.c")
 
+const struct Event eventEmptyArgs = { };
+
 void test_voltageRegulatorEnable_calledOnce_expectVoltageRegulatorEnabledIsPublishedWhenMcuRailHasStabilised(void)
 {
 	voltageRegulatorInitialise();

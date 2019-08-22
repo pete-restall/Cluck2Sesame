@@ -92,6 +92,25 @@ void test_timeChanged_onPublishedWithMatchingScheduleTime_expectScheduleIsAction
 	TEST_ASSERT_EQUAL_PTR_MESSAGE(schedule.eventArgs, onScheduledArgs, "Args");
 }
 
+void test_timeChanged_onPublishedWithMatchingScheduleTimeWhenEventArgsIsNull_expectScheduleIsActionedWithEmptyEventArgs(void)
+{
+	static const struct DateWithFlags today = { .year = 1, .month = 2, .day = 3 };
+	static const struct DateChanged dateChangedArgs = { .today = &today };
+
+	static const struct Time now = { .hour = 4, .minute = 5 };
+	static const struct TimeChanged timeChangedArgs = { .now = &now };
+
+	struct FarSchedule schedule;
+	stubScheduleFor(&schedule, 4, 5);
+	schedule.eventArgs = (struct Event *) 0;
+	farSchedulerAdd(&schedule);
+
+	eventPublish(TIME_CHANGED, &timeChangedArgs);
+	dispatchAllEvents();
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(1, onScheduledCalls, "Calls");
+	TEST_ASSERT_EQUAL_PTR_MESSAGE(&eventEmptyArgs, onScheduledArgs, "Args");
+}
+
 void test_timeChanged_onPublishedWithNonMatchingHourInTheFuture_expectScheduleIsNotActioned(void)
 {
 	static const struct DateWithFlags today = { .year = 1, .month = 2, .day = 3 };

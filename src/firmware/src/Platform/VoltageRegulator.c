@@ -1,4 +1,5 @@
 #include <xc.h>
+#include <stdint.h>
 
 #include "Event.h"
 #include "NearScheduler.h"
@@ -58,8 +59,7 @@ static void onMcuVoltageRailStabilised(void *state)
 	if (!enableCount)
 		return;
 
-	static const struct VoltageRegulatorEnabled emptyEventArgs = { };
-	eventPublish(VOLTAGE_REGULATOR_ENABLED, &emptyEventArgs);
+	eventPublish(VOLTAGE_REGULATOR_ENABLED, &eventEmptyArgs);
 	fullyEnabled = 1;
 }
 
@@ -73,8 +73,7 @@ void voltageRegulatorDisable(void)
 
 	if (enableCount == 1 && fullyEnabled)
 	{
-		static const struct VoltageRegulatorDisabled eventArgs = { };
-		eventPublish(VOLTAGE_REGULATOR_DISABLED, &eventArgs);
+		eventPublish(VOLTAGE_REGULATOR_DISABLED, &eventEmptyArgs);
 		fullyEnabled = 0;
 	}
 

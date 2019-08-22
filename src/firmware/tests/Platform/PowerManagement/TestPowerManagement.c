@@ -21,6 +21,8 @@ static struct Event onAllEventsDispatchedEvent;
 static const struct EventSubscription *onAllEventsDispatched;
 static uint8_t numberOfEventPublishesForWokenFromSleep;
 
+const struct Event eventEmptyArgs = { };
+
 void onBeforeTest(void)
 {
 	sleepExecuted = 0;

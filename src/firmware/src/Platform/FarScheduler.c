@@ -67,7 +67,11 @@ static void onTimeChanged(const struct Event *event)
 			schedule->data->time.hour == args->now->hour &&
 			schedule->data->time.minute == args->now->minute)
 		{
-			eventPublish(schedule->data->eventType, schedule->data->eventArgs);
+			const struct Event *eventArgs = schedule->data->eventArgs;
+			if (!eventArgs)
+				eventArgs = &eventEmptyArgs;
+
+			eventPublish(schedule->data->eventType, eventArgs);
 			schedule->data = (const struct FarSchedule *) 0;
 		}
 	}

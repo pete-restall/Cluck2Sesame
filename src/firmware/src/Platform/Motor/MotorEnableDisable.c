@@ -14,8 +14,7 @@ void motorEnable(void)
 
 	if (motorState.enableCount++ == 0 && voltageRegulatorIsEnabled())
 	{
-		static const struct MotorEnabled eventArgs = { };
-		eventPublish(MOTOR_ENABLED, &eventArgs);
+		eventPublish(MOTOR_ENABLED, &eventEmptyArgs);
 		motorState.flags.isFullyEnabled = 1;
 	}
 }
@@ -27,8 +26,7 @@ void motorDisable(void)
 
 	if (--motorState.enableCount == 0)
 	{
-		static const struct MotorDisabled eventArgs = { };
-		eventPublish(MOTOR_DISABLED, &eventArgs);
+		eventPublish(MOTOR_DISABLED, &eventEmptyArgs);
 		motorState.flags.isFullyEnabled = 0;
 	}
 

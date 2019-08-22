@@ -1,6 +1,7 @@
 #include <xc.h>
 #include <stdint.h>
 
+#include "../Event.h"
 #include "../NearScheduler.h"
 
 #include "Lcd.h"
@@ -22,8 +23,6 @@ void lcdConfigure(void)
 
 static void lcdConfigureStateMachine(void *state)
 {
-	static const struct LcdEnabled emptyEventArgs = { };
-
 	struct NearSchedule waitForLcdCommand =
 	{
 		.ticks = MS_TO_TICKS(8),
@@ -71,7 +70,7 @@ static void lcdConfigureStateMachine(void *state)
 
 		default:
 			lcdState.flags.isBusy = 0;
-			eventPublish(LCD_ENABLED, &emptyEventArgs);
+			eventPublish(LCD_ENABLED, &eventEmptyArgs);
 			waitForLcdCommand.handler = (NearScheduleHandler) 0;
 	}
 

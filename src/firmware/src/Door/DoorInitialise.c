@@ -1,6 +1,7 @@
 #include <xc.h>
 #include <stdint.h>
 
+#include "../Platform/Event.h"
 #include "../Platform/FarScheduler.h"
 #include "../Platform/NvmSettings.h"
 #include "../Platform/Motor.h"
@@ -12,18 +13,14 @@
 static void onDateOrNvmSettingsChanged(const struct Event *event);
 static void onSunEventsChanged(const struct Event *event);
 
-static const struct DoorOpenScheduleActioned openingScheduleEventArgs = { };
 static struct FarSchedule openingSchedule =
 {
-	.eventType = DOOR_OPEN_SCHEDULE_ACTIONED,
-	.eventArgs = &openingScheduleEventArgs
+	.eventType = DOOR_OPEN_SCHEDULE_ACTIONED
 };
 
-static const struct DoorCloseScheduleActioned closingScheduleEventArgs = { };
 static struct FarSchedule closingSchedule =
 {
-	.eventType = DOOR_CLOSE_SCHEDULE_ACTIONED,
-	.eventArgs = &closingScheduleEventArgs
+	.eventType = DOOR_CLOSE_SCHEDULE_ACTIONED
 };
 
 struct DoorStateInternal doorState;

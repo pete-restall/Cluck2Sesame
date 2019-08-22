@@ -13,6 +13,8 @@
 TEST_FILE("Platform/VoltageRegulator.c")
 TEST_FILE("Platform/VoltageRegulatorFixture.c")
 
+const struct Event eventEmptyArgs = { };
+
 void test_voltageRegulatorIsEnabled_calledBeforeEnabled_expectFalse(void)
 {
 	voltageRegulatorInitialise();

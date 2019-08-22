@@ -41,6 +41,8 @@ static struct CallDetails periodicMonitorInitialiseCalls;
 static struct CallDetails applicationInitialiseCalls;
 static struct CallDetails systemInitialisedEventPublishCalls;
 
+const struct Event eventEmptyArgs = { };
+
 void onBeforeTest(void)
 {
 	callSequence = 1;

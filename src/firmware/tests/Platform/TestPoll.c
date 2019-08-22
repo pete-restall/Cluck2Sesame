@@ -11,6 +11,8 @@ TEST_FILE("Platform/Poll.c")
 
 static int numberOfEventPublishCalls;
 
+const struct Event eventEmptyArgs = { };
+
 static void eventPublishThatIncrementsCounter(
 	EventType type,
 	const void *args,

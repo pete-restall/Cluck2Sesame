@@ -14,6 +14,8 @@ static void ensureScheduleHandlerIsNotOmittedByTheCompiler(void);
 
 const struct NearSchedule *requestedSchedule;
 
+const struct Event eventEmptyArgs = { };
+
 void onBeforeTest(void)
 {
 	requestedSchedule = (const struct NearSchedule *) 0;

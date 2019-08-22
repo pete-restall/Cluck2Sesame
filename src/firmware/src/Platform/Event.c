@@ -6,6 +6,8 @@
 #define MAX_SUBSCRIPTIONS 32
 #define MAX_EVENTS 16
 
+const struct Event eventEmptyArgs = { };
+
 static const struct EventSubscription *subscriptions[MAX_SUBSCRIPTIONS];
 
 static struct EventQueueEntry

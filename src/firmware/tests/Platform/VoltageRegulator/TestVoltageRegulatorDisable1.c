@@ -1,4 +1,5 @@
 #include <xc.h>
+#include <stdint.h>
 #include <unity.h>
 
 #include "Mock_Event.h"
@@ -11,6 +12,8 @@
 
 TEST_FILE("Platform/VoltageRegulator.c")
 TEST_FILE("Platform/VoltageRegulatorFixture.c")
+
+const struct Event eventEmptyArgs = { };
 
 void test_voltageRegulatorDisable_calledAfterEnabledOnce_expectEnablePinIsLow(void)
 {

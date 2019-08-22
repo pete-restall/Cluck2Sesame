@@ -388,7 +388,6 @@ void assertFarSchedulesAreEqualWithAnyNonNullArgs(
 {
 	TEST_ASSERT_NOT_NULL_MESSAGE(expected, "NULL1");
 	TEST_ASSERT_NOT_NULL_MESSAGE(actual, "NULL2");
-	TEST_ASSERT_NOT_NULL_MESSAGE(actual->eventArgs, "NULL3");
 
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(
 		expected->time.hour,

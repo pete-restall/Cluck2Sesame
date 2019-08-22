@@ -11,6 +11,8 @@
 
 TEST_FILE("Platform/VoltageRegulator.c")
 
+const struct Event eventEmptyArgs = { };
+
 void onBeforeTest(void)
 {
 }

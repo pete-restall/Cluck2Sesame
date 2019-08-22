@@ -1,4 +1,5 @@
 #include <xc.h>
+#include <stdint.h>
 
 #include "Main.h"
 #include "Event.h"
@@ -28,8 +29,7 @@ void powerManagementInitialise(void)
 
 static void onAllEventsDispatched(const struct Event *event)
 {
-	static const struct WokenFromSleep noEventArgs = { };
-	eventPublish(WOKEN_FROM_SLEEP, &noEventArgs);
+	eventPublish(WOKEN_FROM_SLEEP, &eventEmptyArgs);
 
 	if (T2CONbits.ON)
 		CPUDOZEbits.IDLEN = 1;

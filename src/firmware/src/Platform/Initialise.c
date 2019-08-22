@@ -15,7 +15,6 @@
 
 void initialise(void)
 {
-	static const struct SystemInitialised emptyEventArgs = { };
 	eventInitialise();
 	powerManagementInitialise();
 	clockInitialise();
@@ -28,5 +27,5 @@ void initialise(void)
 	motorInitialise();
 	periodicMonitorInitialise();
 	applicationInitialise();
-	eventPublish(SYSTEM_INITIALISED, &emptyEventArgs);
+	eventPublish(SYSTEM_INITIALISED, &eventEmptyArgs);
 }

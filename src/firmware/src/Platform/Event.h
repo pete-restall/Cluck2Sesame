@@ -22,6 +22,8 @@ struct EventSubscription
 	void *state;
 };
 
+extern const struct Event eventEmptyArgs;
+
 extern void eventInitialise(void);
 extern void eventSubscribe(const struct EventSubscription *subscription);
 extern void eventUnsubscribe(const struct EventSubscription *subscription);
