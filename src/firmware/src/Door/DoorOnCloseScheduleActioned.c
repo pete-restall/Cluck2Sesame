@@ -20,6 +20,8 @@ void doorOnCloseScheduleActioned(const struct Event *event)
 			doorStartClosing(
 				DoorState_Closing,
 				DoorState_Closing_WaitingForEnabledMotor);
+
+			doorState.transition = DoorTransition_Close;
 			break;
 
 		case DoorState_Unknown:
@@ -43,6 +45,4 @@ void doorStartClosing(
 	}
 	else
 		doorState.current = motorDisabledState;
-
-	doorState.transition = DoorTransition_Close;
 }

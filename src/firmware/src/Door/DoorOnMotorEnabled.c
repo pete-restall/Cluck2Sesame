@@ -11,8 +11,10 @@ void doorOnMotorEnabled(const struct Event *event)
 {
 	switch (doorState.current)
 	{
-		// TODO !
-		//case DoorState_Opening_WaitingForEnabledMotor:
+		case DoorState_Opening_WaitingForEnabledMotor:
+			doorStartOpening(DoorState_Opening, DoorState_Unknown);
+			break;
+
 		case DoorState_Closing_WaitingForEnabledMotor:
 			doorStartClosing(DoorState_Closing, DoorState_Unknown);
 			break;
