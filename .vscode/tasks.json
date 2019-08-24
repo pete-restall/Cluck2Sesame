@@ -21,6 +21,13 @@
 				"kind": "build",
 				"isDefault": true
 			}
+		},
+		{
+			"label": "Deploy (No Build)",
+			"type": "shell",
+			"command": "src/firmware/deploy.sh",
+			"group": "build",
+			"problemMatcher": []
 		}
 	]
 }
