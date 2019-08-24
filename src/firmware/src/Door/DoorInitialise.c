@@ -92,8 +92,6 @@ void doorInitialise(void)
 	};
 
 	eventSubscribe(&onMotorEnabledSubscription);
-
-	// TODO: MotorEnabled - changes state to FindBottom if FindBottom_WaitingForEnabledMotor, and starts the motor turning; DOES *NOT* MODIFY THE TRANSITION, HOWEVER...
 }
 
 static void onDateOrNvmSettingsChanged(const struct Event *event)

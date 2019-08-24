@@ -26,7 +26,9 @@ void doorOnOpenScheduleActioned(const struct Event *event)
 
 		case DoorState_Unknown:
 			motorEnable();
-			doorStartFindingBottom();
+			doorStartFindingBottom(
+				DoorState_FindBottom,
+				DoorState_FindBottom_WaitingForEnabledMotor);
 
 		default:
 			doorState.transition = DoorTransition_Open;
@@ -48,16 +50,18 @@ void doorStartOpening(
 		doorState.current = motorDisabledState;
 }
 
-void doorStartFindingBottom(void)
+void doorStartFindingBottom(
+	enum DoorState motorEnabledState,
+	enum DoorState motorDisabledState)
 {
 	if (motorIsEnabled())
 	{
 		motorLimitIsNoLoad();
 		motorOn(FIND_BOTTOM_LOWERING);
-		doorState.current = DoorState_FindBottom;
+		doorState.current = motorEnabledState;
 	}
 	else
-		doorState.current = DoorState_FindBottom_WaitingForEnabledMotor;
+		doorState.current = motorDisabledState;
 
 	doorState.findBottomIterations = 0;
 }

@@ -31,7 +31,9 @@ extern void doorStartOpening(
 	enum DoorState motorEnabledState,
 	enum DoorState motorDisabledState);
 
-extern void doorStartFindingBottom(void);
+extern void doorStartFindingBottom(
+	enum DoorState motorEnabledState,
+	enum DoorState motorDisabledState);
 
 extern void doorOnCloseScheduleActioned(const struct Event *event);
 extern void doorStartClosing(

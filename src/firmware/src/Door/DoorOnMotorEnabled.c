@@ -19,8 +19,9 @@ void doorOnMotorEnabled(const struct Event *event)
 			doorStartClosing(DoorState_Closing, DoorState_Unknown);
 			break;
 
-		// TODO !
-		//case DoorState_FindBottom_WaitingForEnabledMotor:
+		case DoorState_FindBottom_WaitingForEnabledMotor:
+			doorStartFindingBottom(DoorState_FindBottom, DoorState_Unknown);
+			break;
 
 		default:
 		break; // TODO: break TO BE REMOVED AND CURRENT STATE SET TO DoorState_Unknown

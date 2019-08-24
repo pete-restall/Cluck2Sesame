@@ -26,7 +26,9 @@ void doorOnCloseScheduleActioned(const struct Event *event)
 
 		case DoorState_Unknown:
 			motorEnable();
-			doorStartFindingBottom();
+			doorStartFindingBottom(
+				DoorState_FindBottom,
+				DoorState_FindBottom_WaitingForEnabledMotor);
 
 		default:
 			doorState.transition = DoorTransition_Close;
