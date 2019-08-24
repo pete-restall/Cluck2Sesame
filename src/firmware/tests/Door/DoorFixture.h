@@ -20,6 +20,7 @@ extern void stubNvmSettingsForSunEventDrivenModeWithOffsets(
 
 extern void stubNvmSettingsForUnspecifiedMode(void);
 extern void stubAnySunEvents(struct SunEventsChanged *eventArgs);
+extern void stubDoorWithFault(uint8_t flags);
 extern void stubDoorWithState(
 	enum DoorState state,
 	enum DoorTransition transition);

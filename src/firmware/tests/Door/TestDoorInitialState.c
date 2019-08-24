@@ -104,3 +104,17 @@ void test_doorGetState_calledWhenDoorIsInUnspecifiedMode_expectCorrectModeFlags(
 	TEST_ASSERT_FALSE_MESSAGE(state.flags.isSunEventDriven, "S");
 	TEST_ASSERT_TRUE_MESSAGE(state.flags.isManuallyOverridden, "M");
 }
+
+void test_doorGetState_calledAfterInitialised_expectNoFault(void)
+{
+	struct DoorStateWithContext state =
+	{
+		.fault =
+		{
+			.all = anyByteExcept(0)
+		}
+	};
+	doorGetState(&state);
+
+	TEST_ASSERT_EQUAL_UINT8(0, state.fault.all);
+}

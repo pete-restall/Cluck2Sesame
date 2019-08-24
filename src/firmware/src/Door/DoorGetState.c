@@ -20,4 +20,9 @@ void doorGetState(struct DoorStateWithContext *state)
 		(state->flags.isTimeDriven || state->flags.isSunEventDriven)
 			? 0
 			: 1;
+
+	state->fault.all =
+		doorState.current == DoorState_Fault
+			? doorState.aborted.fault.all
+			: 0;
 }

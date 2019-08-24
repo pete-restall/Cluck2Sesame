@@ -190,6 +190,14 @@ void stubAnySunEvents(struct SunEventsChanged *eventArgs)
 	eventArgs->sunset.minute = anyByteLessThan(60);
 }
 
+void stubDoorWithFault(uint8_t flags)
+{
+	stubDoorWithState(DoorState_Fault, (enum DoorTransition) anyByte());
+
+	extern struct DoorStateInternal doorState;
+	doorState.aborted.fault.all = flags;
+}
+
 void stubDoorWithState(
 	enum DoorState state,
 	enum DoorTransition transition)
