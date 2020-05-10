@@ -1,0 +1,60 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "make",
+			"type": "shell",
+			"command": [
+				"./ceedling",
+				"verbosity[4]",
+				"build"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": {
+				"base": "$gcc",
+				"fileLocation": "absolute"
+			}
+		},
+		{
+			"label": "clean",
+			"type": "shell",
+			"command": [
+				"./ceedling",
+				"verbosity[4]",
+				"clean"
+			],
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
+			"label": "test",
+			"type": "shell",
+			"command": [
+				"./ceedling",
+				"verbosity[4]",
+				"test:all"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": {
+				"base": "$gcc",
+				"fileLocation": "absolute"
+			}
+		},
+		{
+			"label": "install",
+			"type": "shell",
+			"command": [
+				"./deploy.sh",
+				"install"
+			],
+			"group": "build",
+			"problemMatcher": []
+		}
+	]
+}

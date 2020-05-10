@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "PIC16F15355",
+            "cppStandard": "c++17",
+            "defines": [
+				"_16F15355",
+				"__XC8",
+				"__PICC__"
+            ],
+            "includePath": [
+                "/opt/microchip/xc8/v2.05/pic/include",
+				"/opt/microchip/xc8/v2.05/pic/include/c99",
+                "src"
+            ],
+            "cStandard": "c99",
+            "compilerPath": "/opt/microchip/xc8/v2.05/bin/xc8-cc"
+        }
+    ],
+    "version": 4
+}
