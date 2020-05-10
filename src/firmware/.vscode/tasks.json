@@ -7,7 +7,7 @@
 			"command": [
 				"./ceedling",
 				"verbosity[4]",
-				"build"
+				"release"
 			],
 			"group": {
 				"kind": "build",
