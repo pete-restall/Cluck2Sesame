@@ -43,11 +43,24 @@ void motorOn(int16_t count)
 	CCPR1L = (uint8_t) ((count >> 0) & 0xff);
 	TMR1H = 0;
 	TMR1L = 0;
-	PIR4bits.TMR1IF = 0;
-PIR2bits.C1IF = 0; // TODO: SHOULD REALLY CLEAR THIS HERE - COMPARATOR CAN BE TWITCHY...
-	CWG1AS0bits.SHUTDOWN = 0;
-	CWG1STR |= steeringMask;
 	CCP1CON |= CCP1CON_COMPARE_AND_SET_MODE;
+
+
+	/* *********************************************************************
+	   ALERT: The interrupt flags need to be cleared *AFTER* the CCP mode
+	   change, see section 28.1.3 of the datasheet for the single sentence
+	   that alludes to this. */
+
+	PIR4bits.TMR1IF = 0;
+	PIR2bits.C1IF = 0; // TODO: SHOULD REALLY CLEAR THIS HERE - COMPARATOR CAN BE TWITCHY...
+	PIR6bits.CCP1IF = 0; // TODO: NEEDS ADDING TO THE TESTS
+	PIR5bits.CLC2IF = 0; // TODO: NEEDS ADDING TO THE TESTS
+	CWG1AS0bits.SHUTDOWN = 0; // TODO: NEEDS ADDING TO THE TESTS
+	PIR7bits.CWG1IF = 0; // TODO: NEEDS ADDING TO THE TESTS
+
+	/* ******************************************************************* */
+
+	CWG1STR |= steeringMask;
 
 	nearSchedulerAdd(&pwmDutyCycleIncrementingSchedule);
 }
@@ -73,6 +86,7 @@ void motorOff(void)
 		static struct MotorStopped eventArgs;
 		eventArgs.fault.currentLimited = PIR2bits.C1IF != 0 ? 1 : 0;
 		eventArgs.fault.encoderOverflow = PIR4bits.TMR1IF != 0 ? 1 : 0;
+		// TODO: eventArgs.fault.encoderTimeout = ???
 		eventArgs.requestedCount = motorStartedEventArgs.count;
 		eventArgs.actualCount = (int16_t) ((uint16_t) TMR1L);
 		eventArgs.actualCount |= ((int16_t) TMR1H) << 8;
