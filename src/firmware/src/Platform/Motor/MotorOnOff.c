@@ -15,7 +15,7 @@ static struct MotorStarted motorStartedEventArgs;
 
 static const struct NearSchedule pwmDutyCycleIncrementingSchedule =
 {
-	.ticks = 1,
+	.ticks = 10, // TODO: TESTS WILL NEED UPDATING FOR THIS...(WAS 1, NOW 10)
 	.handler = &incrementPwmDutyCycle
 };
 
@@ -27,10 +27,10 @@ void motorOn(int16_t count)
 	motorStartedEventArgs.count = count;
 	eventPublish(MOTOR_STARTED, &motorStartedEventArgs);
 
-	uint8_t steeringMask = _CWG1STR_STRB_MASK;
+	uint8_t steeringMask = _CWG1STR_STRA_MASK; // TODO: A AND B HAVE BEEN SWITCHED AROUND AS THEY WERE WRONG...FIX THE TESTS...
 	if (count < 0)
 	{
-		steeringMask = _CWG1STR_STRA_MASK;
+		steeringMask = _CWG1STR_STRB_MASK;
 		count = -count;
 		if (count == -32768)
 			count = 0x7fff;
@@ -44,6 +44,7 @@ void motorOn(int16_t count)
 	TMR1H = 0;
 	TMR1L = 0;
 	PIR4bits.TMR1IF = 0;
+PIR2bits.C1IF = 0; // TODO: SHOULD REALLY CLEAR THIS HERE - COMPARATOR CAN BE TWITCHY...
 	CWG1AS0bits.SHUTDOWN = 0;
 	CWG1STR |= steeringMask;
 	CCP1CON |= CCP1CON_COMPARE_AND_SET_MODE;
@@ -66,7 +67,7 @@ void motorOff(void)
 {
 	if (CWG1STR & CWG1STR_STEERING_MASK)
 	{
-		uint8_t antiClockwise = CWG1STRbits.STRA;
+		uint8_t antiClockwise = CWG1STRbits.STRB; // TODO: A AND B HAVE BEEN SWITCHED AROUND AS THEY WERE WRONG...FIX THE TESTS...
 		CWG1STR &= ~CWG1STR_STEERING_MASK;
 
 		static struct MotorStopped eventArgs;
