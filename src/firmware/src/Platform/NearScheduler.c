@@ -17,6 +17,7 @@ static void buggyCompilerWorkaround(void)
 	};
 }
 
+static void nearSchedulerAddTo(const struct NearSchedule *schedule, struct NearSchedule *ptr);
 static void onWokenFromSleep(const struct Event *event);
 
 static uint8_t ticks;
@@ -61,6 +62,11 @@ void nearSchedulerAdd(const struct NearSchedule *schedule)
 	if (ptr == noMoreSchedules)
 		return; // TODO: THIS SHOULD REGISTER A FAULT
 
+	nearSchedulerAddTo(schedule, ptr);
+}
+
+static void nearSchedulerAddTo(const struct NearSchedule *schedule, struct NearSchedule *ptr)
+{
 	ptr->ticks = ticks + schedule->ticks + 1;
 	ptr->handler = schedule->handler;
 	ptr->state = schedule->state;
@@ -74,6 +80,30 @@ void nearSchedulerAdd(const struct NearSchedule *schedule)
 		NCO1ACCL = 0;
 		NCO1CONbits.N1EN = 1;
 	}
+}
+
+void nearSchedulerAddOrUpdate(const struct NearSchedule *schedule) // TODO: THIS IS AN ENTIRELY NEW FUNCTION - NEEDS TESTING...
+{
+	struct NearSchedule *ptrFree = (struct NearSchedule *) 0;
+	struct NearSchedule *ptrUpdate;
+	for (ptrUpdate = schedules; ptrUpdate != noMoreSchedules; ptrUpdate++)
+	{
+		if (ptrUpdate->handler == schedule->handler)
+			break;
+
+		if (!ptrFree && !ptrUpdate->handler)
+			ptrFree = ptrUpdate;
+	}
+
+	if (ptrUpdate == noMoreSchedules)
+	{
+		if (!ptrFree)
+			return; // TODO: THIS SHOULD REGISTER A FAULT
+
+		ptrUpdate = ptrFree;
+	}
+
+	nearSchedulerAddTo(schedule, ptrUpdate);
 }
 
 static void onWokenFromSleep(const struct Event *event)

@@ -62,7 +62,7 @@ void motorOn(int16_t count)
 
 	CWG1STR |= steeringMask;
 
-	nearSchedulerAdd(&pwmDutyCycleIncrementingSchedule);
+	nearSchedulerAddOrUpdate(&pwmDutyCycleIncrementingSchedule); // TODO: TESTS WILL NEED UPDATING FOR THIS...CHANGED FROM 'add' TO 'add or update'
 }
 
 static void incrementPwmDutyCycle(void *state)
@@ -71,7 +71,7 @@ static void incrementPwmDutyCycle(void *state)
 		return;
 
 	if (PWM4DCH != (256 - 8) >> 2)
-		nearSchedulerAdd(&pwmDutyCycleIncrementingSchedule);
+		nearSchedulerAddOrUpdate(&pwmDutyCycleIncrementingSchedule); // TODO: TESTS WILL NEED UPDATING FOR THIS...CHANGED FROM 'add' TO 'add or update'
 
 	PWM4DCH += 8 >> 2;
 }
