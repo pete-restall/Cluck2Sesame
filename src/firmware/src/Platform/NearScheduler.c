@@ -82,10 +82,10 @@ static void nearSchedulerAddTo(const struct NearSchedule *schedule, struct NearS
 	}
 }
 
-void nearSchedulerAddOrUpdate(const struct NearSchedule *schedule) // TODO: THIS IS AN ENTIRELY NEW FUNCTION - NEEDS TESTING...
+void nearSchedulerAddOrUpdate(const struct NearSchedule *schedule)
 {
-	struct NearSchedule *ptrFree = (struct NearSchedule *) 0;
 	struct NearSchedule *ptrUpdate;
+	struct NearSchedule *ptrFree = (struct NearSchedule *) 0;
 	for (ptrUpdate = schedules; ptrUpdate != noMoreSchedules; ptrUpdate++)
 	{
 		if (ptrUpdate->handler == schedule->handler)

@@ -16,6 +16,13 @@ const struct NearSchedule dummySchedule =
 	.state = (void *) 0
 };
 
+const struct NearSchedule dummySchedule2 =
+{
+	.ticks = 0,
+	.handler = &dummyHandler2,
+	.state = (void *) 0
+};
+
 static const struct EventSubscription *onWokenFromSleep;
 static struct Event wokenFromSleepEvent;
 
@@ -111,6 +118,16 @@ void spyHandler(void *state)
 	*(handlerStateWrptr++) = state;
 }
 
+void spyHandler2(void *state)
+{
+	numberOfHandlerCalls++;
+	*(handlerStateWrptr++) = state;
+}
+
 void dummyHandler(void *state)
+{
+}
+
+void dummyHandler2(void *state)
 {
 }

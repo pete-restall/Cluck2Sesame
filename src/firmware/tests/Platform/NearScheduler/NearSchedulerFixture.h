@@ -12,8 +12,11 @@ extern void assertHandlerCalledOnceWith(const void *state);
 extern void assertHandlerCalledTimes(uint8_t times);
 extern void assertHandlerCalledWith(const void *state);
 extern void spyHandler(void *state);
+extern void spyHandler2(void *state);
 extern void dummyHandler(void *state);
+extern void dummyHandler2(void *state);
 
 extern const struct NearSchedule dummySchedule;
+extern const struct NearSchedule dummySchedule2;
 
 #endif
