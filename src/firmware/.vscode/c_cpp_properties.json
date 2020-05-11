@@ -7,7 +7,7 @@
 				"${workspaceFolder}/**"
 			],
 			"defines": ["__XC8", "__PICC__", "_16F15355"],
-			"compilerPath": "${workspaceFolder}/src/firmware/ceedling",
+			"compilerPath": "${workspaceFolder}/ceedling",
 			"cStandard": "c99",
 			"intelliSenseMode": "gcc-x64"
 		}
