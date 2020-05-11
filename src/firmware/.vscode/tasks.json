@@ -4,19 +4,19 @@
 		{
 			"label": "Test All",
 			"type": "shell",
-			"command": "src/firmware/ceedling test",
+			"command": "./ceedling test",
 			"group": "build"
 		},
 		{
 			"label": "Test Current",
 			"type": "shell",
-			"command": "src/firmware/ceedling verbosity[4] test:${file}",
+			"command": "./ceedling verbosity[4] test:${file}",
 			"group": "build"
 		},
 		{
 			"label": "Release Build",
 			"type": "shell",
-			"command": "src/firmware/ceedling verbosity[4] release",
+			"command": "./ceedling verbosity[4] release",
 			"group": {
 				"kind": "build",
 				"isDefault": true
@@ -25,7 +25,7 @@
 		{
 			"label": "Deploy (No Build)",
 			"type": "shell",
-			"command": "src/firmware/deploy.sh",
+			"command": "./deploy.sh",
 			"group": "build",
 			"problemMatcher": []
 		}
