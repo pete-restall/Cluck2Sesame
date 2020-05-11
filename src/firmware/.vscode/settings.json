@@ -1,22 +1,12 @@
 {
-  "C_Cpp.default.includePath": [
-    "/opt/microchip/xc8/v2.05/pic/include",
-    "/opt/microchip/xc8/v2.05/pic/include/c99",
-    "src"
-  ],
-  "C_Cpp.default.defines": [],
-  "C_Cpp.default.intelliSenseMode": "gcc-x86",
-  "C_Cpp.default.compilerPath": "/opt/microchip/xc8/v2.05/bin/xc8-cc",
-  "C_Cpp.default.cStandard": "c99",
-  "C_Cpp.exclusionPolicy": "checkFilesAndFolders",
   "files.associations": {
-    "location.h": "c",
-    "stdint.h": "c",
-    "main.h": "c",
-    "event.h": "c",
     "xc.h": "c",
-    "language_support.h": "c",
-    "xc8debug.h": "c"
+    "pic.h": "c",
+    "pic_chip_select.h": "c",
+    "doorfixture.h": "c",
+    "door.h": "c",
+    "doorfindbottomfixture.h": "c",
+    "applicationnvmsettings.h": "c"
   },
   "files.exclude": {
     "*.d": "explorerExcludedFiles",

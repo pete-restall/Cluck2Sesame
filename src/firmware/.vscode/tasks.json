@@ -2,57 +2,30 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "make",
+			"label": "Test All",
 			"type": "shell",
-			"command": [
-				"./ceedling",
-				"verbosity[4]",
-				"release"
-			],
+			"command": "src/firmware/ceedling test",
+			"group": "build"
+		},
+		{
+			"label": "Test Current",
+			"type": "shell",
+			"command": "src/firmware/ceedling verbosity[4] test:${file}",
+			"group": "build"
+		},
+		{
+			"label": "Release Build",
+			"type": "shell",
+			"command": "src/firmware/ceedling verbosity[4] release",
 			"group": {
 				"kind": "build",
 				"isDefault": true
-			},
-			"problemMatcher": {
-				"base": "$gcc",
-				"fileLocation": "absolute"
 			}
 		},
 		{
-			"label": "clean",
+			"label": "Deploy (No Build)",
 			"type": "shell",
-			"command": [
-				"./ceedling",
-				"verbosity[4]",
-				"clean"
-			],
-			"group": "build",
-			"problemMatcher": []
-		},
-		{
-			"label": "test",
-			"type": "shell",
-			"command": [
-				"./ceedling",
-				"verbosity[4]",
-				"test:all"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"problemMatcher": {
-				"base": "$gcc",
-				"fileLocation": "absolute"
-			}
-		},
-		{
-			"label": "install",
-			"type": "shell",
-			"command": [
-				"./deploy.sh",
-				"install"
-			],
+			"command": "src/firmware/deploy.sh",
 			"group": "build",
 			"problemMatcher": []
 		}
