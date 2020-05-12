@@ -102,7 +102,7 @@ void doorOnMotorStopped(const struct Event *event)
 			{
 				if (args->fault.currentLimited)
 				{
-					if (args->actualCount > 157)//FIND_BOTTOM_THRESHOLD) // TODO: ABOUT 10% OF THE FIND_BOTTOM_LOWERING
+					if (args->actualCount > FIND_BOTTOM_THRESHOLD)
 					{
 						eventPublish(DOOR_CLOSED, &doorState.closed);
 						if (doorState.transition != DoorTransition_Open)
