@@ -38,6 +38,7 @@ static struct CallDetails adcInitialiseCalls;
 static struct CallDetails lcdInitialiseCalls;
 static struct CallDetails motorInitialiseCalls;
 static struct CallDetails periodicMonitorInitialiseCalls;
+static struct CallDetails buttonsInitialiseCalls;
 static struct CallDetails applicationInitialiseCalls;
 static struct CallDetails systemInitialisedEventPublishCalls;
 
@@ -57,6 +58,7 @@ void onBeforeTest(void)
 	clearCallsFor(&lcdInitialiseCalls);
 	clearCallsFor(&motorInitialiseCalls);
 	clearCallsFor(&periodicMonitorInitialiseCalls);
+	clearCallsFor(&buttonsInitialiseCalls);
 	clearCallsFor(&applicationInitialiseCalls);
 	clearCallsFor(&systemInitialisedEventPublishCalls);
 
@@ -209,10 +211,21 @@ void periodicMonitorInitialise(void)
 	registerCallFor(&periodicMonitorInitialiseCalls);
 }
 
-void test_initialise_called_expectApplicationIsInitialisedAfterPeriodicMonitor(void)
+void test_initialise_called_expectButtonsAreInitialisedAfterPeriodicMonitor(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&applicationInitialiseCalls, 12);
+	assertCalledOnceAtSequence(&buttonsInitialiseCalls, 12);
+}
+
+void buttonsInitialise(void)
+{
+	registerCallFor(&buttonsInitialiseCalls);
+}
+
+void test_initialise_called_expectApplicationIsInitialisedAfterButtons(void)
+{
+	initialise();
+	assertCalledOnceAtSequence(&applicationInitialiseCalls, 13);
 }
 
 void applicationInitialise(void)

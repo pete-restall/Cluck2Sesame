@@ -12,6 +12,7 @@
 #include "Lcd.h"
 #include "Motor.h"
 #include "PeriodicMonitor.h"
+#include "Buttons.h"
 
 void initialise(void)
 {
@@ -26,6 +27,7 @@ void initialise(void)
 	lcdInitialise();
 	motorInitialise();
 	periodicMonitorInitialise();
+	buttonsInitialise();
 	applicationInitialise();
 	eventPublish(SYSTEM_INITIALISED, &eventEmptyArgs);
 }
