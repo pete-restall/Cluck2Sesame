@@ -67,20 +67,20 @@ void test_voltageRegulatorEnabled_onPublished_expectAutoShutdownDoesNotRestart(v
 	TEST_ASSERT_FALSE(CWG1AS0bits.REN);
 }
 
-void test_voltageRegulatorEnabled_onPublished_expectAutoShutdownForcesZeroOnBAndDOutputs(void)
+void test_voltageRegulatorEnabled_onPublished_expectAutoShutdownForcesOnesOnBAndDOutputsForBraking(void)
 {
 	CWG1AS0 = anyByte();
 	publishVoltageRegulatorEnabled();
 	dispatchAllEvents();
-	TEST_ASSERT_EQUAL(0b10, CWG1AS0bits.LSBD);
+	TEST_ASSERT_EQUAL(0b11, CWG1AS0bits.LSBD);
 }
 
-void test_voltageRegulatorEnabled_onPublished_expectAutoShutdownForcesZeroOnAAndCOutputs(void)
+void test_voltageRegulatorEnabled_onPublished_expectAutoShutdownForcesOnesOnAAndCOutputsForBraking(void)
 {
 	CWG1AS0 = anyByte();
 	publishVoltageRegulatorEnabled();
 	dispatchAllEvents();
-	TEST_ASSERT_EQUAL(0b10, CWG1AS0bits.LSAC);
+	TEST_ASSERT_EQUAL(0b11, CWG1AS0bits.LSAC);
 }
 
 void test_voltageRegulatorEnabled_onPublished_expectAutoShutdownOnClc2Output(void)
