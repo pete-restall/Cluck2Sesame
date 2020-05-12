@@ -40,8 +40,8 @@ uint8_t onMotorStartedCalls;
 struct MotorStarted onMotorStartedArgs;
 uint8_t onMotorStoppedCalls;
 struct MotorStopped onMotorStoppedArgs;
-uint16_t nearSchedulerAddCalls;
-const struct NearSchedule *nearSchedulerAddArgs[8];
+uint16_t nearSchedulerAddOrUpdateCalls;
+const struct NearSchedule *nearSchedulerAddOrUpdateArgs[8];
 
 void motorFixtureSetUp(void)
 {
@@ -64,7 +64,7 @@ void motorFixtureSetUp(void)
  	onMotorDisabledSequence = 0;
 	onMotorStartedCalls = 0;
 	onMotorStoppedCalls = 0;
-	nearSchedulerAddCalls = 0;
+	nearSchedulerAddOrUpdateCalls = 0;
 
 	static const struct EventSubscription onMotorEnabledSubscription =
 	{
@@ -228,11 +228,11 @@ int16_t anyEncoderCount(void)
 	return (int16_t) anyWordExcept(0);
 }
 
-void nearSchedulerAdd(const struct NearSchedule *schedule)
+void nearSchedulerAddOrUpdate(const struct NearSchedule *schedule)
 {
-	nearSchedulerAddArgs[
-		nearSchedulerAddCalls++ % (
-			sizeof(nearSchedulerAddArgs) /
+	nearSchedulerAddOrUpdateArgs[
+		nearSchedulerAddOrUpdateCalls++ % (
+			sizeof(nearSchedulerAddOrUpdateArgs) /
 			sizeof(const struct NearSchedule *))
 	] = schedule;
 }

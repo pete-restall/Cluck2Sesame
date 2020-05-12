@@ -28,8 +28,8 @@ extern uint8_t onMotorStartedCalls;
 extern struct MotorStarted onMotorStartedArgs;
 extern uint8_t onMotorStoppedCalls;
 extern struct MotorStopped onMotorStoppedArgs;
-extern uint16_t nearSchedulerAddCalls;
-extern const struct NearSchedule *nearSchedulerAddArgs[8];
+extern uint16_t nearSchedulerAddOrUpdateCalls;
+extern const struct NearSchedule *nearSchedulerAddOrUpdateArgs[8];
 
 extern void motorFixtureSetUp(void);
 extern void motorFixtureTearDown(void);
