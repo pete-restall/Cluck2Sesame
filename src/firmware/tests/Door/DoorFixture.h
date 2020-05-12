@@ -4,9 +4,9 @@
 #include "Platform/Motor.h"
 #include "SunEvents.h"
 
-#define PULSES_PER_10CM 1576
-#define PULSES_PER_1M 15756
-#define PULSES_PER_2MM 3
+#define PULSES_PER_10CM 1138
+#define PULSES_PER_1M 11380
+#define PULSES_PER_2MM 23
 
 extern void doorFixtureInitialise(void);
 extern void doorFixtureShutdown(void);
