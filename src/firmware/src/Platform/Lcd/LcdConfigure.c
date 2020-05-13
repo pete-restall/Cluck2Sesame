@@ -18,6 +18,8 @@ void lcdConfigure(void)
 
 	nearSchedulerAdd(&waitForLcdToStabilise);
 	PWM5CONbits.PWM5EN = 1;
+	TRISAbits.TRISA2 = 0;
+	ANSELAbits.ANSA2 = 0;
 	lcdState.flags.isBusy = 1;
 }
 

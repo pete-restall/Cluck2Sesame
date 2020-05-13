@@ -28,7 +28,6 @@ static void buggyCompilerWorkaround(void)
 void lcdInitialise(void)
 {
 	// TODO: THE NVM_SETTINGS_CHANGED EVENT SHOULD BE HANDLED
-	// TODO: THE PWM MODULES SHOULD BE ENABLED ON VOLTAGE_REGULATOR_ENABLED, AND DISABLED AGAIN ON VOLTAGE_REGULATOR_DISABLED.  THIS ALSO TIES IN WITH THE CONTRAST PIN.  THE LCD ENABLE / DISABLE THEN EFFECTIVELY BECOMES A REFERENCE COUNTER PLUS THE INITIATION OF THE LCD CONFIGURATION SEQUENCE.
 	PMD3bits.PWM3MD = 0;
 	PMD3bits.PWM5MD = 0;
 
@@ -43,6 +42,8 @@ void lcdInitialise(void)
 	PWM5DCH = (nvmSettings.platform.lcd.contrast >> 2) & 0b00111111;
 	PWM5DCL = nvmSettings.platform.lcd.contrast << 6;
 	RA2PPS = PPS_OUT_PWM5;
+	ANSELAbits.ANSA2 = 1;
+	TRISAbits.TRISA2 = 1;
 
 	PWM3CON = 0;
 	PWM3DCH = (nvmSettings.platform.lcd.backlightBrightness >> 2) & 0b00111111;
@@ -61,4 +62,13 @@ void lcdInitialise(void)
 	};
 
 	eventSubscribe(&onVoltageRegulatorEnabledSubscription);
+
+	static const struct EventSubscription onVoltageRegulatorDisabledSubscription =
+	{
+		.type = VOLTAGE_REGULATOR_DISABLED,
+		.handler = &lcdOnVoltageRegulatorDisabled,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onVoltageRegulatorDisabledSubscription);
 }
