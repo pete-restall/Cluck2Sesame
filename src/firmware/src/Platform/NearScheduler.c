@@ -23,6 +23,7 @@ static void onWokenFromSleep(const struct Event *event);
 static uint8_t ticks;
 static struct NearSchedule schedules[MAX_SCHEDULES];
 static struct NearSchedule *noMoreSchedules = schedules + MAX_SCHEDULES;
+static uint8_t numberOfPendingSchedules;
 
 void nearSchedulerInitialise(void)
 {
@@ -48,10 +49,15 @@ void nearSchedulerInitialise(void)
 
 	for (uint8_t i = 0; i < MAX_SCHEDULES; i++)
 		schedules[i].handler = (NearScheduleHandler) 0;
+
+	numberOfPendingSchedules = 0;
 }
 
 void nearSchedulerAdd(const struct NearSchedule *schedule)
 {
+	if (!schedule || !schedule->handler)
+		return;
+
 	struct NearSchedule *ptr;
 	for (ptr = schedules; ptr != noMoreSchedules; ptr++)
 	{
@@ -80,10 +86,15 @@ static void nearSchedulerAddTo(const struct NearSchedule *schedule, struct NearS
 		NCO1ACCL = 0;
 		NCO1CONbits.N1EN = 1;
 	}
+
+	numberOfPendingSchedules++;
 }
 
 void nearSchedulerAddOrUpdate(const struct NearSchedule *schedule)
 {
+	if (!schedule || !schedule->handler)
+		return;
+
 	struct NearSchedule *ptrUpdate;
 	struct NearSchedule *ptrFree = (struct NearSchedule *) 0;
 	for (ptrUpdate = schedules; ptrUpdate != noMoreSchedules; ptrUpdate++)
@@ -113,23 +124,17 @@ static void onWokenFromSleep(const struct Event *event)
 
 	PIR7bits.NCO1IF = 0;
 	ticks++;
-	uint8_t numberOfNonNullHandlers = 0;
 	for (struct NearSchedule *ptr = schedules; ptr != noMoreSchedules; ptr++)
 	{
-		if (ptr->handler)
+		if (ptr->handler && ptr->ticks == ticks)
 		{
-			if (ptr->ticks == ticks)
-			{
-				NearScheduleHandler handler = ptr->handler;
-				ptr->handler = (NearScheduleHandler) 0;
-				handler(ptr->state);
-			}
-
-			if (ptr->handler)
-				numberOfNonNullHandlers++;
+			NearScheduleHandler handler = ptr->handler;
+			ptr->handler = (NearScheduleHandler) 0;
+			numberOfPendingSchedules--;
+			handler(ptr->state);
 		}
 	}
 
-	if (numberOfNonNullHandlers == 0)
+	if (numberOfPendingSchedules == 0)
 		NCO1CONbits.N1EN = 0;
 }
