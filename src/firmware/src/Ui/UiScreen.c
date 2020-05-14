@@ -8,6 +8,9 @@
 #include "Ui.h"
 
 static void uiOnScreenTimeout(void *state);
+static void uiScreenBlitFirstLine(void *state);
+static void uiScreenGotoSecondLine(void *state);
+static void uiScreenBlitSecondLine(void *state);
 
 static const struct NearSchedule uiScreenTimeoutSchedule =
 {
@@ -54,4 +57,62 @@ static void uiOnScreenTimeout(void *state)
 	}
 	else
 		nearSchedulerAddOrUpdate(&uiScreenTimeoutSchedule);
+}
+
+void uiScreenBlit(void)
+{
+	if (!uiState.flags.bits.isScreenOn)
+		return;
+
+	static const struct LcdSetAddressTransaction transaction =
+	{
+		.address = 0x00,
+		.callback = &uiScreenBlitFirstLine
+	};
+
+	lcdSetDdramAddress(&transaction);
+}
+
+static void uiScreenBlitFirstLine(void *state)
+{
+	if (!uiState.flags.bits.isScreenOn)
+		return;
+
+	static const struct LcdPutsTransaction transaction =
+	{
+		.buffer = uiState.screen[0],
+		.callback = &uiScreenGotoSecondLine
+	};
+
+	lcdPuts(&transaction);
+}
+
+static void uiScreenGotoSecondLine(void *state)
+{
+	if (!uiState.flags.bits.isScreenOn)
+		return;
+
+	static const struct LcdSetAddressTransaction transaction =
+	{
+		.address = 0x40,
+		.callback = &uiScreenBlitSecondLine
+	};
+
+	lcdSetDdramAddress(&transaction);
+}
+
+static void uiScreenBlitSecondLine(void *state)
+{
+	if (!uiState.flags.bits.isScreenOn)
+		return;
+
+	// TODO........
+	static const struct LcdPutsTransaction transaction =
+	{
+		.buffer = uiState.screen[1],
+		.callback = 0 //uiState.onScreenBlitted
+	};
+
+	lcdPuts(&transaction);
+	// uiState.onScreenBlitted = (LcdCallback) 0;
 }

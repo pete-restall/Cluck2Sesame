@@ -2,7 +2,9 @@
 #include <stdint.h>
 
 #include "../Platform/Event.h"
+#include "../Platform/Main.h"
 #include "../Platform/Buttons.h"
+#include "../Platform/Lcd.h"
 
 #include "Ui.h"
 
@@ -28,5 +30,20 @@ void uiInitialise(void)
 
 	eventSubscribe(&onButtonsReleasedSubscription);
 
-	uiState.flags.all = 0;
+	static const struct EventSubscription onSystemInitialisedSubscription =
+	{
+		.type = SYSTEM_INITIALISED,
+		.handler = &uiOnSystemInitialised,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onSystemInitialisedSubscription);
+
+	static const struct EventSubscription onLcdEnabledSubscription =
+	{
+		.type = LCD_ENABLED,
+		.handler = (EventHandler) &uiScreenBlit
+	};
+
+	eventSubscribe(&onLcdEnabledSubscription);
 }
