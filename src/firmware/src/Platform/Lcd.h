@@ -6,6 +6,9 @@
 #define LCD_ENABLED ((EventType) 0x20)
 struct LcdEnabled { EMPTY_EVENT_ARGS };
 
+#define LCD_DISABLED ((EventType) 0x21)
+struct LcdDisabled { EMPTY_EVENT_ARGS };
+
 #define LCD_CMD_FUNCTION 0b00100000
 #define LCD_CMD_FUNCTION_TWOLINES 0b00001000
 #define LCD_CMD_FUNCTION_FONT5X8 0b00000000

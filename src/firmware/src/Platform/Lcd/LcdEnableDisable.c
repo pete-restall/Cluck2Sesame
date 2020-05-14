@@ -41,6 +41,7 @@ void lcdDisable(void)
 		lcdState.flags.isBusy = 1;
 		ANSELAbits.ANSA2 = 1;
 		TRISAbits.TRISA2 = 1;
+		eventPublish(LCD_DISABLED, &eventEmptyArgs);
 	}
 
 	pwmTimerDisable();
