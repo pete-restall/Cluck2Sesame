@@ -25,12 +25,14 @@ static void registerCallFor(struct CallDetails *calls);
 static uint8_t callSequence;
 static struct CallDetails sunEventsInitialiseCalls;
 static struct CallDetails doorInitialiseCalls;
+static struct CallDetails uiInitialiseCalls;
 
 void onBeforeTest(void)
 {
 	callSequence = 1;
 	clearCallsFor(&sunEventsInitialiseCalls);
 	clearCallsFor(&doorInitialiseCalls);
+	clearCallsFor(&uiInitialiseCalls);
 }
 
 static void clearCallsFor(struct CallDetails *calls)
@@ -77,4 +79,15 @@ void test_applicationInitialise_called_expectDoorIsInitialisedAfterSunEvents(voi
 void doorInitialise(void)
 {
 	registerCallFor(&doorInitialiseCalls);
+}
+
+void test_applicationInitialise_called_expectUiIsInitialisedAfterDoor(void)
+{
+	applicationInitialise();
+	assertCalledOnceAtSequence(&uiInitialiseCalls, 3);
+}
+
+void uiInitialise(void)
+{
+	registerCallFor(&uiInitialiseCalls);
 }
