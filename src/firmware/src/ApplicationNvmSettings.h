@@ -42,6 +42,11 @@ union ApplicationNvmSettings
 
 			uint16_t height;
 		} door;
+
+		struct
+		{
+			uint8_t screenTimeoutSeconds;
+		} ui;
 	};
 };
 

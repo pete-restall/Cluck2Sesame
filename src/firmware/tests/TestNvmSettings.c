@@ -86,5 +86,10 @@ void test_nvmSettings_getSunEventOffsets_expectDefaultValues(void)
 
 void test_nvmSettings_getDoorHeight_expectDefaultValue(void)
 {
-	TEST_ASSERT_EQUAL_UINT8(0, nvmSettings.application.door.height);
+	TEST_ASSERT_EQUAL_UINT16(0, nvmSettings.application.door.height);
+}
+
+void test_nvmSettings_getScreenTimeoutSeconds_expectDefaultValue(void)
+{
+	TEST_ASSERT_EQUAL_UINT8(20, nvmSettings.application.ui.screenTimeoutSeconds);
 }
