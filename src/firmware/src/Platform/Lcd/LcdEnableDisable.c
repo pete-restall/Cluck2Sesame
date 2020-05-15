@@ -39,6 +39,8 @@ void lcdDisable(void)
 	if (--lcdState.enableCount == 0)
 	{
 		lcdState.flags.isBusy = 1;
+		LATA &= 0b00000011;
+		LATCbits.LATC4 = 0;
 		ANSELAbits.ANSA2 = 1;
 		TRISAbits.TRISA2 = 1;
 		eventPublish(LCD_DISABLED, &eventEmptyArgs);

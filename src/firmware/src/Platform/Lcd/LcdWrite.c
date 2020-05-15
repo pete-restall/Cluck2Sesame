@@ -11,6 +11,9 @@ void lcdWriteCommand(uint8_t byte)
 
 void lcdWriteNybble(uint8_t nybble)
 {
+	if (lcdState.enableCount == 0)
+		return;
+
 	LATAbits.LATA4 = 1;
 	LATAbits.LATA3 = (nybble & 0b10000000) ? 1 : 0;
 	LATCbits.LATC4 = (nybble & 0b00001000) ? 1 : 0;
