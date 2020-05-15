@@ -8,9 +8,12 @@
 #include "Ui.h"
 
 static void uiOnScreenTimeout(void *state);
+static void uiScreenSetAddressToHome(void *state);
 static void uiScreenBlitFirstLine(void *state);
 static void uiScreenGotoSecondLine(void *state);
 static void uiScreenBlitSecondLine(void *state);
+static void uiScreenSetCursorPosition(void *state);
+static void uiScreenTurnCursorOn(void *state);
 
 static const struct NearSchedule uiScreenTimeoutSchedule =
 {
@@ -64,6 +67,20 @@ void uiScreenBlit(void)
 	if (!uiState.flags.bits.isScreenOn)
 		return;
 
+	static const struct LcdSetCursorTransaction transaction =
+	{
+		.on = 0,
+		.callback = &uiScreenSetAddressToHome
+	};
+
+	lcdSetCursor(&transaction);
+}
+
+static void uiScreenSetAddressToHome(void *state)
+{
+	if (!uiState.flags.bits.isScreenOn)
+		return;
+
 	static const struct LcdSetAddressTransaction transaction =
 	{
 		.address = 0x00,
@@ -106,13 +123,40 @@ static void uiScreenBlitSecondLine(void *state)
 	if (!uiState.flags.bits.isScreenOn)
 		return;
 
-	// TODO........
 	static const struct LcdPutsTransaction transaction =
 	{
 		.buffer = uiState.screen[1],
-		.callback = 0 //uiState.onScreenBlitted
+		.callback = &uiScreenSetCursorPosition
 	};
 
 	lcdPuts(&transaction);
-	// uiState.onScreenBlitted = (LcdCallback) 0;
+}
+
+static void uiScreenSetCursorPosition(void *state)
+{
+	if (!uiState.flags.bits.isScreenOn)
+		return;
+
+	struct LcdSetAddressTransaction transaction =
+	{
+		.address = ((uiState.cursorPositionY == 0) ? 0x00 : 0x40) | uiState.cursorPositionX,
+		.callback = &uiScreenTurnCursorOn
+	};
+
+	lcdSetDdramAddress(&transaction);
+}
+
+static void uiScreenTurnCursorOn(void *state)
+{
+	if (!uiState.flags.bits.isScreenOn)
+		return;
+
+	struct LcdSetCursorTransaction transaction =
+	{
+		.on = 1,
+		.callback = 0 //uiState.onScreenBlitted
+	};
+
+	lcdSetCursor(&transaction);
+	//uiState.onScreenBlitted = (LcdCallback) 0;
 }

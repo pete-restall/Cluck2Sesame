@@ -12,5 +12,7 @@ void uiEnterInitialDateAndTime(void)
 		"20YY-MM-DD hh:mm",
 		sizeof(uiState.screen));
 
+	uiState.cursorPositionY = 1;
+	uiState.cursorPositionX = 2;
 	uiScreenBlit();
 }

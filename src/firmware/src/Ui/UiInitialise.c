@@ -46,4 +46,6 @@ void uiInitialise(void)
 	};
 
 	eventSubscribe(&onLcdEnabledSubscription);
+
+	uiState.cursorPositionX = UI_NO_CURSOR;
 }

@@ -4,6 +4,7 @@
 #include "../Ui.h"
 
 #define UI_SCREEN_WIDTH 16
+#define UI_NO_CURSOR 20
 
 enum UiInputStyle
 {
@@ -29,6 +30,8 @@ struct UiState
 	} flags;
 
 	char screen[2][UI_SCREEN_WIDTH + 1];
+	uint8_t cursorPositionX;
+	uint8_t cursorPositionY;
 
 	//////////////////////////////////////////////////////
 	///////// TODO: SOMETHING LIKE THIS, PERHAPS ?
