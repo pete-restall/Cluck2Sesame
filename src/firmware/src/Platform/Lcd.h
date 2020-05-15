@@ -45,10 +45,18 @@ struct LcdSetAddressTransaction
 	void *state;
 };
 
+struct LcdSetCursorTransaction
+{
+	uint8_t on;
+	LcdTransactionCallback callback;
+	void *state;
+};
+
 extern void lcdInitialise(void);
 extern void lcdEnable(void);
 extern void lcdDisable(void);
 extern void lcdPuts(const struct LcdPutsTransaction *transaction);
 extern void lcdSetDdramAddress(const struct LcdSetAddressTransaction *transaction);
+extern void lcdSetCursor(const struct LcdSetCursorTransaction *transaction);
 
 #endif
