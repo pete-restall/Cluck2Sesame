@@ -73,6 +73,9 @@ void nearSchedulerAdd(const struct NearSchedule *schedule)
 
 static void nearSchedulerAddTo(const struct NearSchedule *schedule, struct NearSchedule *ptr)
 {
+	if (!ptr->handler)
+		numberOfPendingSchedules++;
+
 	ptr->ticks = ticks + schedule->ticks + 1;
 	ptr->handler = schedule->handler;
 	ptr->state = schedule->state;
@@ -86,8 +89,6 @@ static void nearSchedulerAddTo(const struct NearSchedule *schedule, struct NearS
 		NCO1ACCL = 0;
 		NCO1CONbits.N1EN = 1;
 	}
-
-	numberOfPendingSchedules++;
 }
 
 void nearSchedulerAddOrUpdate(const struct NearSchedule *schedule)
