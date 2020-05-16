@@ -65,5 +65,8 @@ struct DateAndTimeGet
 extern void clockInitialise(void);
 extern void clockGetNowGmt(struct DateAndTimeGet *now);
 extern void clockSetNowGmt(const struct DateAndTimeSet *now);
+extern uint8_t clockDaysInMonth(uint8_t month, uint8_t year);
+
+#define clockIsLeapYear(year) (((year) & 3) == 0) /* Simplified version works for all dates 2000-2100 */
 
 #endif

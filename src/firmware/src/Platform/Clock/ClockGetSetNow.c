@@ -6,8 +6,6 @@
 
 #include "Clock.h"
 
-static uint8_t daysInMonth(uint8_t month, uint8_t year);
-
 static struct DateAndTimeGet clockNow;
 
 static const struct DateChanged dateChangedEventArgs =
@@ -22,7 +20,7 @@ static const struct TimeChanged timeChangedEventArgs =
 
 void clockGetNowGmt(struct DateAndTimeGet *now)
 {
-	clockNow.date.flags.isLeapYear = (clockNow.date.year & 3) == 0;
+	clockNow.date.flags.isLeapYear = clockIsLeapYear(clockNow.date.year) ? 1 : 0;
 	clockNow.time.second = TMR0L;
 	if (PIR0bits.TMR0IF)
 	{
@@ -43,10 +41,7 @@ void clockTicked(void)
 	{
 		if (++clockNow.time.hour == 24)
 		{
-			uint8_t lastDayOfMonth = daysInMonth(
-				clockNow.date.month,
-				clockNow.date.year);
-
+			uint8_t lastDayOfMonth = clockDaysInMonth(clockNow.date.month, clockNow.date.year);
 			if (clockNow.date.day == lastDayOfMonth)
 			{
 				if (clockNow.date.month++ == 12)
@@ -54,8 +49,7 @@ void clockTicked(void)
 					if (++clockNow.date.year == 100)
 						clockNow.date.year = 0;
 
-					clockNow.date.flags.isLeapYear =
-						(clockNow.date.year & 3) == 0;
+					clockNow.date.flags.isLeapYear = clockIsLeapYear(clockNow.date.year) ? 1 : 0;
 
 					clockNow.date.month = 1;
 					clockNow.date.dayOfYear = UINT16_MAX;
@@ -79,7 +73,7 @@ void clockTicked(void)
 	eventPublish(TIME_CHANGED, &timeChangedEventArgs);
 }
 
-static uint8_t daysInMonth(uint8_t month, uint8_t year)
+uint8_t clockDaysInMonth(uint8_t month, uint8_t year)
 {
 	if (month == 2)
 	{
@@ -100,7 +94,7 @@ void clockSetNowGmt(const struct DateAndTimeSet *now)
 {
 	memcpy(&clockNow, now, sizeof(struct DateAndTimeSet));
 	clockNow.date.flags.all = 0;
-	clockNow.date.flags.isLeapYear = (clockNow.date.year & 3) == 0;
+	clockNow.date.flags.isLeapYear = clockIsLeapYear(clockNow.date.year) ? 1 : 0;
 	TMR0H = 59;
 	TMR0L = clockNow.time.second;
 	PIR0bits.TMR0IF = 0;
@@ -108,7 +102,7 @@ void clockSetNowGmt(const struct DateAndTimeSet *now)
 	clockNow.date.dayOfYear = clockNow.date.day - 1;
 	uint8_t month = clockNow.date.month;
 	while (--month != 0)
-		clockNow.date.dayOfYear += daysInMonth(month, clockNow.date.year);
+		clockNow.date.dayOfYear += clockDaysInMonth(month, clockNow.date.year);
 
 	eventPublish(DATE_CHANGED, &dateChangedEventArgs);
 	eventPublish(TIME_CHANGED, &timeChangedEventArgs);
