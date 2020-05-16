@@ -8,6 +8,9 @@
 
 #include "Ui.h"
 
+static void uiOnLcdEnabled(const struct Event *event);
+static void uiOnLcdDisabled(const struct Event *event);
+
 struct UiState uiState;
 
 void uiInitialise(void)
@@ -15,7 +18,7 @@ void uiInitialise(void)
 	static const struct EventSubscription onButtonsPressedSubscription =
 	{
 		.type = BUTTONS_PRESSED,
-		.handler = &uiOnButtonsPressed,
+		.handler = &uiInputOnButtonsPressed,
 		.state = (void *) 0
 	};
 
@@ -24,7 +27,7 @@ void uiInitialise(void)
 	static const struct EventSubscription onButtonsReleasedSubscription =
 	{
 		.type = BUTTONS_RELEASED,
-		.handler = &uiOnButtonsReleased,
+		.handler = &uiInputOnButtonsReleased,
 		.state = (void *) 0
 	};
 
@@ -42,10 +45,30 @@ void uiInitialise(void)
 	static const struct EventSubscription onLcdEnabledSubscription =
 	{
 		.type = LCD_ENABLED,
-		.handler = (EventHandler) &uiScreenBlit
+		.handler = &uiOnLcdEnabled
 	};
 
 	eventSubscribe(&onLcdEnabledSubscription);
 
-	uiState.cursorPositionX = UI_NO_CURSOR;
+	static const struct EventSubscription onLcdDisabledSubscription =
+	{
+		.type = LCD_DISABLED,
+		.handler = &uiOnLcdDisabled
+	};
+
+	eventSubscribe(&onLcdDisabledSubscription);
+
+	uiState.input.buttons = &uiInputUninitialised;
+	uiState.input.cursorPosition = UI_NO_CURSOR;
+}
+
+static void uiOnLcdEnabled(const struct Event *event)
+{
+	uiState.flags.bits.isLcdEnabled = 1;
+	uiScreenBlit();
+}
+
+static void uiOnLcdDisabled(const struct Event *event)
+{
+	uiState.flags.bits.isLcdEnabled = 0;
 }

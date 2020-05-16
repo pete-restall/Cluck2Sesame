@@ -4,14 +4,41 @@
 #include "../Ui.h"
 
 #define UI_SCREEN_WIDTH 16
-#define UI_NO_CURSOR 20
+#define UI_SCREEN_HEIGHT 2
+#define UI_CURSOR_AT(x, y) ((uint8_t) (((y) * (UI_SCREEN_WIDTH + 1)) + (x)))
+#define UI_NO_CURSOR UI_CURSOR_AT(0, UI_SCREEN_HEIGHT)
 
-enum UiInputStyle
+struct ButtonBehaviour
 {
-	ScreenSelection,
-	CharacterRange,
-	Options,
-	Motor
+	void (*onPressed)(void);
+	void (*onReleased)(void);
+};
+
+struct ButtonsBehaviour
+{
+	const struct ButtonBehaviour *left;
+	const struct ButtonBehaviour *right;
+};
+
+struct UiInput
+{
+	union
+	{
+		struct
+		{
+			char min;
+			char max;
+		} range;
+
+		struct
+		{
+			uint8_t cursorPositions[3];
+		} options;
+	} menu;
+
+	uint8_t cursorPosition;
+	const struct ButtonsBehaviour *buttons;
+	void (*onEnter)(void);
 };
 
 struct UiState
@@ -23,45 +50,33 @@ struct UiState
 		{
 			unsigned int isInitialSetupRequired : 1;
 			unsigned int isScreenOn : 1;
+			unsigned int isLcdEnabled : 1;
 			unsigned int isScreenTimeoutDisabled : 1;
+			unsigned int isScreenBeingBlitted : 1;
+			unsigned int isScreenBlitDirty : 1;
 			unsigned int isLeftButtonPressed : 1;
 			unsigned int isRightButtonPressed : 1;
 		} bits;
 	} flags;
 
-	char screen[2][UI_SCREEN_WIDTH + 1];
-	uint8_t cursorPositionX;
-	uint8_t cursorPositionY;
+	char screen[2 * (UI_SCREEN_WIDTH + 1)];
 
-	//////////////////////////////////////////////////////
-	///////// TODO: SOMETHING LIKE THIS, PERHAPS ?
-	struct
-	{
-		union
-		{
-			struct
-			{
-				uint8_t cursorPosition;
-				uint8_t min;
-				uint8_t max;
-			} range;
-
-			struct
-			{
-				uint8_t cursorPositions[3];
-			} options;
-		} input;
-		enum UiInputStyle inputStyle;
-		uint8_t selectedIndex;
-	} menu;
-	//////////////////////////////////////////////////////
+	struct UiInput input;
 };
 
 extern struct UiState uiState;
 
-extern void uiOnButtonsPressed(const struct Event *event);
-extern void uiOnButtonsReleased(const struct Event *event);
+extern const struct ButtonsBehaviour uiInputUninitialised;
+extern const struct ButtonsBehaviour uiInputIsRange;
+
+extern const struct ButtonBehaviour uiInputIgnored;
+extern const struct ButtonBehaviour uiInputIncrementRange;
+extern const struct ButtonBehaviour uiInputEntered;
+
 extern void uiOnSystemInitialised(const struct Event *event);
+
+extern void uiInputOnButtonsPressed(const struct Event *event);
+extern void uiInputOnButtonsReleased(const struct Event *event);
 
 extern void uiScreenOn(void);
 extern void uiScreenOff(void);

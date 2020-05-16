@@ -14,6 +14,7 @@ static void uiScreenGotoSecondLine(void *state);
 static void uiScreenBlitSecondLine(void *state);
 static void uiScreenSetCursorPosition(void *state);
 static void uiScreenTurnCursorOn(void *state);
+static void uiScreenBlitDone(void *state);
 
 static const struct NearSchedule uiScreenTimeoutSchedule =
 {
@@ -34,6 +35,9 @@ void uiScreenOn(void)
 
 void uiScreenOff(void)
 {
+	uiState.flags.bits.isScreenBlitDirty = 0;
+	uiState.flags.bits.isScreenBeingBlitted = 0;
+
 	if (uiState.flags.bits.isScreenOn)
 	{
 		uiState.flags.bits.isScreenOn = 0;
@@ -64,8 +68,14 @@ static void uiOnScreenTimeout(void *state)
 
 void uiScreenBlit(void)
 {
-	if (!uiState.flags.bits.isScreenOn)
+	if (!uiState.flags.bits.isLcdEnabled || uiState.flags.bits.isScreenBeingBlitted)
+	{
+		uiState.flags.bits.isScreenBlitDirty = uiState.flags.bits.isScreenBeingBlitted ? 1 : 0;
 		return;
+	}
+
+	uiState.flags.bits.isScreenBlitDirty = 0;
+	uiState.flags.bits.isScreenBeingBlitted = 1;
 
 	static const struct LcdSetCursorTransaction transaction =
 	{
@@ -78,7 +88,7 @@ void uiScreenBlit(void)
 
 static void uiScreenSetAddressToHome(void *state)
 {
-	if (!uiState.flags.bits.isScreenOn)
+	if (!uiState.flags.bits.isLcdEnabled)
 		return;
 
 	static const struct LcdSetAddressTransaction transaction =
@@ -92,12 +102,14 @@ static void uiScreenSetAddressToHome(void *state)
 
 static void uiScreenBlitFirstLine(void *state)
 {
-	if (!uiState.flags.bits.isScreenOn)
+	if (!uiState.flags.bits.isLcdEnabled)
 		return;
+
+	uiState.flags.bits.isScreenBlitDirty = 0;
 
 	static const struct LcdPutsTransaction transaction =
 	{
-		.buffer = uiState.screen[0],
+		.buffer = &uiState.screen[0],
 		.callback = &uiScreenGotoSecondLine
 	};
 
@@ -106,12 +118,12 @@ static void uiScreenBlitFirstLine(void *state)
 
 static void uiScreenGotoSecondLine(void *state)
 {
-	if (!uiState.flags.bits.isScreenOn)
+	if (!uiState.flags.bits.isLcdEnabled)
 		return;
 
 	static const struct LcdSetAddressTransaction transaction =
 	{
-		.address = 0x40,
+		.address = LCD_ADDRESS_LINE2,
 		.callback = &uiScreenBlitSecondLine
 	};
 
@@ -120,12 +132,12 @@ static void uiScreenGotoSecondLine(void *state)
 
 static void uiScreenBlitSecondLine(void *state)
 {
-	if (!uiState.flags.bits.isScreenOn)
+	if (!uiState.flags.bits.isLcdEnabled)
 		return;
 
 	static const struct LcdPutsTransaction transaction =
 	{
-		.buffer = uiState.screen[1],
+		.buffer = &uiState.screen[UI_SCREEN_WIDTH + 1],
 		.callback = &uiScreenSetCursorPosition
 	};
 
@@ -134,29 +146,44 @@ static void uiScreenBlitSecondLine(void *state)
 
 static void uiScreenSetCursorPosition(void *state)
 {
-	if (!uiState.flags.bits.isScreenOn)
+	if (!uiState.flags.bits.isLcdEnabled)
 		return;
 
 	struct LcdSetAddressTransaction transaction =
 	{
-		.address = ((uiState.cursorPositionY == 0) ? 0x00 : 0x40) | uiState.cursorPositionX,
+		.address = uiState.input.cursorPosition,
 		.callback = &uiScreenTurnCursorOn
 	};
 
-	lcdSetDdramAddress(&transaction);
+	if (transaction.address > UI_SCREEN_WIDTH)
+	{
+		transaction.address -= (UI_SCREEN_WIDTH + 1);
+		transaction.address += LCD_ADDRESS_LINE2;
+	}
+
+	if (transaction.address < LCD_ADDRESS_LINE2 + UI_SCREEN_WIDTH)
+		lcdSetDdramAddress(&transaction);
+	else
+		uiScreenBlitDone((void *) 0);
 }
 
 static void uiScreenTurnCursorOn(void *state)
 {
-	if (!uiState.flags.bits.isScreenOn)
+	if (!uiState.flags.bits.isLcdEnabled)
 		return;
 
-	struct LcdSetCursorTransaction transaction =
+	static const struct LcdSetCursorTransaction transaction =
 	{
 		.on = 1,
-		.callback = 0 //uiState.onScreenBlitted
+		.callback = &uiScreenBlitDone
 	};
 
 	lcdSetCursor(&transaction);
-	//uiState.onScreenBlitted = (LcdCallback) 0;
+}
+
+static void uiScreenBlitDone(void *state)
+{
+	uiState.flags.bits.isScreenBeingBlitted = 0;
+	if (uiState.flags.bits.isScreenBlitDirty)
+		uiScreenBlit();
 }
