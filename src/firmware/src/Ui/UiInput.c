@@ -49,10 +49,12 @@ void uiInputOnButtonsPressed(const struct Event *event)
 	if (!uiState.flags.bits.isScreenOn)
 	{
 		uiScreenOn();
+		uiState.flags.bits.isButtonPressTurningOnScreen = 1;
 		uiState.flags.bits.isScreenTimeoutDisabled = 1;
 		return;
 	}
 
+	uiState.flags.bits.isButtonPressTurningOnScreen = 0;
 	uiState.flags.bits.isScreenTimeoutDisabled = 1;
 
 	if ((pressed->mask & LEFT_BUTTON) && uiState.input.buttons->left->onPressed)
@@ -69,14 +71,14 @@ void uiInputOnButtonsReleased(const struct Event *event)
 	if (released->mask & LEFT_BUTTON)
 	{
 		uiState.flags.bits.isLeftButtonPressed = 0;
-		if (uiState.input.buttons->left->onReleased)
+		if (!uiState.flags.bits.isButtonPressTurningOnScreen && uiState.input.buttons->left->onReleased)
 			uiState.input.buttons->left->onReleased();
 	}
 
 	if (released->mask & RIGHT_BUTTON)
 	{
 		uiState.flags.bits.isRightButtonPressed = 0;
-		if (uiState.input.buttons->right->onReleased)
+		if (!uiState.flags.bits.isButtonPressTurningOnScreen && uiState.input.buttons->right->onReleased)
 			uiState.input.buttons->right->onReleased();
 	}
 

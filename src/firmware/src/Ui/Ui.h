@@ -45,7 +45,7 @@ struct UiState
 {
 	union
 	{
-		uint8_t all;
+		uint16_t all;
 		struct
 		{
 			unsigned int isInitialSetupRequired : 1;
@@ -56,6 +56,7 @@ struct UiState
 			unsigned int isScreenBlitDirty : 1;
 			unsigned int isLeftButtonPressed : 1;
 			unsigned int isRightButtonPressed : 1;
+			unsigned int isButtonPressTurningOnScreen : 1;
 		} bits;
 	} flags;
 
