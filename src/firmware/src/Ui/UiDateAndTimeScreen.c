@@ -51,24 +51,22 @@ static void uiDateAndTimeScreenEnterNextDigit(void)
 {
 	static struct DateAndTimeSet dateAndTime;
 
+	uiState.input.menu.range.min = '0';
 	switch (++uiState.input.cursorPosition)
 	{
 		case DATE_YY2_POS:
-			uiState.input.menu.range.min = '0';
 			uiState.input.menu.range.max = '9';
 			break;
 
 		case DATE_YY_MM_SEPARATOR_POS:
 			uiState.input.cursorPosition++;
 			dateAndTime.date.year = uiScreenTwoDigitsFromPosition(DATE_YY1_POS);
-			uiState.input.menu.range.min = '0';
 			uiState.input.menu.range.max = '1';
 			break;
 
 		case DATE_MM2_POS:
 			if (uiState.screen[DATE_MM1_POS] == '1')
 			{
-				uiState.input.menu.range.min = '0';
 				uiState.input.menu.range.max = '2';
 			}
 			else
@@ -81,7 +79,6 @@ static void uiDateAndTimeScreenEnterNextDigit(void)
 		case DATE_MM_DD_SEPARATOR_POS:
 			uiState.input.cursorPosition++;
 			dateAndTime.date.month = uiScreenTwoDigitsFromPosition(DATE_MM1_POS);
-			uiState.input.menu.range.min = '0';
 			if (dateAndTime.date.month == 2)
 				uiState.input.menu.range.max = '2';
 			else
@@ -96,8 +93,6 @@ static void uiDateAndTimeScreenEnterNextDigit(void)
 			}
 			else if (uiState.screen[DATE_DD1_POS] == uiState.input.menu.range.max)
 			{
-				uiState.input.menu.range.min = '0';
-
 				uint8_t daysInMonth = clockDaysInMonth(dateAndTime.date.month, dateAndTime.date.year);
 				if (daysInMonth == 28)
 					uiState.input.menu.range.max = '8';
@@ -113,12 +108,10 @@ static void uiDateAndTimeScreenEnterNextDigit(void)
 		case DATE_TIME_SEPARATOR_POS:
 			uiState.input.cursorPosition++;
 			dateAndTime.date.day = uiScreenTwoDigitsFromPosition(DATE_DD1_POS);
-			uiState.input.menu.range.min = '0';
 			uiState.input.menu.range.max = '2';
 			break;
 
 		case TIME_HH2_POS:
-			uiState.input.menu.range.min = '0';
 			if (uiState.screen[TIME_HH1_POS] == '2')
 				uiState.input.menu.range.max = '3';
 			else
@@ -128,12 +121,10 @@ static void uiDateAndTimeScreenEnterNextDigit(void)
 		case TIME_HH_MM_SEPARATOR_POS:
 			uiState.input.cursorPosition++;
 			dateAndTime.time.hour = uiScreenTwoDigitsFromPosition(TIME_HH1_POS);
-			uiState.input.menu.range.min = '0';
 			uiState.input.menu.range.max = '5';
 			break;
 
 		case TIME_MM2_POS:
-			uiState.input.menu.range.min = '0';
 			uiState.input.menu.range.max = '9';
 			break;
 
