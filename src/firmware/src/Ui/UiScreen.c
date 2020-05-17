@@ -48,19 +48,19 @@ void uiScreenOff(void)
 void uiScreenStartTimeout(void)
 {
 	uiState.flags.bits.isScreenTimeoutDisabled = 0;
+	uiState.screenTimeoutCount = 0;
 	nearSchedulerAddOrUpdate(&uiScreenTimeoutSchedule);
 }
 
 static void uiOnScreenTimeout(void *state)
 {
-	static uint8_t timeoutCount = 0;
 	if (uiState.flags.bits.isScreenTimeoutDisabled)
-		timeoutCount = 0;
+		uiState.screenTimeoutCount = 0;
 
-	if (++timeoutCount == nvmSettings.application.ui.screenTimeoutSeconds)
+	if (+uiState.screenTimeoutCount == nvmSettings.application.ui.screenTimeoutSeconds)
 	{
 		uiScreenOff();
-		timeoutCount = 0;
+		uiState.screenTimeoutCount = 0;
 	}
 	else
 		nearSchedulerAddOrUpdate(&uiScreenTimeoutSchedule);
