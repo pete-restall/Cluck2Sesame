@@ -187,3 +187,19 @@ static void uiScreenBlitDone(void *state)
 	if (uiState.flags.bits.isScreenBlitDirty)
 		uiScreenBlit();
 }
+
+int8_t uiScreenSignAndTwoDigitsFromPosition(uint8_t cursorPosition)
+{
+	int8_t value = (int8_t) uiScreenTwoDigitsFromPosition(cursorPosition + 1);
+	if (uiState.screen[cursorPosition] == '-')
+		return -value;
+
+	return value;
+}
+
+uint8_t uiScreenTwoDigitsFromPosition(uint8_t cursorPosition)
+{
+	return
+		(uiState.screen[cursorPosition] - '0') * 10 +
+		(uiState.screen[cursorPosition + 1] - '0');
+}

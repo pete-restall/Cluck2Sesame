@@ -83,6 +83,8 @@ extern void uiScreenOn(void);
 extern void uiScreenOff(void);
 extern void uiScreenStartTimeout(void);
 extern void uiScreenBlit(void);
+extern int8_t uiScreenSignAndTwoDigitsFromPosition(uint8_t cursorPosition);
+extern uint8_t uiScreenTwoDigitsFromPosition(uint8_t cursorPosition);
 
 extern void uiDateAndTimeEntryScreen(void);
 extern void uiDateAndTimeStatusScreen(void);

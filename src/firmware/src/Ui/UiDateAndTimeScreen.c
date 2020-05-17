@@ -23,7 +23,6 @@
 #define DATE_ENTRY_COMPLETED (TIME_MM2_POS + 1)
 
 static void uiEnterInitialDateAndTimeNextDigit(void);
-static uint8_t uiTwoDigitsToDecimalFromScreenAt(uint8_t cursorPosition);
 
 static const char *const uiDateAndTimeScreens =
 	"Today is...     \0"
@@ -61,7 +60,7 @@ static void uiEnterInitialDateAndTimeNextDigit(void)
 
 		case DATE_YY_MM_SEPARATOR_POS:
 			uiState.input.cursorPosition++;
-			dateAndTime.date.year = uiTwoDigitsToDecimalFromScreenAt(DATE_YY1_POS);
+			dateAndTime.date.year = uiScreenTwoDigitsFromPosition(DATE_YY1_POS);
 			uiState.input.menu.range.min = '0';
 			uiState.input.menu.range.max = '1';
 			break;
@@ -81,7 +80,7 @@ static void uiEnterInitialDateAndTimeNextDigit(void)
 
 		case DATE_MM_DD_SEPARATOR_POS:
 			uiState.input.cursorPosition++;
-			dateAndTime.date.month = uiTwoDigitsToDecimalFromScreenAt(DATE_MM1_POS);
+			dateAndTime.date.month = uiScreenTwoDigitsFromPosition(DATE_MM1_POS);
 			uiState.input.menu.range.min = '0';
 			if (dateAndTime.date.month == 2)
 				uiState.input.menu.range.max = '2';
@@ -113,7 +112,7 @@ static void uiEnterInitialDateAndTimeNextDigit(void)
 
 		case DATE_TIME_SEPARATOR_POS:
 			uiState.input.cursorPosition++;
-			dateAndTime.date.day = uiTwoDigitsToDecimalFromScreenAt(DATE_DD1_POS);
+			dateAndTime.date.day = uiScreenTwoDigitsFromPosition(DATE_DD1_POS);
 			uiState.input.menu.range.min = '0';
 			uiState.input.menu.range.max = '2';
 			break;
@@ -128,7 +127,7 @@ static void uiEnterInitialDateAndTimeNextDigit(void)
 
 		case TIME_HH_MM_SEPARATOR_POS:
 			uiState.input.cursorPosition++;
-			dateAndTime.time.hour = uiTwoDigitsToDecimalFromScreenAt(TIME_HH1_POS);
+			dateAndTime.time.hour = uiScreenTwoDigitsFromPosition(TIME_HH1_POS);
 			uiState.input.menu.range.min = '0';
 			uiState.input.menu.range.max = '5';
 			break;
@@ -139,7 +138,7 @@ static void uiEnterInitialDateAndTimeNextDigit(void)
 			break;
 
 		case DATE_ENTRY_COMPLETED:
-			dateAndTime.time.minute = uiTwoDigitsToDecimalFromScreenAt(TIME_MM1_POS);
+			dateAndTime.time.minute = uiScreenTwoDigitsFromPosition(TIME_MM1_POS);
 			// TODO: THIS NEEDS TO BE LOCAL TIME, NOT GMT...BUT IT'LL DO FOR NOW...
 			clockSetNowGmt(&dateAndTime);
 			if (uiState.flags.bits.isInitialSetupRequired)
@@ -151,13 +150,6 @@ static void uiEnterInitialDateAndTimeNextDigit(void)
 
 	uiState.screen[uiState.input.cursorPosition] = uiState.input.menu.range.min;
 	uiScreenBlit();
-}
-
-static uint8_t uiTwoDigitsToDecimalFromScreenAt(uint8_t cursorPosition)
-{
-	return
-		(uiState.screen[cursorPosition] - '0') * 10 +
-		(uiState.screen[cursorPosition + 1] - '0');
 }
 
 void uiDateAndTimeStatusScreen(void)
