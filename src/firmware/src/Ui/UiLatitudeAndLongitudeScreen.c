@@ -56,10 +56,10 @@ void uiLatitudeAndLongitudeEntryScreen(void)
 
 static void uiLatitudeAndLongitudeScreenEnterNextDigit(void)
 {
+	uiState.input.menu.range.min = '0';
 	switch (++uiState.input.cursorPosition)
 	{
 		case LAT_WHOLE2_POS:
-			uiState.input.menu.range.min = '0';
 			if (uiState.screen[LAT_WHOLE1_POS] == '6')
 				uiState.input.menu.range.max = '0';
 			else
@@ -68,7 +68,6 @@ static void uiLatitudeAndLongitudeScreenEnterNextDigit(void)
 
 		case LAT_WHOLE_FRAC_SEPARATOR_POS:
 			uiState.input.cursorPosition++;
-			uiState.input.menu.range.min = '0';
 			if (uiState.screen[LAT_WHOLE1_POS] == '6')
 				uiState.input.menu.range.max = '0';
 			else
@@ -85,13 +84,11 @@ static void uiLatitudeAndLongitudeScreenEnterNextDigit(void)
 			break;
 
 		case LONG_WHOLE1_POS:
-			uiState.input.menu.range.min = '0';
 			uiState.input.menu.range.max = '1';
 			uiState.input.buttons = &uiInputIsRange;
 			break;
 
 		case LONG_WHOLE2_POS:
-			uiState.input.menu.range.min = '0';
 			if (uiState.screen[LONG_WHOLE1_POS] == '1')
 				uiState.input.menu.range.max = '0';
 			else
@@ -100,7 +97,6 @@ static void uiLatitudeAndLongitudeScreenEnterNextDigit(void)
 
 		case LONG_WHOLE_FRAC_SEPARATOR_POS:
 			uiState.input.cursorPosition++;
-			uiState.input.menu.range.min = '0';
 			if (uiState.screen[LONG_WHOLE1_POS] == '1')
 				uiState.input.menu.range.max = '0';
 			else
