@@ -12,7 +12,7 @@
 static void uiInputIncrementScreenCharacter(void);
 static void uiInputOnEnter(void);
 
-const struct ButtonBehaviour uiInputIgnored = { };
+const struct ButtonBehaviour uiInputIgnore = { };
 
 const struct ButtonBehaviour uiInputIncrementRange =
 {
@@ -24,10 +24,10 @@ const struct ButtonBehaviour uiInputEntered =
 	.onReleased = &uiInputOnEnter
 };
 
-const struct ButtonsBehaviour uiInputUninitialised =
+const struct ButtonsBehaviour uiInputIsUninitialised =
 {
-	.left = &uiInputIgnored,
-	.right = &uiInputIgnored
+	.left = &uiInputIgnore,
+	.right = &uiInputIgnore
 };
 
 const struct ButtonsBehaviour uiInputIsRange =

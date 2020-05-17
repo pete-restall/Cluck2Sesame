@@ -67,10 +67,10 @@ struct UiState
 
 extern struct UiState uiState;
 
-extern const struct ButtonsBehaviour uiInputUninitialised;
+extern const struct ButtonsBehaviour uiInputIsUninitialised;
 extern const struct ButtonsBehaviour uiInputIsRange;
 
-extern const struct ButtonBehaviour uiInputIgnored;
+extern const struct ButtonBehaviour uiInputIgnore;
 extern const struct ButtonBehaviour uiInputIncrementRange;
 extern const struct ButtonBehaviour uiInputEntered;
 
@@ -84,6 +84,8 @@ extern void uiScreenOff(void);
 extern void uiScreenStartTimeout(void);
 extern void uiScreenBlit(void);
 
-extern void uiEnterInitialDateAndTime(void);
+extern void uiDateAndTimeEntryScreen(void);
+extern void uiDateAndTimeStatusScreen(void);
+extern void uiLatitudeAndLongitudeEntryScreen(void);
 
 #endif

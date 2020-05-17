@@ -36,7 +36,7 @@ static void uiOnSplashScreenTimeout(void *state)
 	static uint8_t secondsElapsed = 0;
 	if (++secondsElapsed == 5)
 	{
-		uiEnterInitialDateAndTime();
+		uiDateAndTimeEntryScreen();
 		uiScreenStartTimeout();
 		return;
 	}

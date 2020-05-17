@@ -58,7 +58,7 @@ void uiInitialise(void)
 
 	eventSubscribe(&onLcdDisabledSubscription);
 
-	uiState.input.buttons = &uiInputUninitialised;
+	uiState.input.buttons = &uiInputIsUninitialised;
 	uiState.input.cursorPosition = UI_NO_CURSOR;
 }
 
