@@ -22,7 +22,7 @@
 #define TIME_MM2_POS (TIME_MM1_POS + 1)
 #define DATE_ENTRY_COMPLETED (TIME_MM2_POS + 1)
 
-static void uiEnterInitialDateAndTimeNextDigit(void);
+static void uiDateAndTimeScreenEnterNextDigit(void);
 
 static const char *const uiDateAndTimeScreens =
 	"Today is...     \0"
@@ -43,11 +43,11 @@ void uiDateAndTimeEntryScreen(void)
 	uiState.input.menu.range.min = '2';
 	uiState.input.menu.range.max = '9';
 	uiState.input.buttons = &uiInputIsRange;
-	uiState.input.onEnter = &uiEnterInitialDateAndTimeNextDigit;
+	uiState.input.onEnter = &uiDateAndTimeScreenEnterNextDigit;
 	uiScreenBlit();
 }
 
-static void uiEnterInitialDateAndTimeNextDigit(void)
+static void uiDateAndTimeScreenEnterNextDigit(void)
 {
 	static struct DateAndTimeSet dateAndTime;
 
