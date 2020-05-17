@@ -61,17 +61,23 @@ struct UiState
 	} flags;
 
 	char screen[2 * (UI_SCREEN_WIDTH + 1)];
+	uint8_t screenTimeoutCount;
 
 	struct UiInput input;
 };
 
+union NvmSettings;
+
 extern struct UiState uiState;
+extern union NvmSettings uiNvmSettings;
 
 extern const struct ButtonsBehaviour uiInputIsUninitialised;
 extern const struct ButtonsBehaviour uiInputIsRange;
+extern const struct ButtonsBehaviour uiInputIsRangeOfTwo;
 
 extern const struct ButtonBehaviour uiInputIgnore;
 extern const struct ButtonBehaviour uiInputIncrementRange;
+extern const struct ButtonBehaviour uiInputToggleRangeOfTwo;
 extern const struct ButtonBehaviour uiInputEntered;
 
 extern void uiOnSystemInitialised(const struct Event *event);

@@ -10,6 +10,7 @@
 #define RIGHT_BUTTON 0x01
 
 static void uiInputIncrementScreenCharacter(void);
+static void uiInputToggleScreenCharacter(void);
 static void uiInputOnEnter(void);
 
 const struct ButtonBehaviour uiInputIgnore = { };
@@ -17,6 +18,11 @@ const struct ButtonBehaviour uiInputIgnore = { };
 const struct ButtonBehaviour uiInputIncrementRange =
 {
 	.onPressed = &uiInputIncrementScreenCharacter
+};
+
+const struct ButtonBehaviour uiInputToggleRangeOfTwo =
+{
+	.onPressed = &uiInputToggleScreenCharacter
 };
 
 const struct ButtonBehaviour uiInputEntered =
@@ -33,6 +39,12 @@ const struct ButtonsBehaviour uiInputIsUninitialised =
 const struct ButtonsBehaviour uiInputIsRange =
 {
 	.left = &uiInputIncrementRange,
+	.right = &uiInputEntered
+};
+
+const struct ButtonsBehaviour uiInputIsRangeOfTwo =
+{
+	.left = &uiInputToggleRangeOfTwo,
 	.right = &uiInputEntered
 };
 
@@ -93,6 +105,19 @@ static void uiInputIncrementScreenCharacter(void)
 
 	if (++uiState.screen[uiState.input.cursorPosition] > uiState.input.menu.range.max)
 		uiState.screen[uiState.input.cursorPosition] = uiState.input.menu.range.min;
+
+	uiScreenBlit();
+}
+
+static void uiInputToggleScreenCharacter(void)
+{
+	if (uiState.input.cursorPosition >= sizeof(uiState.screen))
+		return;
+
+	if (uiState.screen[uiState.input.cursorPosition] == uiState.input.menu.range.max)
+		uiState.screen[uiState.input.cursorPosition] = uiState.input.menu.range.min;
+	else
+		uiState.screen[uiState.input.cursorPosition] = uiState.input.menu.range.max;
 
 	uiScreenBlit();
 }

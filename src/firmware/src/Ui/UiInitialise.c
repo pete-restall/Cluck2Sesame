@@ -1,10 +1,12 @@
 #include <xc.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "../Platform/Event.h"
 #include "../Platform/Main.h"
 #include "../Platform/Buttons.h"
 #include "../Platform/Lcd.h"
+#include "../Platform/NvmSettings.h"
 
 #include "Ui.h"
 
@@ -12,6 +14,7 @@ static void uiOnLcdEnabled(const struct Event *event);
 static void uiOnLcdDisabled(const struct Event *event);
 
 struct UiState uiState;
+union NvmSettings uiNvmSettings;
 
 void uiInitialise(void)
 {
@@ -60,6 +63,8 @@ void uiInitialise(void)
 
 	uiState.input.buttons = &uiInputIsUninitialised;
 	uiState.input.cursorPosition = UI_NO_CURSOR;
+
+	memcpy(&uiNvmSettings, (const void *) &nvmSettings, sizeof(union NvmSettings));
 }
 
 static void uiOnLcdEnabled(const struct Event *event)
