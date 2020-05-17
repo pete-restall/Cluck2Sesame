@@ -25,8 +25,7 @@ static void onTimeChanged(const struct Event *event);
 
 static uint8_t dateDiscriminator;
 static struct FarScheduleWithFlags schedules[MAX_SCHEDULES];
-static struct FarScheduleWithFlags *noMoreSchedules =
-	schedules + MAX_SCHEDULES;
+static struct FarScheduleWithFlags *noMoreSchedules = schedules + MAX_SCHEDULES;
 
 void farSchedulerInitialise(void)
 {
@@ -49,7 +48,10 @@ void farSchedulerInitialise(void)
 	eventSubscribe(&onTimeChangedSubscription);
 
 	dateDiscriminator = 1;
+
+#ifdef TEST
 	memset(&schedules, 0, sizeof(schedules));
+#endif
 }
 
 static void onDateChanged(const struct Event *event)
