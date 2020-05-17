@@ -14,7 +14,7 @@ union NvmSettings
 	{
 		union
 		{
-			uint8_t raw[16];
+			uint8_t raw[15];
 			struct
 			{
 				struct
@@ -32,10 +32,11 @@ union NvmSettings
 		} platform;
 
 		union ApplicationNvmSettings application;
+
+		uint8_t crc8;
 	};
 };
 
-// TODO: FUNCTION NEEDS TO BE WRITTEN - IT WILL PUBLISH NVM_SETTINGS_CHANGED AFTER WRITING TO THE FLASH
 extern void nvmSettingsStore(const union NvmSettings *newSettings);
 
 extern __section("NvmSettings") const volatile union NvmSettings nvmSettings;
