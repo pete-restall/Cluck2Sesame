@@ -42,7 +42,6 @@ void doorStartOpening(
 	if (motorIsEnabled())
 	{
 		motorLimitIsMaximumLoad();
-		// TODO: SUSPECT THAT COASTING THE MOTOR WILL HAVE OVERRUN SLIGHTLY ON THE DOWNWARD LEG.  BETTER TO RAISE BY THE LAST LOWERING-COUNT.  SAME GOES FOR THE REVERSAL CODE, WHEN JUST CLOSED.
 		motorOn(nvmSettings.application.door.height);
 		doorState.current = motorEnabledState;
 	}
