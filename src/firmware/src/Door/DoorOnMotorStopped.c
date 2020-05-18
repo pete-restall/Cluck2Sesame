@@ -10,25 +10,19 @@
 void doorOnMotorStopped(const struct Event *event)
 {
 	const struct MotorStopped *args = (const struct MotorStopped *) event->args;
+	uint8_t fault = 0;
 	switch (doorState.current)
 	{
 		case DoorState_Opening:
 			if (args->fault.any)
 			{
-				motorDisable();
-				doorState.current = DoorState_Fault;
-				doorState.aborted.fault.all =
-					args->fault.currentLimited
-						? DOOR_JAMMED
-						: args->fault.encoderTimeout
-							? ENCODER_BROKEN
-							: args->fault.encoderOverflow
-								? LINE_TOO_LONG
-								: 0;
+				if (args->fault.currentLimited)
+					fault = DOOR_JAMMED;
 
-				eventPublish(DOOR_ABORTED, &doorState.aborted);
+				goto motorFaulted;
 			}
-			else if (doorState.transition != DoorTransition_Close)
+
+			if (doorState.transition != DoorTransition_Close)
 			{
 				motorDisable();
 				doorState.current = DoorState_Opened;
@@ -46,20 +40,13 @@ void doorOnMotorStopped(const struct Event *event)
 		case DoorState_Closing:
 			if (args->fault.any)
 			{
-				motorDisable();
-				doorState.current = DoorState_Fault;
-				doorState.aborted.fault.all =
-					args->fault.currentLimited
-						? DOOR_REVERSED
-						: args->fault.encoderTimeout
-							? ENCODER_BROKEN
-							: args->fault.encoderOverflow
-								? LINE_TOO_LONG
-								: 0;
+				if (args->fault.currentLimited)
+					fault = DOOR_REVERSED;
 
-				eventPublish(DOOR_ABORTED, &doorState.aborted);
+				goto motorFaulted;
 			}
-			else if (doorState.transition != DoorTransition_Open)
+
+			if (doorState.transition != DoorTransition_Open)
 			{
 				motorDisable();
 				doorState.current = DoorState_Closed;
@@ -79,24 +66,14 @@ void doorOnMotorStopped(const struct Event *event)
 			{
 				if (args->fault.any)
 				{
-					motorDisable();
-					doorState.current = DoorState_Fault;
-					doorState.aborted.fault.all =
-						args->fault.currentLimited
-							? DOOR_REVERSED
-							: args->fault.encoderTimeout
-								? ENCODER_BROKEN
-								: args->fault.encoderOverflow
-									? LINE_TOO_LONG
-									: 0;
+					if (args->fault.currentLimited)
+						fault = DOOR_REVERSED;
 
-					eventPublish(DOOR_ABORTED, &doorState.aborted);
+					goto motorFaulted;
 				}
-				else
-				{
-					motorOn(FIND_BOTTOM_RAISING);
-					doorState.findBottomIterations++;
-				}
+
+				motorOn(FIND_BOTTOM_RAISING);
+				doorState.findBottomIterations++;
 			}
 			else
 			{
@@ -120,27 +97,19 @@ void doorOnMotorStopped(const struct Event *event)
 					{
 						if (doorState.findBottomIterations == MAX_FIND_BOTTOM_ITERATIONS)
 						{
-							motorDisable();
-							doorState.current = DoorState_Fault;
-							doorState.aborted.fault.all = LINE_TOO_LONG;
-							eventPublish(DOOR_ABORTED, &doorState.aborted);
+							fault = LINE_TOO_LONG;
+							goto motorFaulted;
 						}
-						else
-							motorOn(FIND_BOTTOM_LOWERING);
+
+						motorOn(FIND_BOTTOM_LOWERING);
 					}
 				}
 				else
 				{
-					motorDisable();
-					doorState.current = DoorState_Fault;
-					doorState.aborted.fault.all =
-						(args->fault.all == 0 || args->fault.encoderOverflow)
-							? LINE_SNAPPED
-							: args->fault.encoderTimeout
-								? ENCODER_BROKEN
-								: 0;
+					if (args->fault.all == 0 || args->fault.encoderOverflow)
+						fault = LINE_SNAPPED;
 
-					eventPublish(DOOR_ABORTED, &doorState.aborted);
+					goto motorFaulted;
 				}
 			}
 
@@ -157,4 +126,21 @@ void doorOnMotorStopped(const struct Event *event)
 		default:
 			doorState.current = DoorState_Unknown;
 	};
+
+	return;
+
+motorFaulted:
+	if (fault == 0)
+	{
+		if (args->fault.encoderTimeout)
+			fault = ENCODER_BROKEN;
+
+		if (args->fault.encoderOverflow)
+			fault = LINE_TOO_LONG;
+	}
+
+	motorDisable();
+	doorState.current = DoorState_Fault;
+	doorState.aborted.fault.all = fault;
+	eventPublish(DOOR_ABORTED, &doorState.aborted);
 }
