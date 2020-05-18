@@ -48,6 +48,10 @@ enum DoorState
 {
 	DoorState_Unknown,
 	DoorState_Fault,
+	DoorState_ManualOpening_WaitingForEnabledMotor,
+	DoorState_ManualOpening,
+	DoorState_ManualClosing_WaitingForEnabledMotor,
+	DoorState_ManualClosing,
 	DoorState_FindBottom,
 	DoorState_FindBottom_WaitingForEnabledMotor,
 	DoorState_Opening,
@@ -81,5 +85,8 @@ struct DoorStateWithContext
 
 extern void doorInitialise(void);
 extern void doorGetState(struct DoorStateWithContext *state);
+extern void doorManualStartOpening(void);
+extern void doorManualStartClosing(void);
+extern void doorManualStop(void);
 
 #endif

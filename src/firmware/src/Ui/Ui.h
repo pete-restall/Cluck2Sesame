@@ -36,8 +36,10 @@ struct UiInput
 		} options;
 	} menu;
 
+	uint8_t selectedOptionIndex;
 	uint8_t cursorPosition;
 	const struct ButtonsBehaviour *buttons;
+	void (*onPreEnter)(void);
 	void (*onEnter)(void);
 };
 
@@ -74,10 +76,12 @@ extern union NvmSettings uiNvmSettings;
 extern const struct ButtonsBehaviour uiInputIsUninitialised;
 extern const struct ButtonsBehaviour uiInputIsRange;
 extern const struct ButtonsBehaviour uiInputIsRangeOfTwo;
+extern const struct ButtonsBehaviour uiInputIsOptions;
 
 extern const struct ButtonBehaviour uiInputIgnore;
 extern const struct ButtonBehaviour uiInputIncrementRange;
 extern const struct ButtonBehaviour uiInputToggleRangeOfTwo;
+extern const struct ButtonBehaviour uiInputMoveToNextOption;
 extern const struct ButtonBehaviour uiInputEntered;
 
 extern void uiOnSystemInitialised(const struct Event *event);
@@ -95,5 +99,7 @@ extern uint8_t uiScreenTwoDigitsFromPosition(uint8_t cursorPosition);
 extern void uiDateAndTimeEntryScreen(void);
 extern void uiDateAndTimeStatusScreen(void);
 extern void uiLatitudeAndLongitudeEntryScreen(void);
+
+extern void uiDoorCalibrationScreen(void);
 
 #endif

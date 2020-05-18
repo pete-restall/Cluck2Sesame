@@ -35,7 +35,6 @@ static int8_t uiDegreesFromScreenPosition(uint8_t cursorPosition, int8_t origin)
 
 // TODO: THESE NEED WRITING AND PUTTING SOMEWHERE... 
 static void uiLatitudeAndLongitudeStatusScreen(void) { uiState.input.buttons = &uiInputIsUninitialised; }
-static void uiDoorCalibrationScreen(void) { uiState.input.buttons = &uiInputIsUninitialised; }
 // END OF TODO...
 
 void uiLatitudeAndLongitudeEntryScreen(void)
@@ -51,6 +50,8 @@ void uiLatitudeAndLongitudeEntryScreen(void)
 	uiState.input.menu.range.max = '6';
 	uiState.input.buttons = &uiInputIsRange;
 	uiState.input.onEnter = &uiLatitudeAndLongitudeScreenEnterNextDigit;
+	uiState.input.onPreEnter = 0;
+
 	uiScreenBlit();
 }
 

@@ -44,6 +44,7 @@ void uiDateAndTimeEntryScreen(void)
 	uiState.input.menu.range.max = '9';
 	uiState.input.buttons = &uiInputIsRange;
 	uiState.input.onEnter = &uiDateAndTimeScreenEnterNextDigit;
+	uiState.input.onPreEnter = 0;
 	uiScreenBlit();
 }
 
