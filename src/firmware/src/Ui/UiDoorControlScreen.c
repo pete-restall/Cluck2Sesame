@@ -38,28 +38,40 @@ void uiDoorCalibrationScreen(void)
 static void uiDoorControlScreenOptionSelected(void)
 {
 	if (uiState.input.selectedOptionIndex == 0)
+	{
 		doorManualStartOpening();
+		uiState.flags.bits.isDoorBeingManuallyControlled = 1;
+	}
 
 	if (uiState.input.selectedOptionIndex == 1)
+	{
 		doorManualStartClosing();
+		uiState.flags.bits.isDoorBeingManuallyControlled = 1;
+	}
 }
 
 static void uiDoorControlScreenOptionAfterSelected(void)
 {
-	if (uiState.input.selectedOptionIndex != 2)
+	if (uiState.flags.bits.isDoorBeingManuallyControlled)
 	{
-		// TODO: CAN GET WEIRDNESS HERE - IF HELD DOWN RIGHT BUTTON THEN PRESSED LEFT BUTTON BEFORE RELEASING RIGHT BUTTON THEN THE OPTION WILL MOVE ALONG...THINK ABOUT THIS
 		doorManualStop();
+		uiState.flags.bits.isDoorBeingManuallyControlled = 0;
 	}
-	else
+
+	if (uiState.input.selectedOptionIndex == 2)
 	{
 		// TODO: DO WE NEED TO CHECK FOR THE TRANSITION (IE. AN OPEN / CLOSE SCHEDULE WAS ACTIONED WHILST WE WERE DOING THE MANUAL CONTROL), THEN ACTION IT IF THE NVM'S MODE IS NOT 'MANUAL' ?
+		static struct DoorStateWithContext x;
+		doorGetState(&x);
 		memcpy(
 			uiState.screen,
 			"ALL DONE...     \0"
 			"Now do the rest.",
 			sizeof(uiState.screen));
 
+		uiState.screen[13] = '0' + x.current;
+		uiState.screen[14] = '0' + x.transition;
+		uiState.screen[15] = '0' + x.fault.all;
 		uiState.input.buttons = &uiInputIsUninitialised;
 		uiScreenBlit();
 	}

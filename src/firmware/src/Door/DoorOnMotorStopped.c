@@ -115,12 +115,40 @@ void doorOnMotorStopped(const struct Event *event)
 
 			break;
 
+		case DoorState_ManualOpening:
+			if (args->fault.any)
+			{
+				if (args->fault.currentLimited)
+					fault = DOOR_JAMMED;
+
+				goto motorFaulted;
+			}
+
+			motorDisable();
+			doorState.current = DoorState_Unknown;
+			break;
+
+		case DoorState_ManualClosing:
+			if (args->fault.any)
+			{
+				if (args->fault.currentLimited)
+					fault = DOOR_REVERSED;
+
+				goto motorFaulted;
+			}
+
+			motorDisable();
+			doorState.current = DoorState_Unknown;
+			break;
+
 		case DoorState_Fault:
 		case DoorState_Unknown:
 			break;
 
 		case DoorState_Opening_WaitingForEnabledMotor:
 		case DoorState_Closing_WaitingForEnabledMotor:
+		case DoorState_ManualOpening_WaitingForEnabledMotor:
+		case DoorState_ManualClosing_WaitingForEnabledMotor:
 			motorDisable();
 
 		default:

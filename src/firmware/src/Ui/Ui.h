@@ -59,6 +59,7 @@ struct UiState
 			unsigned int isLeftButtonPressed : 1;
 			unsigned int isRightButtonPressed : 1;
 			unsigned int isButtonPressTurningOnScreen : 1;
+			unsigned int isDoorBeingManuallyControlled : 1;
 		} bits;
 	} flags;
 

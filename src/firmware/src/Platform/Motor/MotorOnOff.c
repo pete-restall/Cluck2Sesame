@@ -100,6 +100,7 @@ static void incrementPwmDutyCycle(void *state)
 
 void motorOff(void)
 {
+	CWG1AS0bits.SHUTDOWN = 1;
 	if (CWG1STR & CWG1STR_STEERING_MASK)
 	{
 		CWG1STR &= ~CWG1STR_STEERING_MASK;
@@ -141,6 +142,7 @@ static void motorRunningStateMonitor(void *state)
 
 			eventPublish(MOTOR_STOPPED, &motorStoppedEventArgs);
 			motorRunningState = MOTOR_RUNNING_STATE_STOPPED;
+			CWG1AS0bits.SHUTDOWN = 0;
 			return;
 		}
 	}

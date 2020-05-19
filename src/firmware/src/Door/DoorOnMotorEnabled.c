@@ -28,7 +28,7 @@ void doorOnMotorEnabled(const struct Event *event)
 			break;
 
 		case DoorState_ManualClosing_WaitingForEnabledMotor:
-			doorStartOpening(DoorState_ManualClosing, DoorState_Unknown);
+			doorStartClosing(DoorState_ManualClosing, DoorState_Unknown);
 			break;
 
 		default:
