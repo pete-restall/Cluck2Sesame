@@ -58,7 +58,7 @@ void motorOn(int16_t count)
 	}
 
 	CCP1CON &= ~CCP1CON_MODE_MASK;
-	PWM4DCH = 0;
+	PWM4DCH = 48 >> 2;
 	PWM4DCL = 0;
 	CCPR1H = (uint8_t) ((count >> 8) & 0xff);
 	CCPR1L = (uint8_t) ((count >> 0) & 0xff);
