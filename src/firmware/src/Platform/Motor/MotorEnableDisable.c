@@ -9,10 +9,13 @@
 
 void motorEnable(void)
 {
+	if (motorState.enableCount++ != 0)
+		return;
+
 	voltageRegulatorEnable();
 	pwmTimerEnable();
 
-	if (motorState.enableCount++ == 0 && voltageRegulatorIsEnabled())
+	if (voltageRegulatorIsEnabled())
 	{
 		eventPublish(MOTOR_ENABLED, &eventEmptyArgs);
 		motorState.flags.isFullyEnabled = 1;
@@ -28,10 +31,10 @@ void motorDisable(void)
 	{
 		eventPublish(MOTOR_DISABLED, &eventEmptyArgs);
 		motorState.flags.isFullyEnabled = 0;
-	}
 
-	pwmTimerDisable();
-	voltageRegulatorDisable();
+		pwmTimerDisable();
+		voltageRegulatorDisable();
+	}
 }
 
 uint8_t motorIsEnabled(void)

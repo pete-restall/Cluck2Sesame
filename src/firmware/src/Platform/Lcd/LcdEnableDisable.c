@@ -8,9 +8,12 @@
 
 void lcdEnable(void)
 {
+	if (++lcdState.enableCount > 1)
+		return;
+
 	voltageRegulatorEnable();
 	pwmTimerEnable();
-	if (++lcdState.enableCount == 1 && voltageRegulatorIsEnabled())
+	if (voltageRegulatorIsEnabled())
 		lcdConfigure();
 }
 
@@ -44,8 +47,8 @@ void lcdDisable(void)
 		ANSELAbits.ANSA2 = 1;
 		TRISAbits.TRISA2 = 1;
 		eventPublish(LCD_DISABLED, &eventEmptyArgs);
-	}
 
-	pwmTimerDisable();
-	voltageRegulatorDisable();
+		pwmTimerDisable();
+		voltageRegulatorDisable();
+	}
 }

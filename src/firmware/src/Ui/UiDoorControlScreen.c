@@ -58,8 +58,7 @@ static void uiDoorControlScreenOptionAfterSelected(void)
 		doorManualStop();
 		uiState.flags.bits.isDoorBeingManuallyControlled = 0;
 	}
-
-	if (uiState.input.selectedOptionIndex == 2)
+	else if (uiState.input.selectedOptionIndex == 2)
 	{
 		// TODO: DO WE NEED TO CHECK FOR THE TRANSITION (IE. AN OPEN / CLOSE SCHEDULE WAS ACTIONED WHILST WE WERE DOING THE MANUAL CONTROL), THEN ACTION IT IF THE NVM'S MODE IS NOT 'MANUAL' ?
 		static struct DoorStateWithContext x;
