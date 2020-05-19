@@ -37,6 +37,7 @@ void uiDoorCalibrationScreen(void)
 
 static void uiDoorControlScreenOptionSelected(void)
 {
+	// TODO: COULD DO WITH CAPTURING DOOR_ABORTED AND THEN SHOWING AN ALERT SCREEN WITH A MESSAGE FOR A FAULT ('JAMMED/TOO HEAVY', 'SPOOL REVERSED', etc.)  PROBABLY A BACKLIGHT FLASH AS WELL.  ALERT SCREEN WILL BE GENERALLY USEFUL, SO MAKE A 'uiAlertScreen.c' MODULE FOR IT.
 	if (uiState.input.selectedOptionIndex == 0)
 	{
 		doorManualStartOpening();
