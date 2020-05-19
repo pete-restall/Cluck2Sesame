@@ -57,7 +57,7 @@ static void uiOnScreenTimeout(void *state)
 	if (uiState.flags.bits.isScreenTimeoutDisabled)
 		uiState.screenTimeoutCount = 0;
 
-	if (+uiState.screenTimeoutCount == nvmSettings.application.ui.screenTimeoutSeconds)
+	if (++uiState.screenTimeoutCount == nvmSettings.application.ui.screenTimeoutSeconds)
 	{
 		uiScreenOff();
 		uiState.screenTimeoutCount = 0;
