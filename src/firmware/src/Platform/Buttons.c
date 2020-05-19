@@ -45,7 +45,7 @@ static void onWokenFromSleep(const struct Event *event)
 
 	static const struct NearSchedule onButtonsStoppedBouncingSchedule =
 	{
-		.ticks = MS_TO_TICKS(32),
+		.ticks = MS_TO_TICKS(20),
 		.handler = &onButtonsStoppedBouncing
 	};
 
