@@ -8,7 +8,7 @@
     - test:all
 
 :environment:
-  - :mcu: PIC16F15355
+  - :mcu: PIC16F15356
   - :path:
     - /bin
     - /usr/bin

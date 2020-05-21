@@ -46,7 +46,7 @@ and pronouncible for garden-based fowl.
 
 ## The Hardware and Firmware
 The hardware and firmware are all mine.  The board is based around a
-[PIC16F15355](doc/datasheets/mcu/PIC16F15355.pdf).  It's a beefier evolution
+[PIC16F15356](doc/datasheets/mcu/PIC16F15356.pdf).  It's a beefier evolution
 of what was used last time that has allowed considerable simplification of the
 board through more integration and a higher pin count.
 
