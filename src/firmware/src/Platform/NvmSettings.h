@@ -37,7 +37,7 @@ union NvmSettings
 	};
 };
 
-extern void nvmSettingsStore(const union NvmSettings *newSettings);
+extern uint8_t nvmSettingsStore(const union NvmSettings *newSettings);
 
 extern __section("NvmSettings") const volatile union NvmSettings nvmSettings;
 

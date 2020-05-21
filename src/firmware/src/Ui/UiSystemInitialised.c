@@ -5,6 +5,7 @@
 #include "../Platform/Event.h"
 #include "../Platform/NvmSettings.h"
 #include "../Platform/NearScheduler.h"
+#include "../Platform/NvmSettings.h"
 
 #include "Ui.h"
 
@@ -42,4 +43,15 @@ static void uiOnSplashScreenTimeout(void *state)
 	}
 
 	nearSchedulerAdd(&uiScreenTimeoutSchedule);
+}
+
+void uiOnSystemInitialSetupCompleted(void)
+{
+	if (!nvmSettingsStore(&uiNvmSettings))
+	{
+		// TODO: THIS NEEDS TO BE A FAULT...
+	}
+
+	uiState.flags.bits.isInitialSetupRequired = 0;
+	uiDateAndTimeStatusScreen();
 }

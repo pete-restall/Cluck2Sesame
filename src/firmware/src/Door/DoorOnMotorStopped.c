@@ -38,6 +38,7 @@ void doorOnMotorStopped(const struct Event *event)
 			break;
 
 		case DoorState_Closing:
+			doorState.closed.loweredHeight -= args->actualCount;
 			if (args->fault.any)
 			{
 				if (args->fault.currentLimited)
@@ -62,6 +63,7 @@ void doorOnMotorStopped(const struct Event *event)
 			break;
 
 		case DoorState_FindBottom:
+			doorState.closed.loweredHeight -= args->actualCount;
 			if (args->requestedCount < 0)
 			{
 				if (args->fault.any)

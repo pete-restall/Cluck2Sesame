@@ -29,11 +29,21 @@ struct DoorCloseScheduleActioned { EMPTY_EVENT_ARGS };
 struct DoorOpened { EMPTY_EVENT_ARGS };
 
 #define DOOR_CLOSED ((EventType) 0x5b)
-struct DoorClosed { EMPTY_EVENT_ARGS };
+struct DoorClosed
+{
+	int16_t loweredHeight;
+};
 
 #define DOOR_ABORTED ((EventType) 0x5c)
 struct DoorAborted
 {
+	union DoorFaults fault;
+};
+
+#define DOOR_CALIBRATED ((EventType) 0x5d)
+struct DoorCalibrated
+{
+	uint16_t height;
 	union DoorFaults fault;
 };
 
@@ -85,6 +95,7 @@ struct DoorStateWithContext
 
 extern void doorInitialise(void);
 extern void doorGetState(struct DoorStateWithContext *state);
+extern void doorCalibrate(void);
 extern void doorManualStartOpening(void);
 extern void doorManualStartClosing(void);
 extern void doorManualStop(void);

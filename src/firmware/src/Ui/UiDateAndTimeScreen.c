@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "../Event.h"
 #include "../Platform/Clock.h"
 
 #include "Ui.h"
@@ -23,6 +24,14 @@
 #define DATE_ENTRY_COMPLETED (TIME_MM2_POS + 1)
 
 static void uiDateAndTimeScreenEnterNextDigit(void);
+static void uiDateAndTimeScreenTimeChanged(const struct Event *event);
+static void uiDateAndTimeScreenStatusExit(void);
+
+static const struct EventSubscription onTimeChangedSubscription =
+{
+	.type = TIME_CHANGED,
+	.handler = &uiDateAndTimeScreenTimeChanged
+};
 
 static const char *const uiDateAndTimeScreens =
 	"Today is...     \0"
@@ -30,7 +39,15 @@ static const char *const uiDateAndTimeScreens =
 	"Temp, Volt, etc.";
 
 #define DATE_AND_TIME_ENTRY_SCREEN_LINES (uiDateAndTimeScreens + 0)
-#define DATE_AND_TIME_STATUS_SCREEN_LINES (uiDateAndTimeScreens + UI_SCREEN_WIDTH)
+#define DATE_AND_TIME_STATUS_SCREEN_LINES (uiDateAndTimeScreens + UI_SCREEN_WIDTH + 1)
+
+void uiDateAndTimeEntryMenuScreen(void)
+{
+	uiState.menu.itemText = "Set clock ?     ";
+	uiState.menu.onNext = &uiDoorCalibrationMenuScreen;
+	uiState.menu.onOk = &uiDateAndTimeEntryScreen;
+	uiMenuScreen();
+}
 
 void uiDateAndTimeEntryScreen(void)
 {
@@ -136,7 +153,7 @@ static void uiDateAndTimeScreenEnterNextDigit(void)
 			if (uiState.flags.bits.isInitialSetupRequired)
 				uiLatitudeAndLongitudeEntryScreen();
 			else
-				uiDateAndTimeStatusScreen();
+				UI_DEFAULT_SCREEN();
 			return;
 	}
 
@@ -151,8 +168,31 @@ void uiDateAndTimeStatusScreen(void)
 		DATE_AND_TIME_STATUS_SCREEN_LINES,
 		sizeof(uiState.screen));
 
-	// TODO...
+	eventSubscribe(&onTimeChangedSubscription);
+	uiDateAndTimeScreenTimeChanged((const struct Event *) 0);
+
 	uiState.input.cursorPosition = UI_NO_CURSOR;
-	uiState.input.buttons = &uiInputIsUninitialised;
+	uiState.input.buttons = &uiInputIsStatusScreen;
+	uiState.input.onEnter = &uiDateAndTimeScreenStatusExit;
 	uiScreenBlit();
+}
+
+static void uiDateAndTimeScreenTimeChanged(const struct Event *event)
+{
+	static struct DateAndTimeGet now;
+	// TODO: THIS NEEDS TO BE LOCAL TIME, NOT GMT...BUT IT'LL DO FOR NOW...
+	clockGetNowGmt(&now);
+
+	uiScreenTwoDigitsToPosition(DATE_YY1_POS, now.date.year);
+	uiScreenTwoDigitsToPosition(DATE_MM1_POS, now.date.month);
+	uiScreenTwoDigitsToPosition(DATE_DD1_POS, now.date.day);
+
+	uiScreenTwoDigitsToPosition(TIME_HH1_POS, now.time.hour);
+	uiScreenTwoDigitsToPosition(TIME_MM1_POS, now.time.minute);
+}
+
+static void uiDateAndTimeScreenStatusExit(void)
+{
+	eventUnsubscribe(&onTimeChangedSubscription);
+	uiDoorControlMenuScreen();
 }

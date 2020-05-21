@@ -1,5 +1,6 @@
 #include <xc.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "../Platform/NvmSettings.h"
 #include "../Platform/NearScheduler.h"
@@ -202,4 +203,12 @@ uint8_t uiScreenTwoDigitsFromPosition(uint8_t cursorPosition)
 	return
 		(uiState.screen[cursorPosition] - '0') * 10 +
 		(uiState.screen[cursorPosition + 1] - '0');
+}
+
+void uiScreenTwoDigitsToPosition(uint8_t cursorPosition, uint8_t value)
+{
+	div_t digits;
+	digits = div(value, 10);
+	uiState.screen[cursorPosition] = (char) ('0' + digits.quot);
+	uiState.screen[cursorPosition + 1] = (char) ('0' + digits.rem);
 }

@@ -62,6 +62,12 @@ const struct ButtonsBehaviour uiInputIsOptions =
 	.right = &uiInputEntered
 };
 
+const struct ButtonsBehaviour uiInputIsStatusScreen =
+{
+	.left = &uiInputIgnore,
+	.right = &uiInputEntered
+};
+
 void uiInputOnButtonsPressed(const struct Event *event)
 {
 	const struct ButtonsPressed *pressed = (const struct ButtonsPressed *) event->args;

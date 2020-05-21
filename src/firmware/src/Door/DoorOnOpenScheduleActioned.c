@@ -51,19 +51,3 @@ void doorStartOpening(
 	else
 		doorState.current = motorDisabledState;
 }
-
-void doorStartFindingBottom(
-	enum DoorState motorEnabledState,
-	enum DoorState motorDisabledState)
-{
-	if (motorIsEnabled())
-	{
-		motorLimitIsNoLoad();
-		motorOn(FIND_BOTTOM_LOWERING);
-		doorState.current = motorEnabledState;
-	}
-	else
-		doorState.current = motorDisabledState;
-
-	doorState.findBottomIterations = 0;
-}

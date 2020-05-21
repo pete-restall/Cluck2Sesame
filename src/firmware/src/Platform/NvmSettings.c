@@ -49,10 +49,11 @@ __section("NvmSettings") const volatile union NvmSettings nvmSettings =
 	.crc8 = 0x00 // TODO: THIS NEEDS CALCULATING, AND IT NEEDS VERIFYING ON BOOT
 };
 
-void nvmSettingsStore(const union NvmSettings *newSettings)
+uint8_t nvmSettingsStore(const union NvmSettings *newSettings)
 {
 	static const uint8_t *const dest = (const uint8_t *) &nvmSettings;
 	NVMADR = ((uint16_t) dest) & 0x7fff;
+	NVMCON1bits.WRERR = 0;
 	NVMCON1bits.NVMREGS = 0;
 	NVMCON1bits.FREE = 1;
 	NVMCON1bits.WREN = 1;
@@ -76,10 +77,11 @@ void nvmSettingsStore(const union NvmSettings *newSettings)
 	nvmUnlockSequence();
 	NVMCON1bits.WREN = 0;
 
-	// if (NVMCON1bits.WRERR)
-		// TODO: WHAT TO DO HERE ?  IT'S A FAULT BUT UNRECOVERABLE.  A REBOOT WILL BRING UP THE DEVICE IN AN INVALID STATE.
+	if (NVMCON1bits.WRERR)
+		return 0;
 
 	eventPublish(NVM_SETTINGS_CHANGED, &eventEmptyArgs);
+	return 1;
 }
 
 static void nvmUnlockSequence(void)

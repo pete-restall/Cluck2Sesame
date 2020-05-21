@@ -47,6 +47,7 @@ void doorStartClosing(
 			: -nvmSettings.application.door.height);
 
 		doorState.current = motorEnabledState;
+		doorState.closed.loweredHeight = 0;
 	}
 	else
 		doorState.current = motorDisabledState;
