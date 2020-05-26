@@ -9,5 +9,5 @@ HEX_FILENAME="${THIS_DIR}/build/ceedling/generated/release/Cluck3Sesame.hex";
 pushd .;
 cd "${LOGS_DIR}";
 echo "*** DEPLOYMENT LOGS CAN BE FOUND IN ${LOGS_DIR}";
-${PICKIT3_IPE} -P16F15355 -OL -M -Y -F${HEX_FILENAME};
+${PICKIT3_IPE} -P16F15356 -OL -M -Y -F${HEX_FILENAME};
 popd;
