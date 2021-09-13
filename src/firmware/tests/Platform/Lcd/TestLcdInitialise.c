@@ -3,8 +3,8 @@
 #include <unity.h>
 
 #include "Platform/Event.h"
+#include "Platform/NvmSettings.h"
 #include "Mock_VoltageRegulator.h"
-#include "Mock_NvmSettings.h"
 #include "Mock_LcdInternals.h"
 #include "Platform/Lcd.h"
 

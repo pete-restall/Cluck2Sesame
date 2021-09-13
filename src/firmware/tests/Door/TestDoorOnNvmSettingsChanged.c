@@ -14,6 +14,7 @@
 #include "../NvmSettingsFixture.h"
 
 TEST_FILE("Door/DoorInitialise.c")
+TEST_FILE("Door/DoorCalibrate.c")
 TEST_FILE("Door/DoorOnAborted.c")
 TEST_FILE("Door/DoorOnOpenScheduleActioned.c")
 TEST_FILE("Door/DoorOnCloseScheduleActioned.c")

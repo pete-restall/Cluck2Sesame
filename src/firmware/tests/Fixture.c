@@ -5,6 +5,8 @@
 
 #include "Fixture.h"
 
+const struct Event eventEmptyArgs __attribute__((weak)) = { };
+
 void setUp(void)
 {
 	onBeforeTest();
