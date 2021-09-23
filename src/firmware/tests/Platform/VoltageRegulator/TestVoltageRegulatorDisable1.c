@@ -20,13 +20,13 @@ void test_voltageRegulatorDisable_calledAfterEnabledOnce_expectEnablePinIsLow(vo
 	voltageRegulatorInitialise();
 	voltageRegulatorEnable();
 	voltageRegulatorDisable();
-	TEST_ASSERT_FALSE(LATBbits.LATB2);
+	TEST_ASSERT_FALSE_MESSAGE(LATBbits.LATB2, "A");
 
 	callScheduleHandlerAndForget();
-	TEST_ASSERT_FALSE(LATBbits.LATB2);
+	TEST_ASSERT_FALSE_MESSAGE(LATBbits.LATB2, "B");
 
 	callScheduleHandlerIfPresentAndForget();
-	TEST_ASSERT_FALSE(LATBbits.LATB2);
+	TEST_ASSERT_FALSE_MESSAGE(LATBbits.LATB2, "C");
 }
 
 void test_voltageRegulatorDisable_calledAfterVoltageRailStabilised_expectEnablePinIsLow(void)
@@ -52,13 +52,13 @@ void test_voltageRegulatorDisable_calledAfterEnabledOnce_expectVmcuSelPinIsLow(v
 	voltageRegulatorInitialise();
 	voltageRegulatorEnable();
 	voltageRegulatorDisable();
-	TEST_ASSERT_FALSE(LATBbits.LATB0);
+	TEST_ASSERT_FALSE_MESSAGE(LATBbits.LATB0, "A");
 
 	callScheduleHandlerAndForget();
-	TEST_ASSERT_FALSE(LATBbits.LATB0);
+	TEST_ASSERT_FALSE_MESSAGE(LATBbits.LATB0, "B");
 
 	callScheduleHandlerIfPresentAndForget();
-	TEST_ASSERT_FALSE(LATBbits.LATB0);
+	TEST_ASSERT_FALSE_MESSAGE(LATBbits.LATB0, "C");
 }
 
 void test_voltageRegulatorDisable_calledAfterVoltageRailStabilised_expectVmcuSelPinIsLow(void)
@@ -85,13 +85,13 @@ void test_voltageRegulatorDisable_calledOnceAfterEnabledTwice_expectEnablePinIsH
 	voltageRegulatorEnable();
 	voltageRegulatorEnable();
 	voltageRegulatorDisable();
-	TEST_ASSERT_TRUE(LATBbits.LATB2);
+	TEST_ASSERT_TRUE_MESSAGE(LATBbits.LATB2, "A");
 
 	callScheduleHandlerAndForget();
-	TEST_ASSERT_TRUE(LATBbits.LATB2);
+	TEST_ASSERT_TRUE_MESSAGE(LATBbits.LATB2, "B");
 
 	callScheduleHandlerAndForget();
-	TEST_ASSERT_TRUE(LATBbits.LATB2);
+	TEST_ASSERT_TRUE_MESSAGE(LATBbits.LATB2, "C");
 }
 
 void test_voltageRegulatorDisable_calledOnceAfterEnabledTwice_expectVmcuSelPinIsHigh(void)
@@ -100,11 +100,11 @@ void test_voltageRegulatorDisable_calledOnceAfterEnabledTwice_expectVmcuSelPinIs
 	fullyEnableVoltageRegulator();
 	voltageRegulatorEnable();
 	voltageRegulatorDisable();
-	TEST_ASSERT_TRUE(LATBbits.LATB0);
+	TEST_ASSERT_TRUE_MESSAGE(LATBbits.LATB0, "A");
 
 	callScheduleHandlerIfPresentAndForget();
-	TEST_ASSERT_TRUE(LATBbits.LATB0);
+	TEST_ASSERT_TRUE_MESSAGE(LATBbits.LATB0, "B");
 
 	callScheduleHandlerIfPresentAndForget();
-	TEST_ASSERT_TRUE(LATBbits.LATB0);
+	TEST_ASSERT_TRUE_MESSAGE(LATBbits.LATB0, "C");
 }

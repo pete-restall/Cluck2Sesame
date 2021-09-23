@@ -65,10 +65,13 @@ static void onMcuVoltageRailStabilised(void *state)
 
 void voltageRegulatorDisable(void)
 {
-	if (enableCount == 0)
+	if (enableCount > 1)
+	{
+		enableCount--;
 		return;
+	}
 
-	if (--enableCount == 0 && fullyEnabled)
+	if (enableCount == 1 && fullyEnabled)
 	{
 		eventPublish(VOLTAGE_REGULATOR_DISABLED, &eventEmptyArgs);
 		fullyEnabled = 0;
@@ -76,6 +79,7 @@ void voltageRegulatorDisable(void)
 
 	LATBbits.LATB0 = 0;
 	LATBbits.LATB2 = 0;
+	enableCount = 0;
 }
 
 uint8_t voltageRegulatorIsEnabled(void)
