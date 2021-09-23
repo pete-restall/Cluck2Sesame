@@ -105,8 +105,7 @@ static void onVoltageRegulatorEnabled(const struct Event *event)
 
 	if (motorState.enableCount != 0)
 	{
-		static const struct MotorEnabled eventArgs = { };
-		eventPublish(MOTOR_ENABLED, &eventArgs);
+		eventPublish(MOTOR_ENABLED, &eventEmptyArgs);
 		motorState.flags.isFullyEnabled = 1;
 	}
 }
