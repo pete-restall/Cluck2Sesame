@@ -31,13 +31,13 @@ void test_motorEnable_called_expectPwmTimerIsEnabled(void)
 	TEST_ASSERT_EQUAL_UINT8(1, pwmTimerEnableCalls);
 }
 
-void test_motorEnable_calledMoreThanOnce_expectPwmTimerIsEnabledSameNumberOfTimes(void)
+void test_motorEnable_calledMoreThanOnce_expectPwmTimerIsOnlyEnabledOnce(void)
 {
-	uint8_t numberOfCalls = anyByteLessThan(10);
+	uint8_t numberOfCalls = 2 + anyByteLessThan(10);
 	for (uint8_t i = 0; i < numberOfCalls; i++)
 		motorEnable();
 
-	TEST_ASSERT_EQUAL_UINT8(numberOfCalls, pwmTimerEnableCalls);
+	TEST_ASSERT_EQUAL_UINT8(1, pwmTimerEnableCalls);
 }
 
 void test_motorEnable_calledWhenVoltageRegulatorIsDisabled_expectVoltageRegulatorIsEnabled(void)
@@ -47,20 +47,20 @@ void test_motorEnable_calledWhenVoltageRegulatorIsDisabled_expectVoltageRegulato
 	TEST_ASSERT_EQUAL_UINT8(1, voltageRegulatorEnableCalls);
 }
 
-void test_motorEnable_calledWhenVoltageRegulatorIsEnabled_expectVoltageRegulatorIsEnabledAgain(void)
+void test_motorEnable_calledWhenVoltageRegulatorIsEnabled_expectVoltageRegulatorIsNotEnabledAgain(void)
 {
 	stubVoltageRegulatorIsEnabled(1);
 	motorEnable();
 	TEST_ASSERT_EQUAL_UINT8(1, voltageRegulatorEnableCalls);
 }
 
-void test_motorEnable_calledMoreThanOnce_expectVoltageRegulatorIsEnabledSameNumberOfTimes(void)
+void test_motorEnable_calledMoreThanOnce_expectVoltageRegulatorIsOnlyEnabledOnce(void)
 {
-	uint8_t numberOfCalls = anyByteLessThan(10);
+	uint8_t numberOfCalls = 2 + anyByteLessThan(10);
 	for (uint8_t i = 0; i < numberOfCalls; i++)
 		motorEnable();
 
-	TEST_ASSERT_EQUAL_UINT8(numberOfCalls, voltageRegulatorEnableCalls);
+	TEST_ASSERT_EQUAL_UINT8(1, voltageRegulatorEnableCalls);
 }
 
 void test_motorEnable_calledForFirstTimeWhenVoltageRegulatorIsAlreadyEnabled_expectMotorEnabledEventIsPublished(void)
