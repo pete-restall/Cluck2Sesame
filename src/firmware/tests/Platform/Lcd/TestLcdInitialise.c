@@ -33,10 +33,20 @@ void test_lcdInitialise_called_expectPwm3And5ModulesAreEnabled(void)
 		PMD3);
 }
 
-void test_lcdInitialise_called_expectLcdPortAPinsAreAllOutputs(void)
+void test_lcdInitialise_called_expectLcdContrastPinIsTristated(void)
 {
+	static const uint8_t lcdContrastPin = _TRISA_TRISA2_MASK;
+	ANSELA = anyByteWithMaskClear(lcdContrastPin);
+	TRISA = anyByteWithMaskClear(lcdContrastPin);
+	lcdInitialise();
+	TEST_ASSERT_BITS_HIGH_MESSAGE(lcdContrastPin, ANSELA, "ANSELA");
+	TEST_ASSERT_BITS_HIGH_MESSAGE(lcdContrastPin, TRISA, "TRISA");
+}
+
+void test_lcdInitialise_called_expectLcdPortAPinsExceptContrastPinAreAllOutputs(void)
+{
+	static const uint8_t lcdContrastPin = _TRISA_TRISA3_MASK;
 	static const uint8_t usedPins =
-		_TRISA_TRISA2_MASK |
 		_TRISA_TRISA3_MASK |
 		_TRISA_TRISA4_MASK |
 		_TRISA_TRISA5_MASK |
@@ -46,7 +56,7 @@ void test_lcdInitialise_called_expectLcdPortAPinsAreAllOutputs(void)
 	TRISA = anyByteWithMaskSet(usedPins);
 	uint8_t originalTrisa = TRISA;
 	lcdInitialise();
-	TEST_ASSERT_EQUAL_UINT8(originalTrisa & ~usedPins, TRISA);
+	TEST_ASSERT_EQUAL_UINT8(originalTrisa & ~usedPins, TRISA & ~lcdContrastPin);
 }
 
 void test_lcdInitialise_called_expectLcdPortCPinsAreAllOutputs(void)
@@ -61,10 +71,9 @@ void test_lcdInitialise_called_expectLcdPortCPinsAreAllOutputs(void)
 	TEST_ASSERT_EQUAL_UINT8(originalTrisc & ~usedPins, TRISC);
 }
 
-void test_lcdInitialise_called_expectLcdPortAPinsAreAllDigital(void)
+void test_lcdInitialise_called_expectLcdPortAPinsExceptContrastPinAreAllDigital(void)
 {
 	static const uint8_t usedPins =
-		_ANSELA_ANSA2_MASK |
 		_ANSELA_ANSA3_MASK |
 		_ANSELA_ANSA4_MASK |
 		_ANSELA_ANSA5_MASK |
