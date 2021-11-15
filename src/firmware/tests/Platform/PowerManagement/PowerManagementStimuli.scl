@@ -1,11 +1,11 @@
-configuration for "PIC16F15355" is
+configuration for "PIC16F15356" is
 	shared variable sleepExecuted;
 	shared variable pie0BeforeSleep;
 	shared variable vregconBeforeSleep;
 	shared variable cpudozeBeforeSleep;
 end configuration;
 
-testbench for "PIC16F15355" is
+testbench for "PIC16F15356" is
 begin
 	setup: process is
 	begin

@@ -1,4 +1,4 @@
-configuration for "PIC16F15355" is
+configuration for "PIC16F15356" is
 	shared variable scenarioIndex;
 
 	shared variable stubDayOfYearHigh;
@@ -12,7 +12,7 @@ configuration for "PIC16F15355" is
 	shared variable expectedSunsetMinute;
 end configuration;
 
-testbench for "PIC16F15355" is
+testbench for "PIC16F15356" is
 begin
 	scenarioInjection: process is
 		variable stubDayOfYear : integer;

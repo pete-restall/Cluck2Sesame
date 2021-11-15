@@ -1,4 +1,4 @@
-configuration for "PIC16F15355" is
+configuration for "PIC16F15356" is
 	shared variable fakeLcdSessionIndex;
 	shared variable fakeLcdIsSessionInvalid;
 	shared variable fakeLcdInitialFunctionSetCount;
@@ -51,7 +51,7 @@ configuration for "PIC16F15355" is
 	shared variable fakeLcdDram1_15;
 end configuration;
 
-testbench for "PIC16F15355" is
+testbench for "PIC16F15356" is
 begin
 	resetFixture: process is
 	begin

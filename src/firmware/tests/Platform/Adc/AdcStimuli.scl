@@ -1,4 +1,4 @@
-configuration for "PIC16F15355" is
+configuration for "PIC16F15356" is
 	shared variable isInvalidSession;
 	shared variable adcon0BeforeConversion;
 	shared variable adcon1BeforeConversion;
@@ -22,7 +22,7 @@ configuration for "PIC16F15355" is
 	shared variable stubAdcResult7h;
 end configuration;
 
-testbench for "PIC16F15355" is
+testbench for "PIC16F15356" is
 begin
 	clearSfrsOnModuleDisable: process is
 		variable alreadyDisabled : boolean;
