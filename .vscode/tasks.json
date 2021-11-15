@@ -3,30 +3,34 @@
 	"tasks": [
 		{
 			"label": "Test All",
+			"group": "build",
 			"type": "shell",
 			"command": "./ceedling test",
-			"group": "build"
+			"options": { "cwd": "${workspaceFolder}/src/firmware" }
 		},
 		{
 			"label": "Test Current",
+			"group": "build",
 			"type": "shell",
 			"command": "./ceedling verbosity[4] test:${file}",
-			"group": "build"
+			"options": { "cwd": "${workspaceFolder}/src/firmware" }
 		},
 		{
 			"label": "Release Build",
-			"type": "shell",
-			"command": "./ceedling verbosity[4] release",
 			"group": {
 				"kind": "build",
 				"isDefault": true
-			}
+			},
+			"type": "shell",
+			"command": "./ceedling verbosity[4] release",
+			"options": { "cwd": "${workspaceFolder}/src/firmware" }
 		},
 		{
 			"label": "Deploy (No Build)",
+			"group": "build",
 			"type": "shell",
 			"command": "./deploy.sh",
-			"group": "build",
+			"options": { "cwd": "${workspaceFolder}/src/firmware" },
 			"problemMatcher": []
 		}
 	]

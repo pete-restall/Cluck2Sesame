@@ -1,0 +1,12 @@
+{
+  "files.associations": {
+    "xc.h": "c",
+    "pic.h": "c",
+    "pic_chip_select.h": "c",
+    "doorfixture.h": "c",
+    "door.h": "c",
+    "doorfindbottomfixture.h": "c",
+    "applicationnvmsettings.h": "c",
+    "event.h": "c"
+  }
+}

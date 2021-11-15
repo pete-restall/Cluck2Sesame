@@ -6,8 +6,8 @@
 				"/opt/microchip/xc8/v2.05/pic/include/c99",
 				"${workspaceFolder}/**"
 			],
-			"defines": ["__XC8", "__PICC__", "_16F15355"],
-			"compilerPath": "${workspaceFolder}/ceedling",
+			"defines": ["__XC8", "__PICC__", "_16F15356"],
+			"compilerPath": "${workspaceFolder}/src/firmware/ceedling",
 			"cStandard": "c99",
 			"intelliSenseMode": "gcc-x64"
 		}
