@@ -45,7 +45,7 @@ void test_lcdInitialise_called_expectLcdContrastPinIsTristated(void)
 
 void test_lcdInitialise_called_expectLcdPortAPinsExceptContrastPinAreAllOutputs(void)
 {
-	static const uint8_t lcdContrastPin = _TRISA_TRISA3_MASK;
+	static const uint8_t lcdContrastPin = _TRISA_TRISA2_MASK;
 	static const uint8_t usedPins =
 		_TRISA_TRISA3_MASK |
 		_TRISA_TRISA4_MASK |
