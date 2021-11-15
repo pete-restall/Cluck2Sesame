@@ -470,8 +470,16 @@ begin
 			wait on RA3;
 			if RB2 == '1' then
 				if RA4 == '0' then
-					report("[FAKE LCD ASSERT] RS changed state while EN was low !");
-					fakeLcdIsSessionInvalid := 1;
+					wait for 100 us;
+					if RB2 == '1' then
+						report("[FAKE LCD ASSERT] RS changed state while EN was low !");
+						fakeLcdIsSessionInvalid := 1;
+					elsif RA3 == '1' then
+						report("[FAKE LCD ASSERT] RS changed state (set high) while EN was low and remained so after LCD was powered down !");
+						fakeLcdIsSessionInvalid := 1;
+					else
+						report("[FAKE LCD GLITCH] RS changed state while EN was low, but LCD powered down shortly thereafter.");
+					end if;
 				end if;
 			end if;
 		end loop;
@@ -483,8 +491,16 @@ begin
 			wait on RC4;
 			if RB2 == '1' then
 				if RA4 == '0' then
-					report("[FAKE LCD ASSERT] DB7 changed state while EN was low !");
-					fakeLcdIsSessionInvalid := 1;
+					wait for 100 us;
+					if RB2 == '1' then
+						report("[FAKE LCD ASSERT] DB7 changed state while EN was low !");
+						fakeLcdIsSessionInvalid := 1;
+					elsif RC4 == '1' then
+						report("[FAKE LCD ASSERT] DB7 changed state (set high) while EN was low and remained so after LCD was powered down !");
+						fakeLcdIsSessionInvalid := 1;
+					else
+						report("[FAKE LCD GLITCH] DB7 changed state while EN was low, but LCD powered down shortly thereafter.");
+					end if;
 				end if;
 			end if;
 		end loop;
@@ -496,8 +512,16 @@ begin
 			wait on RA6;
 			if RB2 == '1' then
 				if RA4 == '0' then
-					report("[FAKE LCD ASSERT] DB6 changed state while EN was low !");
-					fakeLcdIsSessionInvalid := 1;
+					wait for 100 us;
+					if RB2 == '1' then
+						report("[FAKE LCD ASSERT] DB6 changed state while EN was low !");
+						fakeLcdIsSessionInvalid := 1;
+					elsif RA6 == '1' then
+						report("[FAKE LCD ASSERT] DB6 changed state (set high) while EN was low and remained so after LCD was powered down !");
+						fakeLcdIsSessionInvalid := 1;
+					else
+						report("[FAKE LCD GLITCH] DB6 changed state while EN was low, but LCD powered down shortly thereafter.");
+					end if;
 				end if;
 			end if;
 		end loop;
@@ -509,8 +533,16 @@ begin
 			wait on RA7;
 			if RB2 == '1' then
 				if RA4 == '0' then
-					report("[FAKE LCD ASSERT] DB5 changed state while EN was low !");
-					fakeLcdIsSessionInvalid := 1;
+					wait for 100 us;
+					if RB2 == '1' then
+						report("[FAKE LCD ASSERT] DB5 changed state while EN was low !");
+						fakeLcdIsSessionInvalid := 1;
+					elsif RA7 == '1' then
+						report("[FAKE LCD ASSERT] DB5 changed state (set high) while EN was low and remained so after LCD was powered down !");
+						fakeLcdIsSessionInvalid := 1;
+					else
+						report("[FAKE LCD GLITCH] DB5 changed state while EN was low, but LCD powered down shortly thereafter.");
+					end if;
 				end if;
 			end if;
 		end loop;
@@ -522,8 +554,16 @@ begin
 			wait on RA5;
 			if RB2 == '1' then
 				if RA4 == '0' then
-					report("[FAKE LCD ASSERT] DB4 changed state while EN was low !");
-					fakeLcdIsSessionInvalid := 1;
+					wait for 100 us;
+					if RB2 == '1' then
+						report("[FAKE LCD ASSERT] DB4 changed state while EN was low !");
+						fakeLcdIsSessionInvalid := 1;
+					elsif RA5 == '1' then
+						report("[FAKE LCD ASSERT] DB4 changed state (set high) while EN was low and remained so after LCD was powered down !");
+						fakeLcdIsSessionInvalid := 1;
+					else
+						report("[FAKE LCD GLITCH] DB4 changed state while EN was low, but LCD powered down shortly thereafter.");
+					end if;
 				end if;
 			end if;
 		end loop;
