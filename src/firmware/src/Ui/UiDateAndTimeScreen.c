@@ -151,9 +151,13 @@ static void uiDateAndTimeScreenEnterNextDigit(void)
 			// TODO: THIS NEEDS TO BE LOCAL TIME, NOT GMT...BUT IT'LL DO FOR NOW...
 			clockSetNowGmt(&dateAndTime);
 			if (uiState.flags.bits.isInitialSetupRequired)
+			{
 				uiLatitudeAndLongitudeEntryScreen();
+			}
 			else
+			{
 				UI_DEFAULT_SCREEN();
+			}
 			return;
 	}
 

@@ -129,7 +129,9 @@ void eventSubscribe(const struct EventSubscription *subscription)
 		onAllEventsDispatchedEvent.args = (void *) 0;
 	}
 	else
+	{
 		TEST_FAIL_MESSAGE("Unknown subscription type");
+	}
 }
 
 void eventPublish(EventType type, const void *args)

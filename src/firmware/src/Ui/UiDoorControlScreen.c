@@ -161,7 +161,11 @@ static void uiDoorOnCalibrated(const struct Event *event)
 	uiNvmSettings.application.door.height = calibrated->height;
 
 	if (uiState.flags.bits.isInitialSetupRequired)
+	{
 		uiOnSystemInitialSetupCompleted();
+	}
 	else
+	{
 		UI_DEFAULT_SCREEN();
+	}
 }
