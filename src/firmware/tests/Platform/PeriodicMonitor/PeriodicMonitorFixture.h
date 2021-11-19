@@ -6,6 +6,8 @@
 #include "Platform/Adc.h"
 #include "Platform/PeriodicMonitor.h"
 
+typedef void (*AdcSampleCallback)(struct AdcSample *);
+
 extern void periodicMonitorFixtureSetUp(void);
 extern void periodicMonitorFixtureTearDown(void);
 
@@ -20,5 +22,6 @@ extern uint8_t monitoredParametersSampledSequence;
 
 extern uint8_t adcSampleCalls;
 extern uint8_t adcSampleSequence;
+extern AdcSampleCallback onAdcSample;
 
 #endif

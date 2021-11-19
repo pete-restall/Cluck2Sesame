@@ -11,6 +11,7 @@
 
 static void onMonitoredParametersSampled(const struct Event *event);
 static void onTimeChanged(const struct Event *event);
+static void stubAdcSample(struct AdcSample *sample);
 
 static uint8_t stubCallSequence;
 
@@ -25,6 +26,12 @@ uint8_t monitoredParametersSampledSequence;
 static struct AdcSample *expectedAdcSampleArg;
 uint8_t adcSampleCalls;
 uint8_t adcSampleSequence;
+AdcSampleCallback onAdcSample;
+
+static void buggyCompilerWorkaround(void)
+{
+	onAdcSample = _OMNITARGET;
+}
 
 void periodicMonitorFixtureSetUp(void)
 {
@@ -44,6 +51,7 @@ void periodicMonitorFixtureSetUp(void)
 	expectedAdcSampleArg = (struct AdcSample *) 0;
 	adcSampleCalls = 0;
 	adcSampleSequence = 0;
+	onAdcSample = &stubAdcSample;
 }
 
 void periodicMonitorFixtureTearDown(void)
@@ -81,6 +89,12 @@ void stubAdcSampleFor(struct AdcSample *sample)
 }
 
 void adcSample(struct AdcSample *sample)
+{
+	if (onAdcSample)
+		onAdcSample(sample);
+}
+
+static void stubAdcSample(struct AdcSample *sample)
 {
 	adcSampleCalls++;
 	adcSampleSequence = stubCallSequence++;

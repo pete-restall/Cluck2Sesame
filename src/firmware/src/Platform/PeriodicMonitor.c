@@ -30,19 +30,26 @@ static void onTimeChanged(const struct Event *event)
 	eventArgs.timestamp = TMR0L;
 	eventArgs.flags.isVddRegulated = (PORTBbits.RB0 == 0 ? 0 : 1);
 
-	// TODO: FVR NEEDS STABILISATION TIME OF 60us - FVRRDY BIT IS ALWAYS 1 SO ENABLE IT (PMD0.FVRMD, FVRCON.FVREN), SAMPLE TEMPERATURE FIRST (ALSO REQUIRES ABOUT 25us STABILISATION TIME AFTER ENABLING) AND THEN USE A BUSY LOOP TO MAKE UP THE REST OF THE TIME; ALSO NEEDS TO BE ENABLED (PMD0bits.FVRMD)
+	PMD0bits.FVRMD = 0;
+	FVRCON = _FVRCON_ADFVR1_MASK | _FVRCON_FVREN_MASK | _FVRCON_TSRNG_MASK | _FVRCON_TSEN_MASK;
+
 	struct AdcSample sample =
 	{
-		.channel = ADC_CHANNEL_ADCFVR,
-		.count = 8
+		.channel = ADC_CHANNEL_VSS,
+		.count = 2
 	};
 
 	adcSample(&sample);
-	eventArgs.fvr = sample.result;
 
+	sample.count = 8;
 	sample.channel = ADC_CHANNEL_TEMPERATURE,
 	adcSample(&sample);
 	eventArgs.temperature = sample.result;
+
+	sample.channel = ADC_CHANNEL_ADCFVR,
+	adcSample(&sample);
+	eventArgs.fvr = sample.result;
+	PMD0bits.FVRMD = 1;
 
 	eventPublish(MONITORED_PARAMETERS_SAMPLED, &eventArgs);
 }
