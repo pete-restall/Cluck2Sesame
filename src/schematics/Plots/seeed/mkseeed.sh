@@ -2,7 +2,7 @@
 
 PROJECT="Cluck2Sesame";
 PLOT_REPORT="../${PROJECT} (Plot Report).txt";
-PLOT_DIR="../";
+PLOT_DIR="..";
 ZIP_DIR="${PROJECT}";
 ZIP_FILE="${PROJECT}.zip";
 
@@ -28,6 +28,9 @@ cp "${PLOT_DIR}/${PROJECT} - Top Solder Mask.gbr" "${ZIP_DIR}/Top Solder Mask.GT
 cp "${PLOT_DIR}/${PROJECT} - Top Silkscreen.gbr" "${ZIP_DIR}/Top Overlay.GTO";
 cp "README.txt" "${ZIP_DIR}/README.TXT";
 cp "${PLOT_REPORT}" "${ZIP_DIR}/DesignSpark Plot Report.TXT";
+
+cp "${PLOT_DIR}/../Cluck2Sesame (Component Placement).csv" "${ZIP_DIR}/Component Placement.csv";
+cp "BOM.xlsx" "${ZIP_DIR}";
 
 zip -9 -r "${ZIP_FILE}" "${ZIP_DIR}";
 
