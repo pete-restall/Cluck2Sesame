@@ -6,3 +6,4 @@
 *.mop binary
 *.cmx binary
 *.cml binary
+*.zip binary
