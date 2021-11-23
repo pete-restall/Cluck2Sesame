@@ -54,4 +54,4 @@ board through more integration and a higher pin count.
 None yet.  But there will be.
 
 ## Build
-[![Build Status](https://travis-ci.org/pete-restall/Cluck3Sesame.svg?branch=master)](https://travis-ci.org/pete-restall/Cluck3Sesame)
+[![Build Status](https://github.com/pete-restall/Cluck3Sesame/actions/workflows/cluck2sesame.yml/badge.svg)](https://github.com/pete-restall/Cluck3Sesame/actions/workflows/cluck2sesame.yml)
