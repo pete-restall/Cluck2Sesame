@@ -5,15 +5,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Install Ruby
         uses: ruby/setup-ruby@477b21f02be01bcb8030d50f37cfec92bfa615b6
         with:
           ruby-version: 2.7
-      - name: Install Pre-Requisites
+
+      - name: Install MPLABX
         run: |
+          sudo apt update -y
+          sudo apt install -y libc6:i386 libx11-6:i386 libxext6:i386 libstdc++6:i386 libexpat1:i386
           src/firmware/build/install-mplabx.sh
+
+      - name: Install Ceedling
+        run: |
           gem install rake
           gem install ceedling
+
       - name: Build
         run: |
           src/firmware/ceedling test && src/firmware/ceedling verbosity[4] release
