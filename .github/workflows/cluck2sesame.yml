@@ -1,0 +1,19 @@
+name: Cluck2Sesame Build
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Ruby
+        uses: ruby/setup-ruby@477b21f02be01bcb8030d50f37cfec92bfa615b6
+        with:
+          ruby-version: 2.7
+      - name: Install Pre-Requisites
+        run: |
+          src/firmware/build/install-mplabx.sh
+          gem install rake
+          gem install ceedling
+      - name: Build
+        run: |
+          src/firmware/ceedling test && src/firmware/ceedling verbosity[4] release
