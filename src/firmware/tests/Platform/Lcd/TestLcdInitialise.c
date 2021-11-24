@@ -43,7 +43,7 @@ void test_lcdInitialise_called_expectLcdContrastPinIsTristated(void)
 	TEST_ASSERT_BITS_HIGH_MESSAGE(lcdContrastPin, TRISA, "TRISA");
 }
 
-void test_lcdInitialise_called_expectLcdPortAPinsExceptContrastPinAreAllOutputs(void)
+void test_lcdInitialise_called_expectLcdPortANonContrastPinsAreAllOutputs(void)
 {
 	static const uint8_t lcdContrastPin = _TRISA_TRISA2_MASK;
 	static const uint8_t usedPins =
@@ -54,7 +54,7 @@ void test_lcdInitialise_called_expectLcdPortAPinsExceptContrastPinAreAllOutputs(
 		_TRISA_TRISA7_MASK;
 
 	TRISA = anyByteWithMaskSet(usedPins);
-	uint8_t originalTrisa = TRISA;
+	uint8_t originalTrisa = TRISA & ~lcdContrastPin;
 	lcdInitialise();
 	TEST_ASSERT_EQUAL_UINT8(originalTrisa & ~usedPins, TRISA & ~lcdContrastPin);
 }
@@ -71,8 +71,9 @@ void test_lcdInitialise_called_expectLcdPortCPinsAreAllOutputs(void)
 	TEST_ASSERT_EQUAL_UINT8(originalTrisc & ~usedPins, TRISC);
 }
 
-void test_lcdInitialise_called_expectLcdPortAPinsExceptContrastPinAreAllDigital(void)
+void test_lcdInitialise_called_expectLcdPortANonContrastPinsAreAllDigital(void)
 {
+	static const uint8_t lcdContrastPin = _ANSELA_ANSA2_MASK;
 	static const uint8_t usedPins =
 		_ANSELA_ANSA3_MASK |
 		_ANSELA_ANSA4_MASK |
@@ -81,9 +82,9 @@ void test_lcdInitialise_called_expectLcdPortAPinsExceptContrastPinAreAllDigital(
 		_ANSELA_ANSA7_MASK;
 
 	ANSELA = anyByteWithMaskSet(usedPins);
-	uint8_t originalAnsela = ANSELA;
+	uint8_t originalAnsela = ANSELA & ~lcdContrastPin;
 	lcdInitialise();
-	TEST_ASSERT_EQUAL_UINT8(originalAnsela & ~usedPins, ANSELA);
+	TEST_ASSERT_EQUAL_UINT8(originalAnsela & ~usedPins, ANSELA & ~lcdContrastPin);
 }
 
 void test_lcdInitialise_called_expectLcdPortCPinsAreAllDigital(void)
