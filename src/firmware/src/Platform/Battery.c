@@ -24,6 +24,26 @@ RB5 = /CHARGER_GOOD
 RB4 = /CHARGING
 RB3 = CHARGER_EN
 
-IF /CHARGER_GOOD && TEMP >= 5 && TEMP <= 30 && VBATT <= 3.8 && LAST_CHARGE_OFF_TIME >= 1MIN (IE. AT CLOCK OVERFLOW) THEN CHARGER_EN = 1
-ELSE CHARGER_EN = 0, LAST_CHARGE_OFF_TIME = CURRENT TIMESTAMP
+onIoc
+	- if /CHARGER_GOOD = 1 then CHARGER_EN = 0
+	- if /CHARGING = 1 then CHARGER_EN = 0
+
+onTemperatureSampled
+	- if temperature < 5degC then CHARGER_EN = 0
+	- if temperature > 30degC then CHARGER_EN = 0
+
+onVbattSampled
+	- if Vbatt >= 3.9V then CHARGER_EN = 0, return
+	- if temperature < 5degC then CHARGER_EN = 0, return
+	- if temperature > 30degC then CHARGER_EN = 0, return
+	- if Vbatt < 3.1V then CHARGER_EN = 1
+	- add or update (far) schedule for 13 minutes hence to set CHARGER_EN = 0
+
+starting charging should publish an event
+wanting to charge but unable to do so (ie. no power) should publish an event (ie. to enable a screen icon)
+termination of charging should publish an event (with reason, ie. charged, power lost, etc.)
+low voltage (<= 2.8V) should publish an event, which should enter a 'safety' mode (to be decided; probably involves disabling motor and waiting for charger to be connected)
+
+determine lowest voltage that motor will start with; beyond certain level the motor should not be operated
+characterise the motor - current over voltage range, current over temperature
 */
