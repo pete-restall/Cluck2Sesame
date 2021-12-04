@@ -14,6 +14,16 @@ struct AdcSample
 	uint8_t count;
 	uint8_t channel;
 	uint16_t result;
+	union
+	{
+		uint8_t all;
+		uint8_t any;
+		struct
+		{
+			unsigned int acquisitionTimeMultiple : 4;
+			unsigned int vrefIsFvr : 1;
+		};
+	} flags;
 };
 
 extern void adcInitialise(void);

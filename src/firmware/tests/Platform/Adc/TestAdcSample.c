@@ -74,7 +74,7 @@ void test_adcSample_called_expectAdcModuleIsDisabledAfterSampling(void)
 {
 	PMD2 = anyByteWithMaskClear(_PMD2_ADCMD_MASK);
 	uint8_t originalPmd2 = PMD2;
-	struct AdcSample sample = { .count = 1, .channel = anyChannel() };
+	struct AdcSample sample = { .count = 1, .channel = anyChannel(), .flags = { .all = 0 } };
 	adcSample(&sample);
 	TEST_ASSERT_EQUAL_UINT8(originalPmd2 | _PMD2_ADCMD_MASK, PMD2);
 }
@@ -96,7 +96,8 @@ void test_adcSample_called_expectResultIsFromAdres(void)
 	{
 		.count = 1,
 		.channel = anyChannel(),
-		.result = anyWordExcept(stubAdcResult[0])
+		.result = anyWordExcept(stubAdcResult[0]),
+		.flags = { .all = 0 }
 	};
 
 	adcSample(&sample);
@@ -112,7 +113,7 @@ void test_adcSample_called_expectAdcChannelIsSameAsPassedIn(void)
 {
 	ADCON0 = anyByte();
 	uint8_t channel = anyChannel();
-	struct AdcSample sample = { .count = 1, .channel = channel };
+	struct AdcSample sample = { .count = 1, .channel = channel, .flags = { .all = 0 } };
 	adcSample(&sample);
 	TEST_ASSERT_EQUAL_UINT8(
 		channel & _ADCON0_CHS_MASK,
@@ -122,7 +123,7 @@ void test_adcSample_called_expectAdcChannelIsSameAsPassedIn(void)
 void test_adcSample_called_expectAdcIsTurnedOn(void)
 {
 	ADCON0 = anyByteWithMaskClear(_ADCON0_GO_MASK);
-	struct AdcSample sample = { .count = 1, .channel = anyChannel() };
+	struct AdcSample sample = { .count = 1, .channel = anyChannel(), .flags = { .all = 0 } };
 	adcSample(&sample);
 	TEST_ASSERT_BITS_HIGH(_ADCON0_ADON_MASK, adcon0BeforeConversion);
 }
@@ -135,30 +136,41 @@ void test_adcSample_called_expectAdcResultIsRightJustified(void)
 	TEST_ASSERT_BITS_HIGH(_ADCON1_ADFM_MASK, adcon1BeforeConversion);
 }
 
-void test_adcSample_called_expectAdcConversionClockIsFoscOver32(void)
+void test_adcSample_called_expectAdcConversionClockIsFoscOver64For2MicrosecondClockPeriod(void)
 {
 	ADCON1 = anyByte();
-	struct AdcSample sample = { .count = 1, .channel = anyChannel() };
+	struct AdcSample sample = { .count = 1, .channel = anyChannel(), .flags = { .all = 0 } };
 	adcSample(&sample);
 	TEST_ASSERT_EQUAL_UINT8(
-		0b010,
+		0b110,
 		(adcon1BeforeConversion >> _ADCON1_ADCS_POSITION) & 0b111);
 }
 
-void test_adcSample_called_expectAdcReferenceVoltageIsVdd(void)
+void test_adcSample_calledWhenVrefIsFvrFlagIsClear_expectAdcReferenceVoltageIsVdd(void)
 {
 	ADCON1 = anyByte();
-	struct AdcSample sample = { .count = 1, .channel = anyChannel() };
+	struct AdcSample sample = { .count = 1, .channel = anyChannel(), .flags = { .all = 0 } };
 	adcSample(&sample);
 	TEST_ASSERT_EQUAL_UINT8(
-		0,
+		0b00,
+		(adcon1BeforeConversion >> _ADCON1_ADPREF_POSITION) & 0b11);
+}
+
+void test_adcSample_calledWhenVrefIsFvrFlagIsSet_expectAdcReferenceVoltageIsInternalFixedVoltageReference(void)
+{
+	ADCON1 = anyByte();
+	struct AdcSample sample = { .count = 1, .channel = anyChannel(), .flags = { .all = 0 } };
+	sample.flags.vrefIsFvr = 1;
+	adcSample(&sample);
+	TEST_ASSERT_EQUAL_UINT8(
+		0b11,
 		(adcon1BeforeConversion >> _ADCON1_ADPREF_POSITION) & 0b11);
 }
 
 void test_adcSample_called_expectAdcAutoConversionTriggersAreDisabled(void)
 {
 	ADACT = anyByte();
-	struct AdcSample sample = { .count = 1, .channel = anyChannel() };
+	struct AdcSample sample = { .count = 1, .channel = anyChannel(), .flags = { .all = 0 } };
 	adcSample(&sample);
 	TEST_ASSERT_EQUAL_UINT8(0, adactBeforeConversion);
 }
@@ -170,7 +182,8 @@ void test_adcSample_calledWithZeroCount_expect0Result(void)
 	{
 		.count = 0,
 		.channel = anyChannel(),
-		.result = anyWordExcept(0)
+		.result = anyWordExcept(0),
+		.flags = { .all = 0 }
 	};
 
 	adcSample(&sample);
@@ -192,7 +205,8 @@ void test_adcSample_calledWithCountGreaterThanOne_expectAccumulationOfResults(vo
 	{
 		.count = count,
 		.channel = anyChannel(),
-		.result = anyWord()
+		.result = anyWord(),
+		.flags = { .all = 0 }
 	};
 
 	adcSample(&sample);
@@ -202,7 +216,7 @@ void test_adcSample_calledWithCountGreaterThanOne_expectAccumulationOfResults(vo
 void test_adcSample_called_expectCountIsNotModified(void)
 {
 	uint8_t count = anyByteLessThan(maxStubResults + 1);
-	struct AdcSample sample = { .count = count, .channel = anyChannel() };
+	struct AdcSample sample = { .count = count, .channel = anyChannel(), .flags = { .all = 0 } };
 	adcSample(&sample);
 	TEST_ASSERT_EQUAL_UINT8(count, sample.count);
 }
@@ -210,7 +224,15 @@ void test_adcSample_called_expectCountIsNotModified(void)
 void test_adcSample_called_expectChannelIsNotModified(void)
 {
 	uint8_t channel = anyChannel();
-	struct AdcSample sample = { .count = 1, .channel = channel };
+	struct AdcSample sample = { .count = 1, .channel = channel, .flags = { .all = 0 } };
 	adcSample(&sample);
 	TEST_ASSERT_EQUAL_UINT8(channel, sample.channel);
+}
+
+void test_adcSample_called_expectFlagsAreNotModified(void)
+{
+	uint8_t flags = anyByte();
+	struct AdcSample sample = { .count = 1, .channel = anyChannel(), .flags = { .all = flags } };
+	adcSample(&sample);
+	TEST_ASSERT_EQUAL_UINT8(flags, sample.flags.all);
 }
