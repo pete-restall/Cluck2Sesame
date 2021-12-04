@@ -35,20 +35,24 @@ static void onTimeChanged(const struct Event *event)
 
 	struct AdcSample sample =
 	{
-		.channel = ADC_CHANNEL_VSS,
-		.count = 2
+		.channel = ADC_CHANNEL_ADCFVR,
+		.count = 8,
+		.flags =
+		{
+			.vrefIsFvr = 0,
+			.acquisitionTimeMultiple = 11
+		}
 	};
 
 	adcSample(&sample);
+	eventArgs.fvr = sample.result;
 
-	sample.count = 8;
 	sample.channel = ADC_CHANNEL_TEMPERATURE,
+	sample.flags.vrefIsFvr = 1;
+	sample.flags.acquisitionTimeMultiple = 0;
 	adcSample(&sample);
 	eventArgs.temperature = sample.result;
 
-	sample.channel = ADC_CHANNEL_ADCFVR,
-	adcSample(&sample);
-	eventArgs.fvr = sample.result;
 	PMD0bits.FVRMD = 1;
 
 	eventPublish(MONITORED_PARAMETERS_SAMPLED, &eventArgs);

@@ -107,5 +107,8 @@ static void stubAdcSample(struct AdcSample *sample)
 	if (sample->count != expectedAdcSampleArg->count)
 		return;
 
+	if (sample->flags.all != expectedAdcSampleArg->flags.all)
+		return;
+
 	sample->result = expectedAdcSampleArg->result;
 }

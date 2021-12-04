@@ -134,7 +134,12 @@ void test_timeChanged_onPublished_expectFixedVoltageReferenceIsSampled(void)
 	{
 		.channel = ADC_CHANNEL_ADCFVR,
 		.count = 8,
-		.result = anyWord()
+		.result = anyWord(),
+		.flags =
+		{
+			.vrefIsFvr = 0,
+			.acquisitionTimeMultiple = 11
+		}
 	};
 
 	stubAdcSampleFor(&sample);
@@ -152,7 +157,7 @@ static void publishTimeChangedAndDispatchToEventHandlers(void)
 	dispatchAllEvents();
 }
 
-void test_timeChanged_onPublished_expectTemperatureSensorIsSampled(void)
+void test_timeChanged_onPublished_expectTemperatureSensorIsSampledUsingInternalFixedVoltageReference(void)
 {
 	mockOnMonitoredParametersSampled();
 
@@ -160,7 +165,12 @@ void test_timeChanged_onPublished_expectTemperatureSensorIsSampled(void)
 	{
 		.channel = ADC_CHANNEL_TEMPERATURE,
 		.count = 8,
-		.result = anyWord()
+		.result = anyWord(),
+		.flags =
+		{
+			.vrefIsFvr = 1,
+			.acquisitionTimeMultiple = 0
+		}
 	};
 
 	stubAdcSampleFor(&sample);
@@ -206,16 +216,14 @@ static void mockAdcSampleForFvrconExpectation(struct AdcSample *sample)
 	TEST_ASSERT_EQUAL_UINT8(onAdcSampleExpectedFvrcon, FVRCON);
 }
 
-void test_timeChanged_onPublished_expectSamplingIsVssThenTemperatureThenFixedVoltageReferenceToAllowForStabilisationPeriods(void)
+void test_timeChanged_onPublished_expectSamplingIsFixedVoltageReferenceThenTemperatureToAllowForStabilisationPeriods(void)
 {
 	spyAdcSampleForChannelsResults[0] = ADC_CHANNEL_CMPFVR;
 	spyAdcSampleForChannelsResults[1] = ADC_CHANNEL_CMPFVR;
-	spyAdcSampleForChannelsResults[2] = ADC_CHANNEL_CMPFVR;
 	onAdcSample = &spyAdcSampleForChannels;
 	publishTimeChangedAndDispatchToEventHandlers();
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(ADC_CHANNEL_VSS, spyAdcSampleForChannelsResults[0], "VSS");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(ADC_CHANNEL_ADCFVR, spyAdcSampleForChannelsResults[0], "FVR");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(ADC_CHANNEL_TEMPERATURE, spyAdcSampleForChannelsResults[1], "TEMP");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(ADC_CHANNEL_ADCFVR, spyAdcSampleForChannelsResults[2], "FVR");
 }
 
 static void spyAdcSampleForChannels(struct AdcSample *sample)
