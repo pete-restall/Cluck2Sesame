@@ -28,6 +28,25 @@ union NvmSettings
 					uint8_t currentLimitNoLoad;
 					uint8_t currentLimitMaximumLoad;
 				} motor;
+
+				struct
+				{
+					uint16_t placeholder[2]; // TODO: FOR CALIBRATION PURPOSES
+				} temperature;
+
+				struct
+				{
+					uint16_t placeholder[2]; // TODO: FOR CALIBRATION PURPOSES
+				} crystal;
+
+				union
+				{
+					uint8_t all;
+					struct
+					{
+						unsigned int isCalibrationRequired : 1;
+					} bits;
+				} flags;
 			};
 		} platform;
 

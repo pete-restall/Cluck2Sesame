@@ -212,3 +212,20 @@ void uiScreenTwoDigitsToPosition(uint8_t cursorPosition, uint8_t value)
 	uiState.screen[cursorPosition] = (char) ('0' + digits.quot);
 	uiState.screen[cursorPosition + 1] = (char) ('0' + digits.rem);
 }
+
+void uiScreenFourHexDigitsToPosition(uint8_t cursorPosition, uint16_t value)
+{
+	uint8_t upper = (value >> 8) & 0xff;
+	uint8_t lower = (value >> 0) & 0xff;
+	uiScreenTwoHexDigitsToPosition(cursorPosition, upper);
+	uiScreenTwoHexDigitsToPosition(cursorPosition + 2, lower);
+}
+
+void uiScreenTwoHexDigitsToPosition(uint8_t cursorPosition, uint8_t value)
+{
+	uint8_t upper = (value >> 4) & 0x0f;
+	uint8_t lower = (value >> 0) & 0x0f;
+
+	uiState.screen[cursorPosition] = ((upper > 9) ? ('A' - 10) : '0') + upper;
+	uiState.screen[cursorPosition + 1] = ((lower > 9) ? ('A' - 10) : '0') + lower;
+}

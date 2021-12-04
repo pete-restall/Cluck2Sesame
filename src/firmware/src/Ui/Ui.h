@@ -54,6 +54,7 @@ struct UiState
 		uint16_t all;
 		struct
 		{
+			unsigned int isCalibrationMode : 1;
 			unsigned int isInitialSetupRequired : 1;
 			unsigned int isScreenOn : 1;
 			unsigned int isLcdEnabled : 1;
@@ -111,10 +112,14 @@ extern void uiScreenBlit(void);
 extern int8_t uiScreenSignAndTwoDigitsFromPosition(uint8_t cursorPosition);
 extern uint8_t uiScreenTwoDigitsFromPosition(uint8_t cursorPosition);
 extern void uiScreenTwoDigitsToPosition(uint8_t cursorPosition, uint8_t value);
+extern void uiScreenFourHexDigitsToPosition(uint8_t cursorPosition, uint16_t value);
+extern void uiScreenTwoHexDigitsToPosition(uint8_t cursorPosition, uint8_t value);
 
 extern void uiMenuScreen(void);
 extern void uiMenuSettingsMenuScreen(void);
 extern void uiMenuSettingsBackMenuScreen(void);
+
+extern void uiCalibrationModeScreen(void);
 
 extern void uiDateAndTimeEntryMenuScreen(void);
 extern void uiDateAndTimeEntryScreen(void);

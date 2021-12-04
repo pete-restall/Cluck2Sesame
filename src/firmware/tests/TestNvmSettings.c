@@ -27,12 +27,17 @@ void test_nvmSettings_getLcdBacklightBrightness_expectDefaultValue(void)
 
 void test_nvmSettings_getMotorCurrentLimitNoLoad_expectDefaultValue(void)
 {
-	TEST_ASSERT_EQUAL_UINT8(0x04, nvmSettings.platform.motor.currentLimitNoLoad);
+	TEST_ASSERT_EQUAL_UINT8(0x07, nvmSettings.platform.motor.currentLimitNoLoad);
 }
 
 void test_nvmSettings_getMotorCurrentLimitMaximumLoad_expectDefaultValue(void)
 {
-	TEST_ASSERT_EQUAL_UINT8(0x13, nvmSettings.platform.motor.currentLimitMaximumLoad);
+	TEST_ASSERT_EQUAL_UINT8(0x10, nvmSettings.platform.motor.currentLimitMaximumLoad);
+}
+
+void test_nvmSettings_getIsCalibrationRequired_expectTrue(void)
+{
+	TEST_ASSERT_TRUE(nvmSettings.platform.flags.bits.isCalibrationRequired);
 }
 
 void test_nvmSettings_getLatitudeOffset_expectDefaultValue(void)

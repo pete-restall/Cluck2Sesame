@@ -26,6 +26,7 @@ void uiOnSystemInitialised(const struct Event *event)
 		sizeof(uiState.screen));
 
 	uiScreenOn();
+	uiState.flags.bits.isCalibrationMode = (nvmSettings.platform.flags.bits.isCalibrationRequired) ? 1 : 0;
 	uiState.flags.bits.isInitialSetupRequired = (nvmSettings.application.door.height < 128) ? 1 : 0;
 	uiState.flags.bits.isScreenTimeoutDisabled = 1;
 	nearSchedulerAdd(&uiScreenTimeoutSchedule);
@@ -37,8 +38,14 @@ static void uiOnSplashScreenTimeout(void *state)
 	static uint8_t secondsElapsed = 0;
 	if (++secondsElapsed == 5)
 	{
-		uiDateAndTimeEntryScreen();
-		uiScreenStartTimeout();
+		if (!uiState.flags.bits.isCalibrationMode)
+		{
+			uiDateAndTimeEntryScreen();
+			uiScreenStartTimeout();
+		}
+		else
+			uiCalibrationModeScreen();
+
 		return;
 	}
 

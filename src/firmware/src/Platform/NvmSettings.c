@@ -29,6 +29,13 @@ __section("NvmSettings") const volatile union NvmSettings nvmSettings =
 		{
 			.currentLimitNoLoad = DAC_AMPS(0.415), // TODO: PEAK 415mA, AVERAGE 140mA WHEN UNLOADED @ 4.2V...*HOWEVER*, THIS CHANGES FOR LOWER VOLTAGES...NEED TO ADAPT THIS PARAMETER ACCORDING TO MOTOR VOLTAGE !
 			.currentLimitMaximumLoad = DAC_AMPS(1.0) // TODO: THIS MAY ALSO HAVE A VOLTAGE DEPENDENCY AS WELL, ALTHOUGH THE WINDING RESISTANCE MAY BE THE LIMITING FACTOR...TEST IT...
+		},
+		.flags =
+		{
+			.bits =
+			{
+				.isCalibrationRequired = 1
+			}
 		}
 	},
 	.application =
