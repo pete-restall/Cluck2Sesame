@@ -31,7 +31,7 @@ static void onAllEventsDispatched(const struct Event *event)
 {
 	eventPublish(WOKEN_FROM_SLEEP, &eventEmptyArgs);
 
-	if (T2CONbits.ON)
+	if (T2CONbits.ON || PIE3bits.RC1IE)
 		CPUDOZEbits.IDLEN = 1;
 	else
 		CPUDOZEbits.IDLEN = 0;

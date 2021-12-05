@@ -68,6 +68,7 @@ void test_powerManagementInitialise_called_expectSubscriptionToAllEventsDispatch
 void test_onAllEventsDispatched_event_expectDeviceSleepsWhenTimer2IsDisabled(void)
 {
 	powerManagementInitialise();
+	PMD1bits.TMR2MD = 0;
 	PIE4bits.TMR2IE = 0;
 	T2CONbits.ON = 0;
 	CPUDOZE = anyByteWithMaskSet(_CPUDOZE_IDLEN_MASK | _CPUDOZE_DOZEN_MASK);
@@ -83,8 +84,47 @@ void test_onAllEventsDispatched_event_expectDeviceSleepsWhenTimer2IsDisabled(voi
 void test_onAllEventsDispatched_event_expectDeviceIdlesWhenTimer2IsEnabled(void)
 {
 	powerManagementInitialise();
+	PMD1bits.TMR2MD = 0;
 	PIE4bits.TMR2IE = 0;
 	T2CONbits.ON = 1;
+	CPUDOZE = anyByte();
+
+	onAllEventsDispatched->handler(&onAllEventsDispatchedEvent);
+	TEST_ASSERT_NOT_EQUAL_MESSAGE(0, sleepExecuted, "SLEEP");
+
+	TEST_ASSERT_BITS_LOW_MESSAGE(
+		_CPUDOZE_DOZEN_MASK,
+		cpudozeBeforeSleep,
+		"DOZEN");
+
+	TEST_ASSERT_BITS_HIGH_MESSAGE(
+		_CPUDOZE_IDLEN_MASK,
+		cpudozeBeforeSleep,
+		"IDLEN");
+}
+
+void test_onAllEventsDispatched_event_expectDeviceSleepsWhenUart1IsDisabled(void)
+{
+	powerManagementInitialise();
+	PMD4bits.UART1MD = 0;
+	T2CONbits.ON = 0;
+	PIE3bits.RC1IE = 0;
+	CPUDOZE = anyByteWithMaskSet(_CPUDOZE_IDLEN_MASK | _CPUDOZE_DOZEN_MASK);
+
+	onAllEventsDispatched->handler(&onAllEventsDispatchedEvent);
+	TEST_ASSERT_NOT_EQUAL_MESSAGE(0, sleepExecuted, "SLEEP");
+	TEST_ASSERT_BITS_LOW_MESSAGE(
+		_CPUDOZE_IDLEN_MASK | _CPUDOZE_DOZEN_MASK,
+		cpudozeBeforeSleep,
+		"IDLEN / DOZEN");
+}
+
+void test_onAllEventsDispatched_event_expectDeviceIdlesWhenUart1ReceiveIsEnabled(void)
+{
+	powerManagementInitialise();
+	PMD4bits.UART1MD = 0;
+	T2CONbits.ON = 0;
+	PIE3bits.RC1IE = 1;
 	CPUDOZE = anyByte();
 
 	onAllEventsDispatched->handler(&onAllEventsDispatchedEvent);
