@@ -14,6 +14,7 @@
 #include "Motor.h"
 #include "PeriodicMonitor.h"
 #include "Buttons.h"
+#include "CalibrationMode.h"
 
 void initialise(void)
 {
@@ -30,6 +31,7 @@ void initialise(void)
 	motorInitialise();
 	periodicMonitorInitialise();
 	buttonsInitialise();
+	calibrationModeInitialise();
 	applicationInitialise();
 	eventPublish(SYSTEM_INITIALISED, &eventEmptyArgs);
 }

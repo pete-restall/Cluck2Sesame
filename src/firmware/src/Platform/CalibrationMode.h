@@ -1,0 +1,6 @@
+#ifndef __CLUCK3SESAME_SRC_PLATFORM_CALIBRATIONMODE_H
+#define __CLUCK3SESAME_SRC_PLATFORM_CALIBRATIONMODE_H
+
+extern void calibrationModeInitialise(void);
+
+#endif

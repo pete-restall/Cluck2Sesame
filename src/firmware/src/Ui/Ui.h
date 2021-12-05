@@ -63,6 +63,7 @@ struct UiState
 			unsigned int isScreenBlitDirty : 1;
 			unsigned int isLeftButtonPressed : 1;
 			unsigned int isRightButtonPressed : 1;
+			unsigned int isButtonPressPreventedFromTurningOnScreen : 1;
 			unsigned int isButtonPressTurningOnScreen : 1;
 			unsigned int isDoorBeingManuallyControlled : 1;
 			unsigned int isDoorBeingCalibrated : 1;

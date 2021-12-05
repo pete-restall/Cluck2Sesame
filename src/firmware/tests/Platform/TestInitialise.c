@@ -40,6 +40,7 @@ static struct CallDetails lcdInitialiseCalls;
 static struct CallDetails motorInitialiseCalls;
 static struct CallDetails periodicMonitorInitialiseCalls;
 static struct CallDetails buttonsInitialiseCalls;
+static struct CallDetails calibrationModeInitialiseCalls;
 static struct CallDetails applicationInitialiseCalls;
 static struct CallDetails systemInitialisedEventPublishCalls;
 
@@ -61,6 +62,7 @@ void onBeforeTest(void)
 	clearCallsFor(&motorInitialiseCalls);
 	clearCallsFor(&periodicMonitorInitialiseCalls);
 	clearCallsFor(&buttonsInitialiseCalls);
+	clearCallsFor(&calibrationModeInitialiseCalls);
 	clearCallsFor(&applicationInitialiseCalls);
 	clearCallsFor(&systemInitialisedEventPublishCalls);
 
@@ -235,10 +237,21 @@ void buttonsInitialise(void)
 	registerCallFor(&buttonsInitialiseCalls);
 }
 
-void test_initialise_called_expectApplicationIsInitialisedAfterButtons(void)
+void test_initialise_called_expectCalibrationModeIsInitialisedAfterButtons(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&applicationInitialiseCalls, 14);
+	assertCalledOnceAtSequence(&calibrationModeInitialiseCalls, 14);
+}
+
+void calibrationModeInitialise(void)
+{
+	registerCallFor(&calibrationModeInitialiseCalls);
+}
+
+void test_initialise_called_expectApplicationIsInitialisedAfterCalibrationMode(void)
+{
+	initialise();
+	assertCalledOnceAtSequence(&applicationInitialiseCalls, 15);
 }
 
 void applicationInitialise(void)
