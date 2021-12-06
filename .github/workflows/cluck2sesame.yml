@@ -29,6 +29,7 @@ jobs:
           ./ceedling test;
           echo -e "\n\n[TEST FAILURE REPORTS]";
           cat build/ceedling/generated/test/results/*.fail 2>/dev/null && exit 1;
+          echo -e "\n\n[TEST RUN SUCCESSFUL].";
 
       - name: Build Release Artefact
         run: |
