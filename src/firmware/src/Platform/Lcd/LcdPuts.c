@@ -16,7 +16,7 @@ static void buggyCompilerWorkaround(void)
 
 static void __reentrant lcdPutsStateMachine(void *state);
 
-void lcdPuts(const struct LcdPutsTransaction *transaction)
+void __reentrant lcdPuts(const struct LcdPutsTransaction *transaction)
 {
 	if (!transaction || lcdState.flags.isBusy)
 		return;

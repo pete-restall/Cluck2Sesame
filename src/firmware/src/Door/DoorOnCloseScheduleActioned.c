@@ -43,8 +43,8 @@ void doorStartClosing(
 	{
 		motorLimitIsNoLoad();
 		motorOn((motorEnabledState == DoorState_ManualClosing)
-			? -MANUAL_MOVEMENT_LIMIT
-			: -nvmSettings.application.door.height);
+			? -((int16_t) MANUAL_MOVEMENT_LIMIT)
+			: -((int16_t) nvmSettings.application.door.height));
 
 		doorState.current = motorEnabledState;
 		doorState.closed.loweredHeight = 0;

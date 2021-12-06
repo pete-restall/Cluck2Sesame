@@ -134,8 +134,8 @@ static void readLookupEntryInto(
 	entry->minuteOfDay = (uint16_t) (
 		((word0 >> 2) & 0b11111000000) | ((word1 >> 8) & 0b111111));
 
-	entry->offsetMinutesNorth = (uint8_t) (word0 & 0xff);
-	entry->offsetMinutesSouth = (uint8_t) (word1 & 0xff);
+	entry->offsetMinutesNorth = (int8_t) (word0 & 0xff);
+	entry->offsetMinutesSouth = (int8_t) (word1 & 0xff);
 }
 
 // TODO: THIS CAN BE MOVED INTO SOMETHING COMMON, SINCE THE DAYLIGHT SAVINGS

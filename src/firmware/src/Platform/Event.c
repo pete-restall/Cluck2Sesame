@@ -50,7 +50,7 @@ void eventInitialise(void)
 void eventSubscribe(const struct EventSubscription *subscription)
 {
 	int8_t freeIndex = -1;
-	uint8_t i;
+	int8_t i;
 	for (i = 0; i < MAX_SUBSCRIPTIONS; i++)
 	{
 		if (

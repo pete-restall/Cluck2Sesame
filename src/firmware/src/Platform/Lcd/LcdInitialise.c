@@ -40,14 +40,14 @@ void lcdInitialise(void)
 
 	PWM5CON = 0;
 	PWM5DCH = (nvmSettings.platform.lcd.contrast >> 2) & 0b00111111;
-	PWM5DCL = nvmSettings.platform.lcd.contrast << 6;
+	PWM5DCL = (uint8_t) (nvmSettings.platform.lcd.contrast << 6);
 	RA2PPS = PPS_OUT_PWM5;
 	ANSELAbits.ANSA2 = 1;
 	TRISAbits.TRISA2 = 1;
 
 	PWM3CON = 0;
 	PWM3DCH = (nvmSettings.platform.lcd.backlightBrightness >> 2) & 0b00111111;
-	PWM3DCL = nvmSettings.platform.lcd.backlightBrightness << 6;
+	PWM3DCL = (uint8_t) (nvmSettings.platform.lcd.backlightBrightness << 6);
 	RC5PPS = PPS_OUT_PWM3;
 
 	lcdState.enableCount = 0;

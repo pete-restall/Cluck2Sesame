@@ -127,7 +127,7 @@ static void motorRunningStateMonitor(void *state)
 	{
 		if (++encoderStaticCount == ENCODER_STATIC_COUNT_LIMIT)
 		{
-			motorStoppedEventArgs.actualCount = encoderValue;
+			motorStoppedEventArgs.actualCount = (int16_t) encoderValue;
 			if (motorStoppedEventArgs.requestedCount < 0)
 			{
 				motorStoppedEventArgs.actualCount = -motorStoppedEventArgs.actualCount;

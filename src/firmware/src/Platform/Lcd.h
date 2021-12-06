@@ -58,7 +58,7 @@ struct LcdSetCursorTransaction
 extern void lcdInitialise(void);
 extern void lcdEnable(void);
 extern void lcdDisable(void);
-extern void lcdPuts(const struct LcdPutsTransaction *transaction);
+extern void __reentrant lcdPuts(const struct LcdPutsTransaction *transaction);
 extern void lcdSetDdramAddress(const struct LcdSetAddressTransaction *transaction);
 extern void lcdSetCursor(const struct LcdSetCursorTransaction *transaction);
 

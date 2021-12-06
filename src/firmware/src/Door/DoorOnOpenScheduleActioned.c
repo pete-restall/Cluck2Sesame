@@ -43,8 +43,8 @@ void doorStartOpening(
 	{
 		motorLimitIsMaximumLoad();
 		motorOn((motorEnabledState == DoorState_ManualOpening)
-			? MANUAL_MOVEMENT_LIMIT
-			: nvmSettings.application.door.height);
+			? (int16_t) MANUAL_MOVEMENT_LIMIT
+			: (int16_t) nvmSettings.application.door.height);
 
 		doorState.current = motorEnabledState;
 	}

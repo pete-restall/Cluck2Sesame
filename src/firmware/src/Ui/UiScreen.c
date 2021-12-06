@@ -10,7 +10,7 @@
 
 static void uiOnScreenTimeout(void *state);
 static void uiScreenSetAddressToHome(void *state);
-static void uiScreenBlitFirstLine(void *state);
+static void __reentrant uiScreenBlitFirstLine(void *state);
 static void uiScreenGotoSecondLine(void *state);
 static void uiScreenBlitSecondLine(void *state);
 static void uiScreenSetCursorPosition(void *state);
@@ -101,7 +101,7 @@ static void uiScreenSetAddressToHome(void *state)
 	lcdSetDdramAddress(&transaction);
 }
 
-static void uiScreenBlitFirstLine(void *state)
+static void __reentrant uiScreenBlitFirstLine(void *state)
 {
 	if (!uiState.flags.bits.isLcdEnabled)
 		return;
@@ -209,8 +209,8 @@ void uiScreenTwoDigitsToPosition(uint8_t cursorPosition, uint8_t value)
 {
 	div_t digits;
 	digits = div(value, 10);
-	uiState.screen[cursorPosition] = (char) ('0' + digits.quot);
-	uiState.screen[cursorPosition + 1] = (char) ('0' + digits.rem);
+	uiState.screen[cursorPosition] = (char) ('0' + (uint8_t) digits.quot);
+	uiState.screen[cursorPosition + 1] = (char) ('0' + (uint8_t) digits.rem);
 }
 
 void uiScreenFourHexDigitsToPosition(uint8_t cursorPosition, uint16_t value)

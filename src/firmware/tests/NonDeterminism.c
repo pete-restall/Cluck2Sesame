@@ -3,7 +3,7 @@
 
 #include "NonDeterminism.h"
 
-volatile int16_t rngSeed __at(0x0420) = 0;
+volatile int16_t rngSeed __at(0x0420);
 
 static void ensureSeedIsInitialised(void)
 {

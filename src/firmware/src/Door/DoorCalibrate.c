@@ -57,7 +57,7 @@ static void onDoorClosedForCalibration(const struct Event *event)
 	const struct DoorClosed *closed = (const struct DoorClosed *) event->args;
 	// TODO: IF DOOR HEIGHT < (say) 100mm THEN IT'S A NONSENSE CONDITION - IT WASN'T RAISED HIGH ENOUGH.  SO SET A FAULT FLAG...
 	doorCalibrationEventArgs.fault.all = 0;
-	doorCalibrationEventArgs.height = closed->loweredHeight;
+	doorCalibrationEventArgs.height = (uint16_t) closed->loweredHeight;
 	eventPublish(DOOR_CALIBRATED, &doorCalibrationEventArgs);
 	eventUnsubscribe(&onDoorAbortedSubscription);
 	eventUnsubscribe(&onDoorClosedSubscription);
