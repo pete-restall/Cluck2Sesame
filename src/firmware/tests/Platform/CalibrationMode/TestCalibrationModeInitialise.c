@@ -2,90 +2,57 @@
 #include <stdint.h>
 #include <unity.h>
 
-#include "Platform/NvmSettings.h"
 #include "Platform/CalibrationMode.h"
 
-#include "Mock_PowerManagement.h"
-#include "Mock_PeriodicMonitor.h"
+#include "CalibrationModeFixture.h"
 
 #include "../../Fixture.h"
 #include "../../NonDeterminism.h"
-#include "../../NvmSettingsFixture.h"
+#include "../../NvmSettingsFixture.c"
 
 TEST_FILE("Platform/CalibrationMode.c")
 
-static struct Event onMonitoredParametersSampledEvent;
-static const struct EventSubscription *onMonitoredParametersSampled;
-
-static struct Event onWokenFromSleepEvent;
-static const struct EventSubscription *onWokenFromSleep;
-
-const struct Event eventEmptyArgs = { };
-
-static const union NvmSettings withCalibrationRequired =
-{
-	.platform =
-	{
-		.flags = { .bits = { .isCalibrationRequired = 1 } }
-	}
-};
-
-static const union NvmSettings withoutCalibrationRequired =
-{
-	.platform =
-	{
-		.flags = { .bits = { .isCalibrationRequired = 0 } }
-	}
-};
-
-static void buggyCompilerWorkaround(void)
-{
-	if (0)
-		onMonitoredParametersSampled->handler(&onMonitoredParametersSampledEvent);
-}
-
 void onBeforeTest(void)
 {
-	onMonitoredParametersSampled = (const struct EventSubscription *) 0;
-	onWokenFromSleep = (const struct EventSubscription *) 0;
-	buggyCompilerWorkaround();
+	calibrationModeFixtureSetUp();
 }
 
 void onAfterTest(void)
 {
+	calibrationModeFixtureTearDown();
 }
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectSubscriptionToMonitoredParametersSampled(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	calibrationModeInitialise();
-	TEST_ASSERT_NOT_NULL(onMonitoredParametersSampled);
+	assertMonitoredParametersSampledSubscription();
 }
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectNoSubscriptionToMonitoredParametersSampled(void)
 {
-	stubNvmSettings(&withoutCalibrationRequired);
+	stubNvmSettingsWithoutCalibrationRequired();
 	calibrationModeInitialise();
-	TEST_ASSERT_NULL(onMonitoredParametersSampled);
+	assertNoMonitoredParametersSampledSubscription();
 }
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectSubscriptionToWokenFromSleep(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	calibrationModeInitialise();
-	TEST_ASSERT_NOT_NULL(onWokenFromSleep);
+	assertWokenFromSleepSubscription();
 }
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectNoSubscriptionToWokenFromSleep(void)
 {
-	stubNvmSettings(&withoutCalibrationRequired);
+	stubNvmSettingsWithoutCalibrationRequired();
 	calibrationModeInitialise();
-	TEST_ASSERT_NULL(onWokenFromSleep);
+	assertNoWokenFromSleepSubscription();
 }
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectClockReferenceModuleIsEnabled(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	PMD0 = anyByteWithMaskSet(_PMD0_CLKRMD_MASK);
 	uint8_t originalPmd0 = PMD0;
 	calibrationModeInitialise();
@@ -94,7 +61,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectClockR
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectClockReferenceModuleIsDisabled(void)
 {
-	stubNvmSettings(&withoutCalibrationRequired);
+	stubNvmSettingsWithoutCalibrationRequired();
 	PMD0 = anyByteWithMaskClear(_PMD0_CLKRMD_MASK);
 	uint8_t originalPmd0 = PMD0;
 	calibrationModeInitialise();
@@ -103,7 +70,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectClo
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPinsAreDigital(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 
 	static const uint8_t usedPins = _ANSELB_ANSB6_MASK | _ANSELB_ANSB7_MASK;
 	ANSELB = anyByteWithMaskSet(usedPins);
@@ -115,7 +82,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPi
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcspPinsAreDigital(void)
 {
-	stubNvmSettings(&withoutCalibrationRequired);
+	stubNvmSettingsWithoutCalibrationRequired();
 
 	static const uint8_t usedPins = _ANSELB_ANSB6_MASK | _ANSELB_ANSB7_MASK;
 	ANSELB = anyByteWithMaskSet(usedPins);
@@ -127,7 +94,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcs
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPgcPinIsOutput(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	TRISB = anyByteWithMaskSet(_TRISB_TRISB6_MASK);
 	uint8_t originalTrisb = TRISB & ~_TRISB_TRISB7_MASK;
 	calibrationModeInitialise();
@@ -136,7 +103,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPg
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcspPgcPinIsOutput(void)
 {
-	stubNvmSettings(&withoutCalibrationRequired);
+	stubNvmSettingsWithoutCalibrationRequired();
 	TRISB = anyByteWithMaskSet(_TRISB_TRISB6_MASK);
 	uint8_t originalTrisb = TRISB & ~_TRISB_TRISB7_MASK;
 	calibrationModeInitialise();
@@ -145,7 +112,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcs
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPgcPinIsMappedToReferenceClockOutput(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	RB6PPS = anyByteExcept(0x1b);
 	calibrationModeInitialise();
 	TEST_ASSERT_EQUAL_UINT8(0x1b, RB6PPS);
@@ -153,7 +120,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPg
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcspPgcPinIsNotMappedToAnyPeripheralOutput(void)
 {
-	stubNvmSettings(&withoutCalibrationRequired);
+	stubNvmSettingsWithoutCalibrationRequired();
 	RB6PPS = anyByteExcept(0);
 	calibrationModeInitialise();
 	TEST_ASSERT_EQUAL_UINT8(0, RB6PPS);
@@ -161,7 +128,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcs
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPgdPinIsInput(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	TRISB = anyByteWithMaskClear(_TRISB_TRISB7_MASK);
 	uint8_t originalTrisb = TRISB & ~_TRISB_TRISB6_MASK;
 	calibrationModeInitialise();
@@ -170,7 +137,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPg
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcspPgdPinIsOutput(void)
 {
-	stubNvmSettings(&withoutCalibrationRequired);
+	stubNvmSettingsWithoutCalibrationRequired();
 	TRISB = anyByteWithMaskSet(_TRISB_TRISB7_MASK);
 	uint8_t originalTrisb = TRISB & ~_TRISB_TRISB6_MASK;
 	calibrationModeInitialise();
@@ -179,7 +146,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcs
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPgdPinIsOpenDrain(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	ODCONB = anyByteWithMaskClear(_ODCONB_ODCB7_MASK);
 	uint8_t originalOdconb = ODCONB;
 	calibrationModeInitialise();
@@ -188,7 +155,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPg
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcspPgdPinIsNotOpenDrain(void)
 {
-	stubNvmSettings(&withoutCalibrationRequired);
+	stubNvmSettingsWithoutCalibrationRequired();
 	ODCONB = anyByteWithMaskSet(_ODCONB_ODCB7_MASK);
 	uint8_t originalOdconb = ODCONB;
 	calibrationModeInitialise();
@@ -197,7 +164,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcs
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPgdPinIsMappedToUart1TxAndRx(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	RB7PPS = anyByteExcept(0x10);
 	RX1DTPPS = anyByte();
 	calibrationModeInitialise();
@@ -207,7 +174,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPg
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcspPgdPinIsNotMappedToAnyPeripheralOutput(void)
 {
-	stubNvmSettings(&withoutCalibrationRequired);
+	stubNvmSettingsWithoutCalibrationRequired();
 	RB7PPS = anyByteExcept(0);
 	RX1DTPPS = anyByteExcept(0);
 	calibrationModeInitialise();
@@ -217,7 +184,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcs
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPinsAreLow(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	LATB = anyByteWithMaskSet(_LATB_LATB6_MASK | _LATB_LATB7_MASK);
 	uint8_t originalLatb = LATB;
 	calibrationModeInitialise();
@@ -226,7 +193,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPi
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcspPinsAreLow(void)
 {
-	stubNvmSettings(&withoutCalibrationRequired);
+	stubNvmSettingsWithoutCalibrationRequired();
 	LATB = anyByteWithMaskSet(_LATB_LATB6_MASK | _LATB_LATB7_MASK);
 	uint8_t originalLatb = LATB;
 	calibrationModeInitialise();
@@ -235,7 +202,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcs
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectReferenceClockSourceIs32768HzCrystal(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	CLKRCLK = anyByte();
 	calibrationModeInitialise();
 	TEST_ASSERT_EQUAL_UINT8(0b0101 << _CLKRCLK_CLKRCLK_POSITION, CLKRCLK & _CLKRCLK_CLKRCLK_MASK);
@@ -243,7 +210,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectRefere
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectReferenceClockDutyCycleIs50Percent(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	CLKRCON = anyByte();
 	calibrationModeInitialise();
 	TEST_ASSERT_EQUAL_UINT8(0b10 << _CLKRCON_CLKRDC_POSITION, CLKRCON & _CLKRCON_CLKRDC_MASK);
@@ -251,7 +218,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectRefere
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectReferenceClockIsNotDivided(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	CLKRCON = anyByte();
 	calibrationModeInitialise();
 	TEST_ASSERT_EQUAL_UINT8(0b000 << _CLKRCON_CLKRDIV_POSITION, CLKRCON & _CLKRCON_CLKRDIV_MASK);
@@ -259,7 +226,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectRefere
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectReferenceClockIsNotEnabled(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	CLKRCON = anyByteWithMaskSet(_CLKRCON_CLKREN_MASK);
 	calibrationModeInitialise();
 	TEST_ASSERT_BIT_LOW(_CLKRCON_CLKREN_POSITION, CLKRCON);
@@ -267,7 +234,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectRefere
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1ModuleIsEnabled(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	PMD4 = anyByteWithMaskSet(_PMD4_UART1MD_MASK);
 	uint8_t originalPmd4 = PMD4;
 	calibrationModeInitialise();
@@ -276,7 +243,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1M
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectUart1ModuleIsDisabled(void)
 {
-	stubNvmSettings(&withoutCalibrationRequired);
+	stubNvmSettingsWithoutCalibrationRequired();
 	PMD4 = anyByteWithMaskClear(_PMD4_UART1MD_MASK);
 	uint8_t originalPmd4 = PMD4;
 	calibrationModeInitialise();
@@ -285,7 +252,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectUar
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1UsesAsynchronous8bitModeWithLowBaudMultiplier(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	TX1STA = anyByte();
 	calibrationModeInitialise();
 	TEST_ASSERT_EQUAL_UINT(0x00, TX1STA & ~_TX1STA_TRMT_MASK);
@@ -293,7 +260,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1U
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1BaudRateIs9600bps(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	SP1BRG = anyWord();
 	calibrationModeInitialise();
 	TEST_ASSERT_EQUAL_UINT16(51, SP1BRG);
@@ -302,7 +269,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1B
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1Uses8bitModeAndIsEnabledForContinuousReception(void)
 {
 	static const uint8_t readonlyBits = _RC1STA_FERR_MASK | _RC1STA_OERR_MASK | _RC1STA_RX9D_MASK;
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	RC1STA = anyByte();
 	calibrationModeInitialise();
 	TEST_ASSERT_EQUAL_UINT8(_RC1STA_SPEN_MASK | _RC1STA_CREN_MASK, RC1STA & ~readonlyBits);
@@ -310,32 +277,8 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1U
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1Uses8bitBaudRateGeneratorWithIdleHighTx(void)
 {
-	stubNvmSettings(&withCalibrationRequired);
+	stubNvmSettingsWithCalibrationRequired();
 	BAUD1CON = anyByte();
 	calibrationModeInitialise();
 	TEST_ASSERT_EQUAL_UINT8(0, BAUD1CON & ~_BAUD1CON_RCIDL_MASK);
-}
-
-void eventSubscribe(const struct EventSubscription *subscription)
-{
-	TEST_ASSERT_NOT_NULL_MESSAGE(subscription, "Null subscription");
-	TEST_ASSERT_NOT_NULL_MESSAGE(subscription->handler, "Null handler");
-	if (subscription->type == MONITORED_PARAMETERS_SAMPLED)
-	{
-		onMonitoredParametersSampled = subscription;
-		onMonitoredParametersSampledEvent.type = subscription->type;
-		onMonitoredParametersSampledEvent.state = subscription->state;
-		onMonitoredParametersSampledEvent.args = (void *) 0;
-	}
-	else if (subscription->type == WOKEN_FROM_SLEEP)
-	{
-		onWokenFromSleep = subscription;
-		onWokenFromSleepEvent.type = subscription->type;
-		onWokenFromSleepEvent.state = subscription->state;
-		onWokenFromSleepEvent.args = (void *) 0;
-	}
-	else
-	{
-		TEST_FAIL_MESSAGE("Unknown subscription type");
-	}
 }
