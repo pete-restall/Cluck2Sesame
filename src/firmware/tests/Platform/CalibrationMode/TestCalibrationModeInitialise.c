@@ -38,10 +38,17 @@ static const union NvmSettings withoutCalibrationRequired =
 	}
 };
 
+static void buggyCompilerWorkaround(void)
+{
+	if (0)
+		onMonitoredParametersSampled->handler(&onMonitoredParametersSampledEvent);
+}
+
 void onBeforeTest(void)
 {
 	onMonitoredParametersSampled = (const struct EventSubscription *) 0;
 	onWokenFromSleep = (const struct EventSubscription *) 0;
+	buggyCompilerWorkaround();
 }
 
 void onAfterTest(void)
@@ -136,24 +143,6 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcs
 	TEST_ASSERT_EQUAL_UINT8(originalTrisb & ~_TRISB_TRISB6_MASK, TRISB & ~_TRISB_TRISB7_MASK);
 }
 
-void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPgcPinIsOpenDrain(void)
-{
-	stubNvmSettings(&withCalibrationRequired);
-	ODCONB = anyByteWithMaskClear(_ODCONB_ODCB6_MASK);
-	uint8_t originalOdconb = ODCONB;
-	calibrationModeInitialise();
-	TEST_ASSERT_EQUAL_UINT8(originalOdconb | _ODCONB_ODCB6_MASK, ODCONB);
-}
-
-void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcspPgcPinIsNotOpenDrain(void)
-{
-	stubNvmSettings(&withoutCalibrationRequired);
-	ODCONB = anyByteWithMaskSet(_ODCONB_ODCB6_MASK);
-	uint8_t originalOdconb = ODCONB;
-	calibrationModeInitialise();
-	TEST_ASSERT_EQUAL_UINT8(originalOdconb & ~_ODCONB_ODCB6_MASK, ODCONB);
-}
-
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPgcPinIsMappedToReferenceClockOutput(void)
 {
 	stubNvmSettings(&withCalibrationRequired);
@@ -186,6 +175,24 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcs
 	uint8_t originalTrisb = TRISB & ~_TRISB_TRISB6_MASK;
 	calibrationModeInitialise();
 	TEST_ASSERT_EQUAL_UINT8(originalTrisb & ~_TRISB_TRISB7_MASK, TRISB & ~_TRISB_TRISB6_MASK);
+}
+
+void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPgdPinIsOpenDrain(void)
+{
+	stubNvmSettings(&withCalibrationRequired);
+	ODCONB = anyByteWithMaskClear(_ODCONB_ODCB7_MASK);
+	uint8_t originalOdconb = ODCONB;
+	calibrationModeInitialise();
+	TEST_ASSERT_EQUAL_UINT8(originalOdconb | _ODCONB_ODCB7_MASK, ODCONB);
+}
+
+void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcspPgdPinIsNotOpenDrain(void)
+{
+	stubNvmSettings(&withoutCalibrationRequired);
+	ODCONB = anyByteWithMaskSet(_ODCONB_ODCB7_MASK);
+	uint8_t originalOdconb = ODCONB;
+	calibrationModeInitialise();
+	TEST_ASSERT_EQUAL_UINT8(originalOdconb & ~_ODCONB_ODCB7_MASK, ODCONB);
 }
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPgdPinIsMappedToUart1TxAndRx(void)
@@ -276,15 +283,37 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectUar
 	TEST_ASSERT_EQUAL_UINT8(originalPmd4 | _PMD4_UART1MD_MASK, PMD4);
 }
 
-// TODO: NEXT TESTS WILL ENSURE THAT THE UART IS CORRECTLY SETUP...
-
-void test_onMonitoredParametersSampled_called_expectSOMETHINGBLAHBLAHBLAH(void)
+void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1UsesAsynchronous8bitModeWithLowBaudMultiplier(void)
 {
-	// TODO: ONLY REQUIRED AT THE MOMENT TO PREVENT FUNCTIONS BEING OPTIMISED AWAY - MAKE A PROPER TEST OUT OF THIS...
+	stubNvmSettings(&withCalibrationRequired);
+	TX1STA = anyByte();
 	calibrationModeInitialise();
-	//onMonitoredParametersSampledEvent->args = ...
-	onMonitoredParametersSampled->handler(&onMonitoredParametersSampledEvent);
-	TEST_ASSERT_TRUE(1);
+	TEST_ASSERT_EQUAL_UINT(0x00, TX1STA & ~_TX1STA_TRMT_MASK);
+}
+
+void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1BaudRateIs9600bps(void)
+{
+	stubNvmSettings(&withCalibrationRequired);
+	SP1BRG = anyWord();
+	calibrationModeInitialise();
+	TEST_ASSERT_EQUAL_UINT16(51, SP1BRG);
+}
+
+void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1Uses8bitModeAndIsEnabledForContinuousReception(void)
+{
+	static const uint8_t readonlyBits = _RC1STA_FERR_MASK | _RC1STA_OERR_MASK | _RC1STA_RX9D_MASK;
+	stubNvmSettings(&withCalibrationRequired);
+	RC1STA = anyByte();
+	calibrationModeInitialise();
+	TEST_ASSERT_EQUAL_UINT8(_RC1STA_SPEN_MASK | _RC1STA_CREN_MASK, RC1STA & ~readonlyBits);
+}
+
+void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1Uses8bitBaudRateGeneratorWithIdleHighTx(void)
+{
+	stubNvmSettings(&withCalibrationRequired);
+	BAUD1CON = anyByte();
+	calibrationModeInitialise();
+	TEST_ASSERT_EQUAL_UINT8(0, BAUD1CON & ~_BAUD1CON_RCIDL_MASK);
 }
 
 void eventSubscribe(const struct EventSubscription *subscription)

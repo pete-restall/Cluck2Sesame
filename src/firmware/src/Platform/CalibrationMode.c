@@ -15,6 +15,8 @@
 #define CLKRCON_NO_DIVIDER 0
 #define CLKRCLK_SOURCE_SOSC (0b0101 << _CLKRCLK_CLKRCLK_POSITION)
 
+static void configureReferenceClockModuleFor32768HzCrystalOutput(void);
+static void configureUart1AsAsynchronous8bit9600BaudContinuousReception(void);
 static void onMonitoredParametersSampled(const struct Event *event);
 static void onWokenFromSleep(const struct Event *event);
 
@@ -28,27 +30,17 @@ void calibrationModeInitialise(void)
 	{
 		PMD4bits.UART1MD = 1;
 		PMD0bits.CLKRMD = 1;
-		ODCONBbits.ODCB6 = 0;
 		RB6PPS = 0;
 		RB7PPS = 0;
 		RX1DTPPS = 0;
+		ODCONBbits.ODCB7 = 0;
 		TRISBbits.TRISB6 = 0;
 		TRISBbits.TRISB7 = 0;
 		return;
 	}
 
-	PMD0bits.CLKRMD = 0;
-	ODCONBbits.ODCB6 = 1;
-	TRISBbits.TRISB6 = 0;
-	TRISBbits.TRISB7 = 1;
-	CLKRCON = CLKRCON_DUTY_CYCLE_50 | CLKRCON_NO_DIVIDER;
-	CLKRCLK = CLKRCLK_SOURCE_SOSC;
-	RB6PPS = PPS_OUT_CLKR;
-
-	PMD4bits.UART1MD = 0;
-	RB7PPS = PPS_OUT_UART1TX;
-	RX1DTPPS = PPS_IN_RB7;
-	// TODO: ASYNC UART TX _AND_ RX ON RB7, NO CK (EXPLICIT SET TO PPS 0)...
+	configureReferenceClockModuleFor32768HzCrystalOutput();
+	configureUart1AsAsynchronous8bit9600BaudContinuousReception();
 
 	static const struct EventSubscription onMonitoredParametersSampledSubscription =
 	{
@@ -67,6 +59,28 @@ void calibrationModeInitialise(void)
 	};
 
 	eventSubscribe(&onWokenFromSleepSubscription);
+}
+
+static void configureReferenceClockModuleFor32768HzCrystalOutput(void)
+{
+	PMD0bits.CLKRMD = 0;
+	TRISBbits.TRISB6 = 0;
+	CLKRCON = CLKRCON_DUTY_CYCLE_50 | CLKRCON_NO_DIVIDER;
+	CLKRCLK = CLKRCLK_SOURCE_SOSC;
+	RB6PPS = PPS_OUT_CLKR;
+}
+
+static void configureUart1AsAsynchronous8bit9600BaudContinuousReception(void)
+{
+	PMD4bits.UART1MD = 0;
+	TRISBbits.TRISB7 = 1;
+	ODCONBbits.ODCB7 = 1;
+	RB7PPS = PPS_OUT_UART1TX;
+	RX1DTPPS = PPS_IN_RB7;
+	SP1BRG = 51;
+	TX1STA = 0;
+	RC1STA = _RC1STA_CREN_MASK | _RC1STA_SPEN_MASK;
+	BAUD1CON = 0;
 }
 
 static void onMonitoredParametersSampled(const struct Event *event)
