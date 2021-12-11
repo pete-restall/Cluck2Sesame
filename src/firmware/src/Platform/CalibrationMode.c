@@ -9,7 +9,7 @@
 
 #define PPS_IN_RB7 0x0f
 #define PPS_OUT_CLKR 0x1b
-#define PPS_OUT_UART1TX 0x10
+#define PPS_OUT_UART1TX 0x0f
 
 #define CLKRCON_DUTY_CYCLE_50 (0b10 << _CLKRCON_CLKRDC_POSITION)
 #define CLKRCON_NO_DIVIDER 0
@@ -73,14 +73,16 @@ static void configureReferenceClockModuleFor32768HzCrystalOutput(void)
 static void configureUart1AsAsynchronous8bit9600BaudContinuousReception(void)
 {
 	PMD4bits.UART1MD = 0;
-	TRISBbits.TRISB7 = 1;
+	TRISBbits.TRISB7 = 0;
 	ODCONBbits.ODCB7 = 1;
 	RB7PPS = PPS_OUT_UART1TX;
 	RX1DTPPS = PPS_IN_RB7;
 	SP1BRG = 51;
-	TX1STA = 0;
+	TX1STA = _TX1STA_TXEN_MASK;
 	RC1STA = _RC1STA_CREN_MASK | _RC1STA_SPEN_MASK;
 	BAUD1CON = 0;
+	PIE3bits.RC1IE = 1;
+	PIE3bits.TX1IE = 0;
 }
 
 static void onMonitoredParametersSampled(const struct Event *event)
@@ -92,7 +94,9 @@ static void onMonitoredParametersSampled(const struct Event *event)
 
 static void onWokenFromSleep(const struct Event *event)
 {
-	// TODO: THIS IS WHERE UART1 EVENTS CAN BE HANDLED FROM... DON'T FORGET TO CHECK FOR RC1IF AND CLEAR RC1IF...
+	// TODO: THIS IS WHERE UART1 EVENTS CAN BE HANDLED FROM...
+	// WHILE (RC1IF) READ RC1REG AND DO SOMETHING; IF RX1REG == TX1REG THEN WE CAN DISCARD IT SINCE IT'S LOOPBACK FROM THE MULTIPLEXED RX/TX LINES...
+	// TRANSMISSION JUST CONSISTS OF WRITING TO TX1REG
 	const struct WokenFromSleep *args = (const struct WokenFromSleep *) event->args;
 	asm("nop");
 }

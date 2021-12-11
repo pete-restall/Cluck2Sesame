@@ -126,13 +126,13 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcs
 	TEST_ASSERT_EQUAL_UINT8(0, RB6PPS);
 }
 
-void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPgdPinIsInput(void)
+void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPgdPinIsOutput(void)
 {
 	stubNvmSettingsWithCalibrationRequired();
-	TRISB = anyByteWithMaskClear(_TRISB_TRISB7_MASK);
+	TRISB = anyByteWithMaskSet(_TRISB_TRISB7_MASK);
 	uint8_t originalTrisb = TRISB & ~_TRISB_TRISB6_MASK;
 	calibrationModeInitialise();
-	TEST_ASSERT_EQUAL_UINT8(originalTrisb | _TRISB_TRISB7_MASK, TRISB & ~_TRISB_TRISB6_MASK);
+	TEST_ASSERT_EQUAL_UINT8(originalTrisb & ~_TRISB_TRISB7_MASK, TRISB & ~_TRISB_TRISB6_MASK);
 }
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcspPgdPinIsOutput(void)
@@ -164,12 +164,14 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcs
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectIcspPgdPinIsMappedToUart1TxAndRx(void)
 {
+	static const uint8_t ppsOutUart1Tx = 0x0f;
+	static const uint8_t ppsInRb7 = 0x0f;
 	stubNvmSettingsWithCalibrationRequired();
 	RB7PPS = anyByteExcept(0x10);
 	RX1DTPPS = anyByte();
 	calibrationModeInitialise();
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0x10, RB7PPS, "TX");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(0x0f, RX1DTPPS, "RX");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(ppsOutUart1Tx, RB7PPS, "TX");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(ppsInRb7, RX1DTPPS, "RX");
 }
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectIcspPgdPinIsNotMappedToAnyPeripheralOutput(void)
@@ -250,12 +252,12 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectUar
 	TEST_ASSERT_EQUAL_UINT8(originalPmd4 | _PMD4_UART1MD_MASK, PMD4);
 }
 
-void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1UsesAsynchronous8bitModeWithLowBaudMultiplier(void)
+void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1UsesAsynchronous8bitModeWithLowBaudMultiplierAndEnabledTransmitter(void)
 {
 	stubNvmSettingsWithCalibrationRequired();
 	TX1STA = anyByte();
 	calibrationModeInitialise();
-	TEST_ASSERT_EQUAL_UINT(0x00, TX1STA & ~_TX1STA_TRMT_MASK);
+	TEST_ASSERT_EQUAL_UINT(_TX1STA_TXEN_MASK, TX1STA & ~_TX1STA_TRMT_MASK);
 }
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1BaudRateIs9600bps(void)
@@ -281,4 +283,22 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1U
 	BAUD1CON = anyByte();
 	calibrationModeInitialise();
 	TEST_ASSERT_EQUAL_UINT8(0, BAUD1CON & ~_BAUD1CON_RCIDL_MASK);
+}
+
+void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1TxInterruptIsDisabled(void)
+{
+	stubNvmSettingsWithCalibrationRequired();
+	PIE3 = anyByteWithMaskSet(_PIE3_TX1IE_MASK);
+	uint8_t originalPie3 = PIE3;
+	calibrationModeInitialise();
+	TEST_ASSERT_EQUAL_UINT8(originalPie3 & ~_PIE3_TX1IE_MASK, PIE3 & ~_PIE3_RC1IE_MASK);
+}
+
+void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1RxInterruptIsEnabled(void)
+{
+	stubNvmSettingsWithCalibrationRequired();
+	PIE3 = anyByteWithMaskClear(_PIE3_RC1IE_MASK);
+	uint8_t originalPie3 = PIE3;
+	calibrationModeInitialise();
+	TEST_ASSERT_EQUAL_UINT8(originalPie3 | _PIE3_RC1IE_MASK, PIE3 & ~_PIE3_TX1IE_MASK);
 }
