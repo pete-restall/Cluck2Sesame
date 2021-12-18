@@ -1,5 +1,9 @@
 #include <xc.h>
 #include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
+
+#define __PERIODICMONITOR_EXPOSE_INTERNALS
 
 #include "Event.h"
 #include "NvmSettings.h"
@@ -17,8 +21,25 @@
 
 static void configureReferenceClockModuleFor32768HzCrystalOutput(void);
 static void configureUart1AsAsynchronous8bit9600BaudContinuousReception(void);
-static void onMonitoredParametersSampled(const struct Event *event);
 static void onWokenFromSleep(const struct Event *event);
+static void tryToTransmitNextByteToHost(void);
+static void onNoCommandReceived(void);
+static void transmitToHost(const uint8_t buffer[]);
+static void onSampleParametersCommandReceived(void);
+static void hexDigitsForByte(uint8_t *out, uint8_t byte);
+static uint8_t hexDigitHigh(uint8_t value);
+static uint8_t hexDigitLow(uint8_t value);
+static void hexDigitsForWord(uint8_t *out, uint16_t word);
+static void onUnknownCommandReceived(void);
+
+static uint8_t transmitBuffer[] = {
+	CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL,
+	CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL,
+	CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL,
+	CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL
+};
+
+static const uint8_t *transmitBufferPtr;
 
 void calibrationModeInitialise(void)
 {
@@ -41,15 +62,6 @@ void calibrationModeInitialise(void)
 
 	configureReferenceClockModuleFor32768HzCrystalOutput();
 	configureUart1AsAsynchronous8bit9600BaudContinuousReception();
-
-	static const struct EventSubscription onMonitoredParametersSampledSubscription =
-	{
-		.type = MONITORED_PARAMETERS_SAMPLED,
-		.handler = &onMonitoredParametersSampled,
-		.state = (void *) 0
-	};
-
-	eventSubscribe(&onMonitoredParametersSampledSubscription);
 
 	static const struct EventSubscription onWokenFromSleepSubscription =
 	{
@@ -85,18 +97,106 @@ static void configureUart1AsAsynchronous8bit9600BaudContinuousReception(void)
 	PIE3bits.TX1IE = 0;
 }
 
-static void onMonitoredParametersSampled(const struct Event *event)
-{
-	// TODO: THIS IS WHERE TEMPERATURE AND FVR MEASUREMENT EVENTS CAN BE HANDLED FROM...
-	const struct MonitoredParametersSampled *args = (const struct MonitoredParametersSampled *) event->args;
-	asm("nop");
-}
-
 static void onWokenFromSleep(const struct Event *event)
 {
-	// TODO: THIS IS WHERE UART1 EVENTS CAN BE HANDLED FROM...
-	// WHILE (RC1IF) READ RC1REG AND DO SOMETHING; IF RX1REG == TX1REG THEN WE CAN DISCARD IT SINCE IT'S LOOPBACK FROM THE MULTIPLEXED RX/TX LINES...
-	// TRANSMISSION JUST CONSISTS OF WRITING TO TX1REG
-	const struct WokenFromSleep *args = (const struct WokenFromSleep *) event->args;
-	asm("nop");
+	static uint8_t buffer[4];
+	static uint8_t bufferIndex = 0;
+	static bool isTransmitting = false;
+	while (PIR3bits.RC1IF)
+	{
+		uint8_t received = RC1REG;
+		if (isTransmitting)
+		{
+			isTransmitting = received != CALIBRATIONMODE_CMD_EOL;
+			if (isTransmitting)
+				tryToTransmitNextByteToHost();
+		}
+		else if (received == CALIBRATIONMODE_CMD_EOL)
+		{
+			if (bufferIndex == 0)
+				onNoCommandReceived();
+			else if (buffer[0] == CALIBRATIONMODE_CMD_SAMPLEPARAMETERS && bufferIndex == 1)
+				onSampleParametersCommandReceived();
+			else
+				onUnknownCommandReceived();
+
+			bufferIndex = 0;
+			isTransmitting = true;
+		}
+		else if (bufferIndex < sizeof(buffer))
+		{
+			buffer[bufferIndex] = received;
+			bufferIndex++;
+		}
+		else
+			bufferIndex = 0xff;
+	}
+}
+
+static void tryToTransmitNextByteToHost(void)
+{
+	if (TX1STAbits.TRMT)
+	{
+		TX1REG = *transmitBufferPtr;
+		transmitBufferPtr++;
+	}
+}
+
+static void onNoCommandReceived(void)
+{
+	static const uint8_t ok[] = {CALIBRATIONMODE_REPLY_OK, 'K', CALIBRATIONMODE_CMD_EOL};
+	transmitToHost(ok);
+}
+
+static void transmitToHost(const uint8_t buffer[])
+{
+	transmitBufferPtr = buffer;
+	tryToTransmitNextByteToHost();
+}
+
+static void onSampleParametersCommandReceived(void)
+{
+	struct MonitoredParametersSampled sample;
+	periodicMonitorSampleNow(&sample);
+	hexDigitsForByte(transmitBuffer, sample.timestamp);
+	transmitBuffer[2] = ',';
+	hexDigitsForByte(transmitBuffer + 3, sample.flags.all);
+	transmitBuffer[5] = ',';
+	hexDigitsForWord(transmitBuffer + 6, sample.fvr);
+	transmitBuffer[10] = ',';
+	hexDigitsForWord(transmitBuffer + 11, sample.temperature);
+	transmitBuffer[15] = CALIBRATIONMODE_CMD_EOL;
+	transmitToHost(transmitBuffer);
+}
+
+static void hexDigitsForByte(uint8_t *out, uint8_t byte) // TODO: MORE WIDELY USEFUL (FOR EXAMPLE, USED IN THE TESTS) - EXTRACT SOMEWHERE
+{
+	*(out++) = hexDigitHigh(byte);
+	*out = hexDigitLow(byte);
+}
+
+static uint8_t hexDigitHigh(uint8_t value)
+{
+	return hexDigitLow((value >> 4) & 0x0f);
+}
+
+static uint8_t hexDigitLow(uint8_t value)
+{
+	value &= 0x0f;
+	if (value > 9)
+		return 'a' + (value - 10);
+
+	return '0' + value;
+}
+
+static void hexDigitsForWord(uint8_t *out, uint16_t word)
+{
+	hexDigitsForByte(out, (uint8_t) (word >> 8));
+	hexDigitsForByte(out + 2, (uint8_t) word);
+}
+
+static void onUnknownCommandReceived(void)
+{
+	static const uint8_t error[] = {CALIBRATIONMODE_REPLY_ERROR, '0', '1', CALIBRATIONMODE_CMD_EOL};
+	transmitToHost(error);
 }

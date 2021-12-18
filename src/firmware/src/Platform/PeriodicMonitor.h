@@ -20,4 +20,8 @@ struct MonitoredParametersSampled
 
 extern void periodicMonitorInitialise(void);
 
+#ifdef __PERIODICMONITOR_EXPOSE_INTERNALS
+extern void periodicMonitorSampleNow(struct MonitoredParametersSampled *eventArgs);
+#endif
+
 #endif

@@ -6,8 +6,6 @@ extern void calibrationModeFixtureSetUp(void);
 extern void calibrationModeFixtureTearDown(void);
 extern void stubNvmSettingsWithCalibrationRequired(void);
 extern void stubNvmSettingsWithoutCalibrationRequired(void);
-extern void assertMonitoredParametersSampledSubscription(void);
-extern void assertNoMonitoredParametersSampledSubscription(void);
 extern void assertWokenFromSleepSubscription(void);
 extern void assertNoWokenFromSleepSubscription(void);
 

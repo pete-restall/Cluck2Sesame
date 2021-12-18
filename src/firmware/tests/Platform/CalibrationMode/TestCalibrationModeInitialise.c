@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <unity.h>
 
+#include "Mock_PeriodicMonitor.h"
 #include "Platform/CalibrationMode.h"
 
 #include "CalibrationModeFixture.h"
@@ -20,20 +21,6 @@ void onBeforeTest(void)
 void onAfterTest(void)
 {
 	calibrationModeFixtureTearDown();
-}
-
-void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectSubscriptionToMonitoredParametersSampled(void)
-{
-	stubNvmSettingsWithCalibrationRequired();
-	calibrationModeInitialise();
-	assertMonitoredParametersSampledSubscription();
-}
-
-void test_calibrationModeInitialise_calledWhenCalibrationIsNotRequired_expectNoSubscriptionToMonitoredParametersSampled(void)
-{
-	stubNvmSettingsWithoutCalibrationRequired();
-	calibrationModeInitialise();
-	assertNoMonitoredParametersSampledSubscription();
 }
 
 void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectSubscriptionToWokenFromSleep(void)
@@ -289,7 +276,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1T
 {
 	stubNvmSettingsWithCalibrationRequired();
 	PIE3 = anyByteWithMaskSet(_PIE3_TX1IE_MASK);
-	uint8_t originalPie3 = PIE3;
+	uint8_t originalPie3 = PIE3 & ~_PIE3_RC1IE_MASK;
 	calibrationModeInitialise();
 	TEST_ASSERT_EQUAL_UINT8(originalPie3 & ~_PIE3_TX1IE_MASK, PIE3 & ~_PIE3_RC1IE_MASK);
 }
@@ -298,7 +285,7 @@ void test_calibrationModeInitialise_calledWhenCalibrationIsRequired_expectUart1R
 {
 	stubNvmSettingsWithCalibrationRequired();
 	PIE3 = anyByteWithMaskClear(_PIE3_RC1IE_MASK);
-	uint8_t originalPie3 = PIE3;
+	uint8_t originalPie3 = PIE3 & ~_PIE3_TX1IE_MASK;
 	calibrationModeInitialise();
 	TEST_ASSERT_EQUAL_UINT8(originalPie3 | _PIE3_RC1IE_MASK, PIE3 & ~_PIE3_TX1IE_MASK);
 }

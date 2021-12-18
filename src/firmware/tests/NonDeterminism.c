@@ -81,3 +81,15 @@ uint16_t anyWordLessThan(uint16_t value)
 {
 	return anyWord() % value;
 }
+
+void *anyBytesInto(void *dest, size_t numberOfBytes)
+{
+	if (dest)
+	{
+		uint8_t *byteDest = (uint8_t *) dest;
+		for (size_t i = 0; i < numberOfBytes; i++)
+			*(byteDest++) = anyByte();
+	}
+
+	return dest;
+}

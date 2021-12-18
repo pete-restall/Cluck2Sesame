@@ -11,5 +11,6 @@ extern uint8_t anyBoolean(void);
 extern uint16_t anyWord(void);
 extern uint16_t anyWordExcept(uint16_t except);
 extern uint16_t anyWordLessThan(uint16_t value);
+extern void *anyBytesInto(void *dest, size_t numberOfBytes);
 
 #endif
