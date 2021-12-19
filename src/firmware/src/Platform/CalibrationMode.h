@@ -8,6 +8,7 @@
 
 #define CALIBRATIONMODE_REPLY_OK 'O'
 #define CALIBRATIONMODE_REPLY_ERROR 'E'
+#define CALIBRATIONMODE_REPLY_RESULT '='
 
 extern void calibrationModeInitialise(void);
 

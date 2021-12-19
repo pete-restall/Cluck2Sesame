@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-extern volatile uint8_t deviceToHostBytes[16];
+extern volatile uint8_t deviceToHostBytes[18];
 extern volatile uint8_t deviceToHostNumberOfBytes;
 
 extern void calibrationModeFixtureSetUp(void);

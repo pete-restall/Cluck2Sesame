@@ -51,23 +51,24 @@ void test_uart1_receivesSampleParametersCommand_expectSampledParametersAreTransm
 	uint8_t command[] = {CALIBRATIONMODE_CMD_SAMPLEPARAMETERS, CALIBRATIONMODE_CMD_EOL};
 	fakeHostToDeviceSend(command, sizeof(command));
 	fakeHostWaitForDeviceResponse();
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(16, deviceToHostNumberOfBytes, "NUM");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitHigh(sample.timestamp), deviceToHostBytes[0], "0");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitLow(sample.timestamp), deviceToHostBytes[1], "1");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(',', deviceToHostBytes[2], "2");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitHigh(sample.flags.all), deviceToHostBytes[3], "3");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitLow(sample.flags.all), deviceToHostBytes[4], "4");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(',', deviceToHostBytes[5], "5");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitHigh(byteHigh(sample.fvr)), deviceToHostBytes[6], "6");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitLow(byteHigh(sample.fvr)), deviceToHostBytes[7], "7");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitHigh(byteLow(sample.fvr)), deviceToHostBytes[8], "8");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitLow(byteLow(sample.fvr)), deviceToHostBytes[9], "9");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(',', deviceToHostBytes[10], "10");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitHigh(byteHigh(sample.temperature)), deviceToHostBytes[11], "11");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitLow(byteHigh(sample.temperature)), deviceToHostBytes[12], "12");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitHigh(byteLow(sample.temperature)), deviceToHostBytes[13], "13");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitLow(byteLow(sample.temperature)), deviceToHostBytes[14], "14");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(CALIBRATIONMODE_CMD_EOL, deviceToHostBytes[15], "EOL");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(17, deviceToHostNumberOfBytes, "NUM");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(CALIBRATIONMODE_REPLY_RESULT, deviceToHostBytes[0], "0");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitHigh(sample.timestamp), deviceToHostBytes[1], "1");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitLow(sample.timestamp), deviceToHostBytes[2], "2");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(',', deviceToHostBytes[3], "3");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitHigh(sample.flags.all), deviceToHostBytes[4], "4");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitLow(sample.flags.all), deviceToHostBytes[5], "5");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(',', deviceToHostBytes[6], "6");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitHigh(byteHigh(sample.fvr)), deviceToHostBytes[7], "7");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitLow(byteHigh(sample.fvr)), deviceToHostBytes[8], "8");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitHigh(byteLow(sample.fvr)), deviceToHostBytes[9], "9");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitLow(byteLow(sample.fvr)), deviceToHostBytes[10], "10");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(',', deviceToHostBytes[11], "11");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitHigh(byteHigh(sample.temperature)), deviceToHostBytes[12], "12");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitLow(byteHigh(sample.temperature)), deviceToHostBytes[13], "13");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitHigh(byteLow(sample.temperature)), deviceToHostBytes[14], "14");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(hexDigitLow(byteLow(sample.temperature)), deviceToHostBytes[15], "15");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(CALIBRATIONMODE_CMD_EOL, deviceToHostBytes[16], "EOL");
 }
 
 static void stubMonitoredParametersSampledFor(const struct MonitoredParametersSampled *sample)

@@ -17,7 +17,7 @@
 #include "CalibrationModeFixtureWithUart.h"
 
 #define HOST_TO_DEVICE_BYTE_ADDR(x) __at(0x23a0 + (x))
-#define DEVICE_TO_HOST_BYTE_ADDR(x) __at(0x23b0 + (x))
+#define DEVICE_TO_HOST_BYTE_ADDR(x) __at(0x23a8 + (x))
 
 static void fakeUart1Initialise(void);
 
@@ -28,7 +28,7 @@ volatile uint8_t hostToDeviceByte2 HOST_TO_DEVICE_BYTE_ADDR(2);
 volatile uint8_t hostToDeviceByte3 HOST_TO_DEVICE_BYTE_ADDR(3);
 volatile uint8_t hostToDeviceNumberOfBytes;
 
-volatile uint8_t deviceToHostBytes[16] DEVICE_TO_HOST_BYTE_ADDR(0);
+volatile uint8_t deviceToHostBytes[18] DEVICE_TO_HOST_BYTE_ADDR(0);
 volatile uint8_t deviceToHostByte0 DEVICE_TO_HOST_BYTE_ADDR(0);
 volatile uint8_t deviceToHostByte1 DEVICE_TO_HOST_BYTE_ADDR(1);
 volatile uint8_t deviceToHostByte2 DEVICE_TO_HOST_BYTE_ADDR(2);
@@ -45,6 +45,8 @@ volatile uint8_t deviceToHostByte12 DEVICE_TO_HOST_BYTE_ADDR(12);
 volatile uint8_t deviceToHostByte13 DEVICE_TO_HOST_BYTE_ADDR(13);
 volatile uint8_t deviceToHostByte14 DEVICE_TO_HOST_BYTE_ADDR(14);
 volatile uint8_t deviceToHostByte15 DEVICE_TO_HOST_BYTE_ADDR(15);
+volatile uint8_t deviceToHostByte16 DEVICE_TO_HOST_BYTE_ADDR(16);
+volatile uint8_t deviceToHostByte17 DEVICE_TO_HOST_BYTE_ADDR(17);
 volatile uint8_t deviceToHostNumberOfBytes;
 
 volatile uint8_t fakeUart1IsSessionInvalid;
@@ -114,12 +116,10 @@ void fakeHostWaitForDeviceResponse(void)
 	CPUDOZEbits.IDLEN = 1;
 	INTCONbits.PEIE = 1;
 
-	bool foundEol = false;
 	uint8_t byteIndex = 0;
-	while (!foundEol)
+	while (true)
 	{
 		dispatchAllEvents();
-		asm("sleep");
 		eventPublish(WOKEN_FROM_SLEEP, &eventEmptyArgs);
 
 		while (byteIndex < deviceToHostNumberOfBytes)
@@ -127,8 +127,8 @@ void fakeHostWaitForDeviceResponse(void)
 			TEST_ASSERT_LESS_THAN_MESSAGE(sizeof(deviceToHostBytes), byteIndex, "Receive overflow");
 			if (deviceToHostBytes[byteIndex] == CALIBRATIONMODE_CMD_EOL)
 			{
-				foundEol = true;
-				break;
+				dispatchAllEvents();
+				return;
 			}
 
 			byteIndex++;

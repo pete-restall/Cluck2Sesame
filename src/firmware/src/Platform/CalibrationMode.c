@@ -36,7 +36,8 @@ static uint8_t transmitBuffer[] = {
 	CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL,
 	CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL,
 	CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL,
-	CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL
+	CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL,
+	CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL
 };
 
 static const uint8_t *transmitBufferPtr;
@@ -158,14 +159,15 @@ static void onSampleParametersCommandReceived(void)
 {
 	struct MonitoredParametersSampled sample;
 	periodicMonitorSampleNow(&sample);
-	hexDigitsForByte(transmitBuffer, sample.timestamp);
-	transmitBuffer[2] = ',';
-	hexDigitsForByte(transmitBuffer + 3, sample.flags.all);
-	transmitBuffer[5] = ',';
-	hexDigitsForWord(transmitBuffer + 6, sample.fvr);
-	transmitBuffer[10] = ',';
-	hexDigitsForWord(transmitBuffer + 11, sample.temperature);
-	transmitBuffer[15] = CALIBRATIONMODE_CMD_EOL;
+	transmitBuffer[0] = CALIBRATIONMODE_REPLY_RESULT;
+	hexDigitsForByte(transmitBuffer + 1, sample.timestamp);
+	transmitBuffer[3] = ',';
+	hexDigitsForByte(transmitBuffer + 4, sample.flags.all);
+	transmitBuffer[6] = ',';
+	hexDigitsForWord(transmitBuffer + 7, sample.fvr);
+	transmitBuffer[11] = ',';
+	hexDigitsForWord(transmitBuffer + 12, sample.temperature);
+	transmitBuffer[16] = CALIBRATIONMODE_CMD_EOL;
 	transmitToHost(transmitBuffer);
 }
 
