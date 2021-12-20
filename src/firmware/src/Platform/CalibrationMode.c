@@ -145,7 +145,7 @@ static void tryToTransmitNextByteToHost(void)
 
 static void onNoCommandReceived(void)
 {
-	static const uint8_t ok[] = {CALIBRATIONMODE_REPLY_OK, 'K', CALIBRATIONMODE_CMD_EOL};
+	static const uint8_t ok[] = {CALIBRATIONMODE_REPLY_RESULT, 'O', 'K', CALIBRATIONMODE_CMD_EOL};
 	transmitToHost(ok);
 }
 
