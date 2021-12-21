@@ -40,6 +40,16 @@ void test_uart1_receivesRefclkOffCommand_expect0IsTransmittedToHost(void)
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(CALIBRATIONMODE_CMD_EOL, deviceToHostBytes[2], "EOL");
 }
 
+void test_uart1_receivesRefclkOffCommand_expectRefclkIsDisabled(void)
+{
+	uint8_t originalClkrcon = CLKRCON;
+	CLKRCON |= _CLKRCON_CLKREN_MASK;
+	uint8_t command[] = {CALIBRATIONMODE_CMD_REFCLK, '0', CALIBRATIONMODE_CMD_EOL};
+	fakeHostToDeviceSend(command, sizeof(command));
+	fakeHostWaitForDeviceResponse();
+	TEST_ASSERT_EQUAL_UINT8(originalClkrcon & ~_CLKRCON_CLKREN_MASK, CLKRCON);
+}
+
 void test_uart1_receivesRefclkOnCommand_expect1IsTransmittedToHost(void)
 {
 	uint8_t command[] = {CALIBRATIONMODE_CMD_REFCLK, '1', CALIBRATIONMODE_CMD_EOL};
@@ -49,6 +59,16 @@ void test_uart1_receivesRefclkOnCommand_expect1IsTransmittedToHost(void)
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(CALIBRATIONMODE_REPLY_RESULT, deviceToHostBytes[0], "0");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE('1', deviceToHostBytes[1], "1");
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(CALIBRATIONMODE_CMD_EOL, deviceToHostBytes[2], "EOL");
+}
+
+void test_uart1_receivesRefclkOnCommand_expectRefclkIsDisabled(void)
+{
+	uint8_t originalClkrcon = CLKRCON;
+	CLKRCON &= ~_CLKRCON_CLKREN_MASK;
+	uint8_t command[] = {CALIBRATIONMODE_CMD_REFCLK, '1', CALIBRATIONMODE_CMD_EOL};
+	fakeHostToDeviceSend(command, sizeof(command));
+	fakeHostWaitForDeviceResponse();
+	TEST_ASSERT_EQUAL_UINT8(originalClkrcon | _CLKRCON_CLKREN_MASK, CLKRCON);
 }
 
 void test_uart1_receivesRefclkCommandWithInvalidArgument_expectErrorIsTransmittedToHost(void)

@@ -212,9 +212,15 @@ static void hexDigitsForWord(uint8_t *out, uint16_t word)
 static void onRefclkCommandReceived(uint8_t onOff)
 {
 	if (onOff == '0')
+	{
+		CLKRCONbits.CLKREN = 0;
 		transmitToHost(replyResult0);
+	}
 	else if (onOff == '1')
+	{
+		CLKRCONbits.CLKREN = 1;
 		transmitToHost(replyResult1);
+	}
 	else
 		transmitToHost(replyErrorUnknownCommandArgument);
 }
