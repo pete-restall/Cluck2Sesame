@@ -9,7 +9,7 @@
 
 #include "../../Fixture.h"
 #include "../../NonDeterminism.h"
-#include "../../NvmSettingsFixture.c"
+#include "../../NvmSettingsFixture.h"
 
 TEST_FILE("Platform/CalibrationMode.c")
 TEST_FILE("Platform/Event.c")
