@@ -37,7 +37,6 @@ set oscillator.rcfrequencyunit Mega
 set oscillator.frequency 8
 set oscillator.frequencyunit Mega
 
-set uart1io.uartioenabled true
 set uart2io.uartioenabled true
 set uart2io.output window
 

@@ -6,6 +6,7 @@
 #include "Fixture.h"
 
 const struct Event eventEmptyArgs __attribute__((weak)) = { };
+volatile uint8_t sclDataOverlay[31] __section("sclDataOverlay");
 
 void setUp(void)
 {

@@ -25,17 +25,23 @@ configuration for "PIC16F15356" is
 	shared variable deviceToHostByte17;
 	shared variable deviceToHostNumberOfBytes;
 
+	shared variable fakeUart1SessionIndex;
 	shared variable fakeUart1IsSessionInvalid;
 end configuration;
 
 testbench for "PIC16F15356" is
 begin
-	fixtureReset: process is
+	resetFixture: process is
 		variable byteTransmissionTime : time;
 		variable txString : string;
 	begin
 		byteTransmissionTime := 1041 us; // (1 start + 8 data + 1 stop) bits / 9600 baud = 1041.6...us
-		wait;
+		loop
+			wait on fakeUart1SessionIndex;
+			report("[FAKE UART1] Resetting fixture.");
+			hostToDeviceNumberOfBytes := 0;
+			deviceToHostNumberOfBytes := 0;
+		end loop;
 	end process;
 
 	hostToDeviceTransmission: process is
@@ -321,8 +327,9 @@ begin
 					rxString := "ff";
 				end if;
 
+				report(rxString);
 				packetin(rxString, RC1REG, true);
-				wait for byteTransmissionTime;
+				wait on fakeUart1SessionIndex for byteTransmissionTime;
 			end loop;
 		end loop;
 	end process;
@@ -665,27 +672,36 @@ begin
 		loop
 			wait on TX1REG;
 
-			if TX1STA.TRMT == '0' then
-				report("[FAKE UART1 ASSERT] TX Overrun Error !");
-				fakeUart1IsSessionInvalid := 1;
+			if TX1STA.TXEN == '1' then
+				if TX1STA.TRMT == '0' then
+					report("[FAKE UART1 ASSERT] TX Overrun Error !");
+					fakeUart1IsSessionInvalid := 1;
+				end if;
 			end if;
 		end loop;
 	end process;
 
 	echoTransmittedByte: process is
+		variable localTxString : string;
 	begin
 		loop
 			wait on TX1REG;
-			if RC1STA.SREN == '1' then
-				wait for byteTransmissionTime;
-				report("[FAKE UART1] Echoing device-to-host transmitted byte (single reception)");
-				packetin(txString, RC1REG, false);
-			elsif RC1STA.CREN == '1' then
-				wait for byteTransmissionTime;
-				report("[FAKE UART1] Echoing device-to-host transmitted byte (continuous reception)");
-				packetin(txString, RC1REG, false);
-			else
-				report("[FAKE UART1] Not echoing device-to-host transmitted byte (receiver not ready)");
+			if TX1STA.TXEN == '1' then
+				wait for 1 ic;
+				localTxString := txString;
+				report("[FAKE UART1] TX");
+				report(localTxString);
+				if RC1STA.SREN == '1' then
+					wait on fakeUart1SessionIndex for byteTransmissionTime;
+					report("[FAKE UART1] Echoing device-to-host transmitted byte (single reception)");
+					packetin(localTxString, RC1REG, false);
+				elsif RC1STA.CREN == '1' then
+					wait on fakeUart1SessionIndex for byteTransmissionTime;
+					report("[FAKE UART1] Echoing device-to-host transmitted byte (continuous reception)");
+					packetin(localTxString, RC1REG, false);
+				else
+					report("[FAKE UART1] Not echoing device-to-host transmitted byte (receiver not ready)");
+				end if;
 			end if;
 		end loop;
 	end process;
@@ -694,15 +710,7 @@ begin
 	begin
 		loop
 			wait on RC1REG;
-			report("RX");
-		end loop;
-	end process;
-
-	reportTx: process is
-	begin
-		loop
-			wait on TX1REG;
-			report("TX");
+			report("[FAKE UART1] RX");
 		end loop;
 	end process;
 end testbench;

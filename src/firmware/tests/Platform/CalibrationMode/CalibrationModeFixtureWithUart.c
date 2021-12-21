@@ -49,6 +49,7 @@ volatile uint8_t deviceToHostByte16 DEVICE_TO_HOST_BYTE_ADDR(16);
 volatile uint8_t deviceToHostByte17 DEVICE_TO_HOST_BYTE_ADDR(17);
 volatile uint8_t deviceToHostNumberOfBytes;
 
+volatile uint8_t fakeUart1SessionIndex;
 volatile uint8_t fakeUart1IsSessionInvalid;
 
 void calibrationModeFixtureSetUp(void)
@@ -59,13 +60,18 @@ void calibrationModeFixtureSetUp(void)
 
 static void fakeUart1Initialise(void)
 {
-	deviceToHostNumberOfBytes = 0;
-	for (uint8_t i = 0; i < sizeof(deviceToHostBytes); i++)
-		deviceToHostBytes[i] = i;
+	RC1STA = 0;
+	TX1STA = 0;
 
+	fakeUart1SessionIndex++;
+	for (uint16_t i = 0; i < 2084; i++)
+		asm("nop");
+
+	while (PIR3bits.RC1IF)
+		(void) RC1REG;
+
+	deviceToHostNumberOfBytes = 0;
 	hostToDeviceNumberOfBytes = 0;
-	for (uint8_t i = 0; i < sizeof(hostToDeviceBytes); i++)
-		hostToDeviceBytes[i] = i;
 
 	fakeUart1IsSessionInvalid = 0;
 }

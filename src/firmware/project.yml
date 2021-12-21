@@ -145,6 +145,7 @@
       - -Wl,-AID=0x8006-0x8007
       - -Wl,-PID=ID
       - -Wl,-PNvmSettings=0x1fe0
+      - -Wl,-PsclDataOverlay=0x23a0+31
       - --fill=0x3fff
       - -mserial=0000@8005
       - -mserial=ae30@8006
