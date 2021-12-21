@@ -29,16 +29,10 @@ void onAfterTest(void)
 	calibrationModeFixtureTearDown();
 }
 
-void test_uart1_receivesUnknownCommand_expectErrorWithCorrectCodeIsTransmittedToHost(void)
+void test_uart1_receivesInvalidCommand_expectErrorWithCorrectCodeIsTransmittedToHost(void)
 {
 	uint8_t command[] = {anyUnknownCommand(), CALIBRATIONMODE_CMD_EOL};
-	fakeHostToDeviceSend(command, sizeof(command));
-	fakeHostWaitForDeviceResponse();
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(4, deviceToHostNumberOfBytes, "NUM");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(CALIBRATIONMODE_REPLY_ERROR, deviceToHostBytes[0], "0");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE('0', deviceToHostBytes[1], "1");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE('1', deviceToHostBytes[2], "2");
-	TEST_ASSERT_EQUAL_UINT8_MESSAGE(CALIBRATIONMODE_CMD_EOL, deviceToHostBytes[3], "EOL");
+	uart1_receivesInvalidCommand_expectInvalidCommandErrorIsTransmittedToHost(command, sizeof(command));
 }
 
 static uint8_t anyUnknownCommand(void)

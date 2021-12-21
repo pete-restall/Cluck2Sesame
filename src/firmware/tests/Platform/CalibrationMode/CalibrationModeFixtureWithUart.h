@@ -12,5 +12,7 @@ extern void stubNvmSettingsWithCalibrationRequired(void);
 extern void stubNvmSettingsWithoutCalibrationRequired(void);
 extern void fakeHostToDeviceSend(const uint8_t *bytes, size_t numberOfBytes);
 extern void fakeHostWaitForDeviceResponse(void);
+extern void uart1_receivesInvalidCommand_expectInvalidCommandErrorIsTransmittedToHost(const uint8_t *command, size_t numberOfBytes);
+extern void uart1_receivesInvalidCommand_expectInvalidArgumentErrorIsTransmittedToHost(const uint8_t *command, size_t numberOfBytes);
 
 #endif

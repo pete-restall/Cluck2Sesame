@@ -99,3 +99,9 @@ static uint8_t byteLow(uint16_t value)
 {
 	return (uint8_t) (value & 0xff);
 }
+
+void test_uart1_receivesSampleParametersCommandWithAnArgument_expectErrorIsTransmittedToHost(void)
+{
+	uint8_t command[] = {CALIBRATIONMODE_CMD_SAMPLEPARAMETERS, '1', CALIBRATIONMODE_CMD_EOL};
+	uart1_receivesInvalidCommand_expectInvalidCommandErrorIsTransmittedToHost(command, sizeof(command));
+}

@@ -1,6 +1,7 @@
 #include <xc.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <string.h>
 #include <unity.h>
 
@@ -20,6 +21,7 @@
 #define DEVICE_TO_HOST_BYTE_ADDR(x) __at(0x23a8 + (x))
 
 static void fakeUart1Initialise(void);
+static void uart1_receivesInvalidCommand_expectErrorIsTransmittedToHost(const uint8_t *command, size_t numberOfBytes, uint8_t errorHigh, uint8_t errorLow);
 
 volatile uint8_t hostToDeviceBytes[4] HOST_TO_DEVICE_BYTE_ADDR(0);
 volatile uint8_t hostToDeviceByte0 HOST_TO_DEVICE_BYTE_ADDR(0);
@@ -140,4 +142,25 @@ void fakeHostWaitForDeviceResponse(void)
 			byteIndex++;
 		}
 	}
+}
+
+void uart1_receivesInvalidCommand_expectInvalidCommandErrorIsTransmittedToHost(const uint8_t *command, size_t numberOfBytes)
+{
+	uart1_receivesInvalidCommand_expectErrorIsTransmittedToHost(command, numberOfBytes, '0', '1');
+}
+
+static void uart1_receivesInvalidCommand_expectErrorIsTransmittedToHost(const uint8_t *command, size_t numberOfBytes, uint8_t errorHigh, uint8_t errorLow)
+{
+	fakeHostToDeviceSend(command, numberOfBytes);
+	fakeHostWaitForDeviceResponse();
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(4, deviceToHostNumberOfBytes, "NUM");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(CALIBRATIONMODE_REPLY_ERROR, deviceToHostBytes[0], "0");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(errorHigh, deviceToHostBytes[1], "1");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(errorLow, deviceToHostBytes[2], "2");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(CALIBRATIONMODE_CMD_EOL, deviceToHostBytes[3], "EOL");
+}
+
+void uart1_receivesInvalidCommand_expectInvalidArgumentErrorIsTransmittedToHost(const uint8_t *command, size_t numberOfBytes)
+{
+	uart1_receivesInvalidCommand_expectErrorIsTransmittedToHost(command, numberOfBytes, '0', '2');
 }
