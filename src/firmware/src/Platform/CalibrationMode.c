@@ -30,7 +30,17 @@ static void hexDigitsForByte(uint8_t *out, uint8_t byte);
 static uint8_t hexDigitHigh(uint8_t value);
 static uint8_t hexDigitLow(uint8_t value);
 static void hexDigitsForWord(uint8_t *out, uint16_t word);
+static void onRefclkCommandReceived(uint8_t onOff);
 static void onUnknownCommandReceived(void);
+
+static const uint8_t replyResult0[] = {CALIBRATIONMODE_REPLY_RESULT, '0', CALIBRATIONMODE_CMD_EOL};
+static const uint8_t replyResult1[] = {CALIBRATIONMODE_REPLY_RESULT, '1', CALIBRATIONMODE_CMD_EOL};
+static const uint8_t replyErrorUnknownCommand[] = {CALIBRATIONMODE_REPLY_ERROR, '0', '1', CALIBRATIONMODE_CMD_EOL};
+static const uint8_t replyErrorUnknownCommandArgument[] = {CALIBRATIONMODE_REPLY_ERROR, '0', '2', CALIBRATIONMODE_CMD_EOL};
+
+static uint8_t receiveBuffer[4];
+static uint8_t receiveBufferIndex;
+static bool isTransmitting;
 
 static uint8_t transmitBuffer[] = {
 	CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL, CALIBRATIONMODE_CMD_EOL,
@@ -44,6 +54,9 @@ static const uint8_t *transmitBufferPtr;
 
 void calibrationModeInitialise(void)
 {
+	receiveBufferIndex = 0;
+	isTransmitting = false;
+
 	LATBbits.LATB6 = 0;
 	LATBbits.LATB7 = 0;
 	ANSELBbits.ANSB6 = 0;
@@ -100,9 +113,6 @@ static void configureUart1AsAsynchronous8bit9600BaudContinuousReception(void)
 
 static void onWokenFromSleep(const struct Event *event)
 {
-	static uint8_t buffer[4];
-	static uint8_t bufferIndex = 0;
-	static bool isTransmitting = false;
 	while (PIR3bits.RC1IF)
 	{
 		uint8_t received = RC1REG;
@@ -114,23 +124,25 @@ static void onWokenFromSleep(const struct Event *event)
 		}
 		else if (received == CALIBRATIONMODE_CMD_EOL)
 		{
-			if (bufferIndex == 0)
+			if (receiveBufferIndex == 0)
 				onNoCommandReceived();
-			else if (buffer[0] == CALIBRATIONMODE_CMD_SAMPLEPARAMETERS && bufferIndex == 1)
+			else if (receiveBuffer[0] == CALIBRATIONMODE_CMD_SAMPLEPARAMETERS && receiveBufferIndex == 1)
 				onSampleParametersCommandReceived();
+			else if (receiveBuffer[0] == CALIBRATIONMODE_CMD_REFCLK && receiveBufferIndex == 2)
+				onRefclkCommandReceived(receiveBuffer[1]);
 			else
 				onUnknownCommandReceived();
 
-			bufferIndex = 0;
+			receiveBufferIndex = 0;
 			isTransmitting = true;
 		}
-		else if (bufferIndex < sizeof(buffer))
+		else if (receiveBufferIndex < sizeof(receiveBuffer))
 		{
-			buffer[bufferIndex] = received;
-			bufferIndex++;
+			receiveBuffer[receiveBufferIndex] = received;
+			receiveBufferIndex++;
 		}
 		else
-			bufferIndex = 0xff;
+			receiveBufferIndex = 0xff;
 	}
 }
 
@@ -197,8 +209,17 @@ static void hexDigitsForWord(uint8_t *out, uint16_t word)
 	hexDigitsForByte(out + 2, (uint8_t) word);
 }
 
+static void onRefclkCommandReceived(uint8_t onOff)
+{
+	if (onOff == '0')
+		transmitToHost(replyResult0);
+	else if (onOff == '1')
+		transmitToHost(replyResult1);
+	else
+		transmitToHost(replyErrorUnknownCommandArgument);
+}
+
 static void onUnknownCommandReceived(void)
 {
-	static const uint8_t error[] = {CALIBRATIONMODE_REPLY_ERROR, '0', '1', CALIBRATIONMODE_CMD_EOL};
-	transmitToHost(error);
+	transmitToHost(replyErrorUnknownCommand);
 }
