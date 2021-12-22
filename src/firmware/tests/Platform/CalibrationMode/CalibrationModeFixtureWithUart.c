@@ -23,11 +23,15 @@
 static void fakeUart1Initialise(void);
 static void uart1_receivesInvalidCommand_expectErrorIsTransmittedToHost(const uint8_t *command, size_t numberOfBytes, uint8_t errorHigh, uint8_t errorLow);
 
-volatile uint8_t hostToDeviceBytes[4] HOST_TO_DEVICE_BYTE_ADDR(0);
+volatile uint8_t hostToDeviceBytes[8] HOST_TO_DEVICE_BYTE_ADDR(0);
 volatile uint8_t hostToDeviceByte0 HOST_TO_DEVICE_BYTE_ADDR(0);
 volatile uint8_t hostToDeviceByte1 HOST_TO_DEVICE_BYTE_ADDR(1);
 volatile uint8_t hostToDeviceByte2 HOST_TO_DEVICE_BYTE_ADDR(2);
 volatile uint8_t hostToDeviceByte3 HOST_TO_DEVICE_BYTE_ADDR(3);
+volatile uint8_t hostToDeviceByte4 HOST_TO_DEVICE_BYTE_ADDR(4);
+volatile uint8_t hostToDeviceByte5 HOST_TO_DEVICE_BYTE_ADDR(5);
+volatile uint8_t hostToDeviceByte6 HOST_TO_DEVICE_BYTE_ADDR(6);
+volatile uint8_t hostToDeviceByte7 HOST_TO_DEVICE_BYTE_ADDR(7);
 volatile uint8_t hostToDeviceNumberOfBytes;
 
 volatile uint8_t deviceToHostBytes[18] DEVICE_TO_HOST_BYTE_ADDR(0);

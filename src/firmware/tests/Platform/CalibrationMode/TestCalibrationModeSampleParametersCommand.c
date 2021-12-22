@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unity.h>
 
+#include "Mock_Nvm.h"
+#include "Platform/HexDigits.h"
 #include "Mock_PeriodicMonitor.h"
 #include "Platform/CalibrationMode.h"
 
@@ -76,7 +78,7 @@ static void stubMonitoredParametersSampledFor(const struct MonitoredParametersSa
 	stubbedMonitoredParametersSampled = sample;
 }
 
-static uint8_t hexDigitHigh(uint8_t value)
+static uint8_t hexDigitHigh(uint8_t value) // TODO: THESE CAN BE REMOVED AND WE CAN USE THE ONES IN HexDigits.h INSTEAD !
 {
 	return hexDigitLow((value >> 4) & 0x0f);
 }

@@ -6,8 +6,10 @@
 #define __PERIODICMONITOR_EXPOSE_INTERNALS
 
 #include "Event.h"
+#include "Nvm.h"
 #include "NvmSettings.h"
 #include "PowerManagement.h"
+#include "HexDigits.h"
 #include "PeriodicMonitor.h"
 #include "CalibrationMode.h"
 
@@ -26,11 +28,8 @@ static void tryToTransmitNextByteToHost(void);
 static void onNoCommandReceived(void);
 static void transmitToHost(const uint8_t buffer[]);
 static void onSampleParametersCommandReceived(void);
-static void hexDigitsForByte(uint8_t *out, uint8_t byte);
-static uint8_t hexDigitHigh(uint8_t value);
-static uint8_t hexDigitLow(uint8_t value);
-static void hexDigitsForWord(uint8_t *out, uint16_t word);
 static void onRefclkCommandReceived(uint8_t onOff);
+static void onReadCommandReceived(const uint8_t addressString[]);
 static void onUnknownCommandReceived(void);
 
 static const uint8_t replyResult0[] = {CALIBRATIONMODE_REPLY_RESULT, '0', CALIBRATIONMODE_CMD_EOL};
@@ -38,7 +37,7 @@ static const uint8_t replyResult1[] = {CALIBRATIONMODE_REPLY_RESULT, '1', CALIBR
 static const uint8_t replyErrorUnknownCommand[] = {CALIBRATIONMODE_REPLY_ERROR, '0', '1', CALIBRATIONMODE_CMD_EOL};
 static const uint8_t replyErrorUnknownCommandArgument[] = {CALIBRATIONMODE_REPLY_ERROR, '0', '2', CALIBRATIONMODE_CMD_EOL};
 
-static uint8_t receiveBuffer[4];
+static uint8_t receiveBuffer[6];
 static uint8_t receiveBufferIndex;
 static bool isTransmitting;
 
@@ -122,6 +121,10 @@ static void onWokenFromSleep(const struct Event *event)
 			if (isTransmitting)
 				tryToTransmitNextByteToHost();
 		}
+		else if (received == '\r')
+		{
+			/* Ignore - dubious hack to allow some miniterm implementation's default line endings */
+		}
 		else if (received == CALIBRATIONMODE_CMD_EOL)
 		{
 			if (receiveBufferIndex == 0)
@@ -130,6 +133,8 @@ static void onWokenFromSleep(const struct Event *event)
 				onSampleParametersCommandReceived();
 			else if (receiveBuffer[0] == CALIBRATIONMODE_CMD_REFCLK && receiveBufferIndex == 2)
 				onRefclkCommandReceived(receiveBuffer[1]);
+			else if (receiveBuffer[0] == CALIBRATIONMODE_CMD_READ && receiveBufferIndex == 5)
+				onReadCommandReceived(&receiveBuffer[1]);
 			else
 				onUnknownCommandReceived();
 
@@ -183,32 +188,6 @@ static void onSampleParametersCommandReceived(void)
 	transmitToHost(transmitBuffer);
 }
 
-static void hexDigitsForByte(uint8_t *out, uint8_t byte) // TODO: MORE WIDELY USEFUL (FOR EXAMPLE, USED IN THE TESTS) - EXTRACT SOMEWHERE
-{
-	*(out++) = hexDigitHigh(byte);
-	*out = hexDigitLow(byte);
-}
-
-static uint8_t hexDigitHigh(uint8_t value)
-{
-	return hexDigitLow((value >> 4) & 0x0f);
-}
-
-static uint8_t hexDigitLow(uint8_t value)
-{
-	value &= 0x0f;
-	if (value > 9)
-		return 'a' + (value - 10);
-
-	return '0' + value;
-}
-
-static void hexDigitsForWord(uint8_t *out, uint16_t word)
-{
-	hexDigitsForByte(out, (uint8_t) (word >> 8));
-	hexDigitsForByte(out + 2, (uint8_t) word);
-}
-
 static void onRefclkCommandReceived(uint8_t onOff)
 {
 	if (onOff == '0')
@@ -220,6 +199,21 @@ static void onRefclkCommandReceived(uint8_t onOff)
 	{
 		CLKRCONbits.CLKREN = 1;
 		transmitToHost(replyResult1);
+	}
+	else
+		transmitToHost(replyErrorUnknownCommandArgument);
+}
+
+static void onReadCommandReceived(const uint8_t addressString[])
+{
+	uint16_t value;
+	if (hexDigitsToWord(&value, addressString))
+	{
+		value = nvmWordAt(value);
+		receiveBuffer[0] = CALIBRATIONMODE_REPLY_RESULT;
+		hexDigitsForWord(&receiveBuffer[1], value);
+		receiveBuffer[5] = CALIBRATIONMODE_CMD_EOL;
+		transmitToHost(receiveBuffer);
 	}
 	else
 		transmitToHost(replyErrorUnknownCommandArgument);

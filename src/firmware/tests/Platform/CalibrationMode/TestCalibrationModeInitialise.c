@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <unity.h>
 
+#include "Mock_Nvm.h"
+#include "Mock_HexDigits.h"
 #include "Mock_PeriodicMonitor.h"
 #include "Platform/CalibrationMode.h"
 

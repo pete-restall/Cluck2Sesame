@@ -1,0 +1,2 @@
+stim "${cwd}/FakeUart1Host.scl"
+run
