@@ -78,7 +78,7 @@ static void stubMonitoredParametersSampledFor(const struct MonitoredParametersSa
 	stubbedMonitoredParametersSampled = sample;
 }
 
-static uint8_t hexDigitHigh(uint8_t value) // TODO: THESE CAN BE REMOVED AND WE CAN USE THE ONES IN HexDigits.h INSTEAD !
+static uint8_t hexDigitHigh(uint8_t value)
 {
 	return hexDigitLow((value >> 4) & 0x0f);
 }
