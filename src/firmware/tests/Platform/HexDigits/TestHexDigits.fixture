@@ -1,1 +1,7 @@
 run
+
+#
+# Verification of the hex value representations is exhaustive for both 8-bit and 16-bit words.  This is usually quick enough but some build
+# agents are slow.  To accommodate this the fixture timeout is increased over and above the default.
+#
+wait 30000
