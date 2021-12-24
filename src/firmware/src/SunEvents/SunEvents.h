@@ -22,7 +22,7 @@ struct SunEventsCalculationContext
 
 	struct
 	{
-		int lookupPtr;
+		uint16_t lookupPtr;
 		struct Time *destination;
 	} working;
 };
@@ -36,8 +36,8 @@ struct SunEventsLookupEntry
 
 extern struct SunEventsCalculationContext sunEventsCalculationContext;
 
-extern const uint8_t sunriseLookupTable[];
-extern const uint8_t sunsetLookupTable[];
+extern const uint8_t sunriseLookupTable;
+extern const uint8_t sunsetLookupTable;
 
 extern void sunEventsCalculate(void);
 

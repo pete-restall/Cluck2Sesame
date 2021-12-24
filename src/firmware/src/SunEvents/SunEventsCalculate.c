@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "../Platform/Event.h"
+#include "../Platform/Nvm.h"
 #include "../Platform/Clock.h"
 #include "../Location.h"
 
@@ -11,12 +12,7 @@
 #define MINUTES_PER_DEGREE_LONGITUDE 4
 
 static void calculateSunEvent(void);
-
-static void readLookupEntryInto(
-	struct SunEventsLookupEntry *entry,
-	int lookupIndex);
-
-static void readFlashWordInto(uint16_t *destination, int ptr);
+static void readLookupEntryInto(struct SunEventsLookupEntry *entry, uint8_t lookupIndex);
 
 struct SunEventsCalculationContext sunEventsCalculationContext;
 static struct SunEventsLookupEntry lookupEntries[2];
@@ -25,11 +21,11 @@ void sunEventsCalculate(void)
 {
 	static struct SunEventsChanged eventArgs;
 
-	sunEventsCalculationContext.working.lookupPtr = (int) sunriseLookupTable;
+	sunEventsCalculationContext.working.lookupPtr = (uint16_t) &sunriseLookupTable;
 	sunEventsCalculationContext.working.destination = &eventArgs.sunrise;
 	calculateSunEvent();
 
-	sunEventsCalculationContext.working.lookupPtr = (int) sunsetLookupTable;
+	sunEventsCalculationContext.working.lookupPtr = (uint16_t) &sunsetLookupTable;
 	sunEventsCalculationContext.working.destination = &eventArgs.sunset;
 	calculateSunEvent();
 
@@ -43,10 +39,12 @@ static void calculateSunEvent(void)
 		(int) sunEventsCalculationContext.inputs.dayOfYear,
 		LOOKUP_STEP);
 
-	readLookupEntryInto(&lookupEntries[0], lookupIndex.quot);
-	readLookupEntryInto(
-		&lookupEntries[1],
-		(lookupIndex.quot + 1) < LOOKUP_LENGTH ? lookupIndex.quot + 1 : 0);
+	uint8_t lookupIndexUint8 = (uint8_t) lookupIndex.quot;
+	readLookupEntryInto(&lookupEntries[0], lookupIndexUint8);
+	if (++lookupIndexUint8 >= LOOKUP_LENGTH)
+		lookupIndexUint8 = 0;
+
+	readLookupEntryInto(&lookupEntries[1], lookupIndexUint8);
 
 	int dayDelta =
 		lookupIndex.rem * (int)
@@ -113,39 +111,17 @@ static void calculateSunEvent(void)
 		longitudeAdjustmentMinutes.quot;
 
 	div_t hours = div(minuteOfDay, 60);
-	sunEventsCalculationContext.working.destination->hour =
-		(uint8_t) hours.quot;
-
-	sunEventsCalculationContext.working.destination->minute =
-		(uint8_t) hours.rem;
+	sunEventsCalculationContext.working.destination->hour = (uint8_t) hours.quot;
+	sunEventsCalculationContext.working.destination->minute = (uint8_t) hours.rem;
 }
 
-static void readLookupEntryInto(
-	struct SunEventsLookupEntry *entry,
-	int lookupIndex)
+static void readLookupEntryInto(struct SunEventsLookupEntry *entry, uint8_t lookupIndex)
 {
-	int lookupPtr =
-		sunEventsCalculationContext.working.lookupPtr + (lookupIndex << 1);
+	uint16_t lookupPtr = (sunEventsCalculationContext.working.lookupPtr + (((uint16_t) lookupIndex) << 1)) & 0x7fff;
+	uint16_t word0 = nvmWordAt(lookupPtr);
+	uint16_t word1 = nvmWordAt(lookupPtr + 1);
 
-	uint16_t word0, word1;
-	readFlashWordInto(&word0, lookupPtr);
-	readFlashWordInto(&word1, lookupPtr + 1);
-
-	entry->minuteOfDay = (uint16_t) (
-		((word0 >> 2) & 0b11111000000) | ((word1 >> 8) & 0b111111));
-
+	entry->minuteOfDay = (uint16_t) (((word0 >> 2) & 0b11111000000) | ((word1 >> 8) & 0b111111));
 	entry->offsetMinutesNorth = (int8_t) (word0 & 0xff);
 	entry->offsetMinutesSouth = (int8_t) (word1 & 0xff);
-}
-
-// TODO: THIS CAN BE MOVED INTO SOMETHING COMMON, SINCE THE DAYLIGHT SAVINGS
-// LOOKUP WILL ALSO REQUIRE WORD-BASED FLASH READING
-static void readFlashWordInto(uint16_t *destination, int ptr)
-{
-	NVMCON1bits.NVMREGS = 0;
-	NVMADRH = (ptr >> 8) & 0xff;
-	NVMADRL = (ptr >> 0) & 0xff;
-	NVMCON1bits.RD = 1;
-
-	*destination = (((uint16_t) NVMDATH) << 8) | NVMDATL;
 }

@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <unity.h>
 
+#include "Platform/Nvm.h"
 #include "TestSunEventsScenarios.h"
 #include "SunEvents.h"
 
@@ -59,7 +60,7 @@ void test_onDateChanged_ExpectSunEventsChangedIsPublishedWithCalculatedSunEventT
 
 	for (scenarioIndex = 0; ; scenarioIndex++)
 	{
-		today.dayOfYear = (stubDayOfYearHigh << 8) | stubDayOfYearLow;
+		today.dayOfYear = (((uint16_t) stubDayOfYearHigh) << 8) | stubDayOfYearLow;
 		if (today.dayOfYear > 365)
 			break;
 
@@ -110,8 +111,7 @@ void eventPublish(EventType type, const void *args)
 
 		TEST_ASSERT_NOT_NULL_MESSAGE(args, "Null args");
 
-		const struct SunEventsChanged *event =
-			(const struct SunEventsChanged *) args;
+		const struct SunEventsChanged *event = (const struct SunEventsChanged *) args;
 
 		TEST_ASSERT_EQUAL_UINT8_MESSAGE(
 			expectedSunriseHour,
@@ -144,7 +144,9 @@ void eventPublish(EventType type, const void *args)
 			"Sunset second");
 	}
 	else if (type != SUN_EVENTS_CHANGED)
+	{
 		TEST_FAIL_MESSAGE("Unknown event type");
+	}
 }
 
 void test_onLocationChanged_ExpectSunEventsChangedIsPublishedWithCalculatedSunEventTimes(void)
@@ -161,7 +163,7 @@ void test_onLocationChanged_ExpectSunEventsChangedIsPublishedWithCalculatedSunEv
 
 	for (scenarioIndex = 0; ; scenarioIndex++)
 	{
-		today.dayOfYear = (stubDayOfYearHigh << 8) | stubDayOfYearLow;
+		today.dayOfYear = (((uint16_t) stubDayOfYearHigh) << 8) | stubDayOfYearLow;
 		if (today.dayOfYear > 365)
 			break;
 

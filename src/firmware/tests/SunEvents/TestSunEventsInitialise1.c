@@ -3,6 +3,7 @@
 #include <unity.h>
 
 #include "Mock_Event.h"
+#include "Platform/Nvm.h"
 #include "Mock_Location.h"
 
 #include "SunEvents.h"
