@@ -1,7 +1,7 @@
 class Pic16f15356DeviceInformationArea:
 	def __init__(self, address, dia):
 		if len(dia) != 32:
-			raise ValueError('dia', 'PIC16F15356 DIA is 32 words but received ' + len(dia) + ' words')
+			raise ValueError('dia', f'PIC16F15356 DIA is 32 words but received {len(dia)} words')
 
 		self._address = address
 		self._raw = dia.copy()

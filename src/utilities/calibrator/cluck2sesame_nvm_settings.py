@@ -6,7 +6,7 @@ _TEMPERATURE_ADC_HIGH_OFFSET = 4
 class Cluck2SesameNvmSettings:
 	def __init__(self, address, nvm):
 		if len(nvm) != 32:
-			raise ValueError('nvm', 'NVM Settings is 32 words but received ' + len(nvm) + ' words')
+			raise ValueError('nvm', f'NVM Settings is 32 words but received {len(nvm)} words')
 
 		self._address = address
 		self._raw = nvm.copy()
@@ -32,7 +32,7 @@ class Cluck2SesameNvmSettings:
 	def _uint8_at(self, offset):
 		word = self._raw[offset]
 		if (word & _RETLW) != _RETLW:
-			raise Exception('NVM Settings at offset ' + offset + ' is not a retlw instruction')
+			raise Exception(f'NVM Settings at offset {offset} is not a retlw instruction')
 
 		return word & 0xff
 

@@ -9,7 +9,7 @@ class CalibrationProcess:
 		calibrate_another = True
 		while calibrate_another:
 			while True:
-				ready = input('Is the device connected and ready for calibration; [y]es, [n]o or [q]uit ? ')
+				ready = input('Is the device connected and ready for calibration; [y]es, [n]o or [q]uit ?  ')
 				if ready in ('q', 'Q'):
 					calibrate_another = False
 					break
