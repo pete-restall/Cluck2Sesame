@@ -78,6 +78,7 @@ class DeviceCalibrationLog:
 		template = Path('crystal-template.m').read_text()
 		DeviceCalibrationLog._write_crystal_parabola_octave(template, results.low_vdd, self._file_path_for('crystal-low-vdd.m'))
 		DeviceCalibrationLog._write_crystal_parabola_octave(template, results.high_vdd, self._file_path_for('crystal-high-vdd.m'))
+		DeviceCalibrationLog._write_crystal_parabola_octave(template, results.mean_vdd, self._file_path_for('crystal-mean-vdd.m'))
 		return self
 
 	@staticmethod
@@ -85,9 +86,13 @@ class DeviceCalibrationLog:
 		(temperatures_adc, temperatures_celsius) = DeviceCalibrationLog._temperatures_from(results.calibration_points)
 		coefficients = ', '.join([str(c) for c in results.crystal_parabola.coefficients])
 		filename.write_text(template
-			.replace('{coefficients}', coefficients)
+			.replace('{crystal_coefficients}', coefficients)
 			.replace('{temperatures_adc}', temperatures_adc)
-			.replace('{temperatures_celsius}', temperatures_celsius)) # TODO: NEED TO SUBSTITUTE THE FVR / DIA VALUES AS WELL, SO FREQUENCY-VS-TEMPERATURE (AS OPPOSED TO FREQUENCY-VS-ADC) CAN BE PLOTTED
+			.replace('{temperatures_celsius}', temperatures_celsius)
+			.replace('{temperature_high_adc}', str(results.highest_temperature_calibration_point.temperature_adc))
+			.replace('{temperature_high_celsius}', str(results.highest_temperature_calibration_point.temperature_celsius))
+			.replace('{temperature_coefficient}', str(results.temperature_coefficient))
+			.replace('{vdd_volts}', str(results.vdd_volts)))
 
 	@staticmethod
 	def _temperatures_from(calibration_points):

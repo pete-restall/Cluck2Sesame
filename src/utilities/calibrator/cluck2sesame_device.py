@@ -5,6 +5,8 @@ from cluck2sesame_nvm_settings import Cluck2SesameNvmSettings
 from pic16f15356_device_information_area import Pic16f15356DeviceInformationArea
 
 class Cluck2SesameDevice:
+	NVM_SETTINGS_ADDRESS = 0x3f80
+
 	def __init__(self, serial_factory):
 		if serial_factory is None:
 			raise TypeError('serial_factory')
@@ -56,7 +58,7 @@ class Cluck2SesameDevice:
 		return self._send_command('C0') == '0'
 
 	def sample_parameters(self):
-		return Cluck2SesameParametersSample(self._send_command('S'))
+		return Cluck2SesameParametersSample.from_raw(self._send_command('S'))
 
 	def read_device_information_area(self):
 		return Pic16f15356DeviceInformationArea(0x8100, self._read_nvm_at(range(0x8100, 0x8120)))
@@ -68,4 +70,6 @@ class Cluck2SesameDevice:
 		return [int(self._send_command('R{:04x}'.format(addr)), base=16) for addr in addr_range]
 
 	def read_nvm_settings(self):
-		return Cluck2SesameNvmSettings(0x3f80, self._read_nvm_at(range(0x3f80, 0x3fa0)))
+		return Cluck2SesameNvmSettings(
+			Cluck2SesameDevice.NVM_SETTINGS_ADDRESS,
+			self._read_nvm_at(range(Cluck2SesameDevice.NVM_SETTINGS_ADDRESS, Cluck2SesameDevice.NVM_SETTINGS_ADDRESS + 32)))
