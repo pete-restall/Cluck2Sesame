@@ -2,6 +2,8 @@ from types import SimpleNamespace
 
 _RETLW = 0b11_0100_0000_0000
 _TEMPERATURE_ADC_HIGH_OFFSET = 4
+_TEMPERATURE_CELSIUS_HIGH_OFFSET = 6
+_TEMPERATURE_COEFFICIENT_OFFSET = 7
 
 class Cluck2SesameNvmSettings:
 	def __init__(self, address, nvm):
@@ -48,7 +50,30 @@ class Cluck2SesameNvmSettings:
 		return as_obj
 
 	def with_temperature_adc_high(self, value):
+		adc_value = int(value + 0.5)
+		if adc_value < 0 or adc_value > 1023:
+			raise Exception(f'ADC value must be an unsigned 10-bit integer; value={value}')
+
 		nvm = self._raw.copy()
-		nvm[_TEMPERATURE_ADC_HIGH_OFFSET + 0] = _RETLW | ((value >> 0) & 0xff)
-		nvm[_TEMPERATURE_ADC_HIGH_OFFSET + 1] = _RETLW | ((value >> 8) & 0xff)
+		nvm[_TEMPERATURE_ADC_HIGH_OFFSET + 0] = _RETLW | ((adc_value >> 0) & 0xff)
+		nvm[_TEMPERATURE_ADC_HIGH_OFFSET + 1] = _RETLW | ((adc_value >> 8) & 0xff)
+		return Cluck2SesameNvmSettings(self._address, nvm)
+
+	def with_temperature_celsius_high(self, value):
+		scaled_value = int((value - 25) * 10 + 0.5)
+		if scaled_value < 0 or scaled_value > 255:
+			raise Exception(f'Highest Calibration Temperature is higher than the maximum allowed; celsius={value}')
+
+		nvm = self._raw.copy()
+		nvm[_TEMPERATURE_CELSIUS_HIGH_OFFSET] = _RETLW | (scaled_value & 0xff)
+		return Cluck2SesameNvmSettings(self._address, nvm)
+
+	def with_temperature_coefficient(self, value):
+		scaled_value = int(65536 * -value + 0.5)
+		if scaled_value <= 0 or scaled_value > 65535:
+			raise Exception(f'Temperature coefficient must be negative and in the closed range (-1, 0); coefficient={value}')
+
+		nvm = self._raw.copy()
+		nvm[_TEMPERATURE_COEFFICIENT_OFFSET + 0] = _RETLW | ((scaled_value >> 0) & 0xff)
+		nvm[_TEMPERATURE_COEFFICIENT_OFFSET + 1] = _RETLW | ((scaled_value >> 8) & 0xff)
 		return Cluck2SesameNvmSettings(self._address, nvm)
