@@ -4,6 +4,8 @@ _RETLW = 0b11_0100_0000_0000
 _TEMPERATURE_ADC_HIGH_OFFSET = 4
 _TEMPERATURE_CELSIUS_HIGH_OFFSET = 6
 _TEMPERATURE_COEFFICIENT_OFFSET = 7
+_FLAGS_OFFSET = 12
+_CRC8_OFFSET = 31
 
 class Cluck2SesameNvmSettings:
 	def __init__(self, address, nvm):
@@ -14,7 +16,7 @@ class Cluck2SesameNvmSettings:
 		self._raw = nvm.copy()
 		self._lcd_contrast = self._uint8_at(0)
 		self._temperature_adc_high = self._uint16_at(_TEMPERATURE_ADC_HIGH_OFFSET)
-		self._flags = self._uint8_at(12)
+		self._flags = self._uint8_at(_FLAGS_OFFSET)
 
 	@property
 	def address(self): return self._address
@@ -77,3 +79,30 @@ class Cluck2SesameNvmSettings:
 		nvm[_TEMPERATURE_COEFFICIENT_OFFSET + 0] = _RETLW | ((scaled_value >> 0) & 0xff)
 		nvm[_TEMPERATURE_COEFFICIENT_OFFSET + 1] = _RETLW | ((scaled_value >> 8) & 0xff)
 		return Cluck2SesameNvmSettings(self._address, nvm)
+
+	def without_calibration_required_flag(self):
+		nvm = self._raw.copy()
+		nvm[_FLAGS_OFFSET] = _RETLW | (self._flags & 0xfe)
+		return Cluck2SesameNvmSettings(self._address, nvm)
+
+	def with_recalculated_crc8(self):
+		nvm = self._raw.copy()
+		crc8 = 0
+		for input in nvm[0:31]:
+			crc8 = Cluck2SesameNvmSettings._crc8Next(crc8, (input >> 8) & 0xff)
+			crc8 = Cluck2SesameNvmSettings._crc8Next(crc8, (input >> 0) & 0xff)
+
+		crc8 = Cluck2SesameNvmSettings._crc8Next(crc8, (_RETLW >> 8) & 0xff)
+		nvm[_CRC8_OFFSET] = _RETLW | crc8
+		return Cluck2SesameNvmSettings(self._address, nvm)
+
+	@staticmethod
+	def _crc8Next(crc8, input):
+		input ^= crc8
+		for _ in range(0, 8):
+			msb = input & 0x80
+			input <<= 1
+			if msb != 0:
+				input ^= 0x07
+
+		return input

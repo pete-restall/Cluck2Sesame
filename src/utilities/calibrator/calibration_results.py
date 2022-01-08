@@ -46,7 +46,9 @@ class CalibrationResults:
 		return self._nvm_settings \
 			.with_temperature_adc_high(self._mean_vdd.highest_temperature_calibration_point.temperature_adc) \
 			.with_temperature_celsius_high(self._mean_vdd.highest_temperature_calibration_point.temperature_celsius) \
-			.with_temperature_coefficient(self._mean_vdd.temperature_coefficient)
+			.with_temperature_coefficient(self._mean_vdd.temperature_coefficient) \
+			.without_calibration_required_flag() \
+			.with_recalculated_crc8()
 
 	@property
 	def calibrated_nvm_settings(self): return self._calibrated_nvm_settings
