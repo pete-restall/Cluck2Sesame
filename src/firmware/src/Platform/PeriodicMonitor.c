@@ -38,7 +38,7 @@ void periodicMonitorSampleNow(struct MonitoredParametersSampled *eventArgs)
 	if (!eventArgs)
 		return;
 
-	eventArgs->timestamp = TMR0L;
+	eventArgs->timestamp = TMR0L; // TODO: THIS TIMESTAMP NEEDS TO BE MONOTONOUS (TEMPERATURE AND BATTERY CALCULATIONS) - KEEP ADDING THE ACTUAL NUMBER OF SECONDS TO IT...
 	eventArgs->flags.isVddRegulated = (PORTBbits.RB0 == 0 ? 0 : 1);
 
 	PMD0bits.FVRMD = 0;

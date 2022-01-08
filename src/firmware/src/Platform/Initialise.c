@@ -7,6 +7,7 @@
 #include "FarScheduler.h"
 #include "PowerManagement.h"
 #include "VoltageRegulator.h"
+#include "Temperature.h"
 #include "Battery.h"
 #include "PwmTimer.h"
 #include "Adc.h"
@@ -24,6 +25,7 @@ void initialise(void)
 	nearSchedulerInitialise();
 	farSchedulerInitialise();
 	voltageRegulatorInitialise();
+	temperatureInitialise();
 	batteryInitialise();
 	pwmTimerInitialise();
 	adcInitialise();

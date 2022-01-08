@@ -33,6 +33,7 @@ static struct CallDetails clockInitialiseCalls;
 static struct CallDetails nearSchedulerInitialiseCalls;
 static struct CallDetails farSchedulerInitialiseCalls;
 static struct CallDetails voltageRegulatorInitialiseCalls;
+static struct CallDetails temperatureInitialiseCalls;
 static struct CallDetails batteryInitialiseCalls;
 static struct CallDetails pwmTimerInitialiseCalls;
 static struct CallDetails adcInitialiseCalls;
@@ -55,6 +56,7 @@ void onBeforeTest(void)
 	clearCallsFor(&nearSchedulerInitialiseCalls);
 	clearCallsFor(&farSchedulerInitialiseCalls);
 	clearCallsFor(&voltageRegulatorInitialiseCalls);
+	clearCallsFor(&temperatureInitialiseCalls);
 	clearCallsFor(&batteryInitialiseCalls);
 	clearCallsFor(&pwmTimerInitialiseCalls);
 	clearCallsFor(&adcInitialiseCalls);
@@ -160,10 +162,21 @@ void voltageRegulatorInitialise(void)
 	registerCallFor(&voltageRegulatorInitialiseCalls);
 }
 
-void test_initialise_called_expectBatteryIsInitialisedAfterVoltageRegulator(void)
+void test_initialise_called_expectTemperatureIsInitialisedAfterVoltageRegulator(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&batteryInitialiseCalls, 7);
+	assertCalledOnceAtSequence(&temperatureInitialiseCalls, 7);
+}
+
+void temperatureInitialise(void)
+{
+	registerCallFor(&temperatureInitialiseCalls);
+}
+
+void test_initialise_called_expectBatteryIsInitialisedAfterTemperature(void)
+{
+	initialise();
+	assertCalledOnceAtSequence(&batteryInitialiseCalls, 8);
 }
 
 void batteryInitialise(void)
@@ -174,7 +187,7 @@ void batteryInitialise(void)
 void test_initialise_called_expectPwmTimerIsInitialisedAfterBattery(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&pwmTimerInitialiseCalls, 8);
+	assertCalledOnceAtSequence(&pwmTimerInitialiseCalls, 9);
 }
 
 void pwmTimerInitialise(void)
@@ -185,7 +198,7 @@ void pwmTimerInitialise(void)
 void test_initialise_called_expectAdcIsInitialisedAfterPwmTimer(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&adcInitialiseCalls, 9);
+	assertCalledOnceAtSequence(&adcInitialiseCalls, 10);
 }
 
 void adcInitialise(void)
@@ -196,7 +209,7 @@ void adcInitialise(void)
 void test_initialise_called_expectLcdIsInitialisedAfterAdc(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&lcdInitialiseCalls, 10);
+	assertCalledOnceAtSequence(&lcdInitialiseCalls, 11);
 }
 
 void lcdInitialise(void)
@@ -207,7 +220,7 @@ void lcdInitialise(void)
 void test_initialise_called_expectMotorIsInitialisedAfterLcd(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&motorInitialiseCalls, 11);
+	assertCalledOnceAtSequence(&motorInitialiseCalls, 12);
 }
 
 void motorInitialise(void)
@@ -218,7 +231,7 @@ void motorInitialise(void)
 void test_initialise_called_expectPeriodicMonitorIsInitialisedAfterMotor(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&periodicMonitorInitialiseCalls, 12);
+	assertCalledOnceAtSequence(&periodicMonitorInitialiseCalls, 13);
 }
 
 void periodicMonitorInitialise(void)
@@ -229,7 +242,7 @@ void periodicMonitorInitialise(void)
 void test_initialise_called_expectButtonsAreInitialisedAfterPeriodicMonitor(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&buttonsInitialiseCalls, 13);
+	assertCalledOnceAtSequence(&buttonsInitialiseCalls, 14);
 }
 
 void buttonsInitialise(void)
@@ -240,7 +253,7 @@ void buttonsInitialise(void)
 void test_initialise_called_expectCalibrationModeIsInitialisedAfterButtons(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&calibrationModeInitialiseCalls, 14);
+	assertCalledOnceAtSequence(&calibrationModeInitialiseCalls, 15);
 }
 
 void calibrationModeInitialise(void)
@@ -251,7 +264,7 @@ void calibrationModeInitialise(void)
 void test_initialise_called_expectApplicationIsInitialisedAfterCalibrationMode(void)
 {
 	initialise();
-	assertCalledOnceAtSequence(&applicationInitialiseCalls, 15);
+	assertCalledOnceAtSequence(&applicationInitialiseCalls, 16);
 }
 
 void applicationInitialise(void)
