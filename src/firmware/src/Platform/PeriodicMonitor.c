@@ -10,6 +10,8 @@
 
 static void onTimeChanged(const struct Event *event);
 
+static uint8_t nextTimestamp;
+
 void periodicMonitorInitialise(void)
 {
 	static const struct EventSubscription onTimeChangedSubscription =
@@ -20,6 +22,8 @@ void periodicMonitorInitialise(void)
 	};
 
 	eventSubscribe(&onTimeChangedSubscription);
+
+	nextTimestamp = 0;
 }
 
 static void onTimeChanged(const struct Event *event)
@@ -38,8 +42,9 @@ void periodicMonitorSampleNow(struct MonitoredParametersSampled *eventArgs)
 	if (!eventArgs)
 		return;
 
-	eventArgs->timestamp = TMR0L; // TODO: THIS TIMESTAMP NEEDS TO BE MONOTONOUS (TEMPERATURE AND BATTERY CALCULATIONS) - KEEP ADDING THE ACTUAL NUMBER OF SECONDS TO IT...
+	eventArgs->timestamp = nextTimestamp;
 	eventArgs->flags.isVddRegulated = (PORTBbits.RB0 == 0 ? 0 : 1);
+	nextTimestamp += 240;
 
 	PMD0bits.FVRMD = 0;
 	FVRCON = _FVRCON_ADFVR1_MASK | _FVRCON_FVREN_MASK | _FVRCON_TSRNG_MASK | _FVRCON_TSEN_MASK;

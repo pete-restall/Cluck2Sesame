@@ -14,6 +14,8 @@ TEST_FILE("Platform/Clock/ClockInitialise.c")
 TEST_FILE("Platform/Clock/ClockGetSetNow.c")
 TEST_FILE("Platform/PeriodicMonitor.c")
 
+static void timeChanged_onPublishedNumberOfTimes_expectTimestampIs(uint8_t numberOfTimes, uint8_t expectedTimestamp);
+
 static void publishTimeChangedAndDispatchToEventHandlers(void);
 
 static uint8_t onAdcSampleExpectedPmd0;
@@ -77,7 +79,12 @@ void test_timeChanged_onPublishedWithFourMinuteIntervalSchedule_expectMonitoredP
 	}
 }
 
-void test_timeChanged_onPublished_expectTmr0lIsUsedAsTimestamp(void)
+void test_timeChanged_onPublishedForFirstTime_expectTimestampIsZero(void)
+{
+	timeChanged_onPublishedNumberOfTimes_expectTimestampIs(1, 0);
+}
+
+static void timeChanged_onPublishedNumberOfTimes_expectTimestampIs(uint8_t numberOfTimes, uint8_t expectedTimestamp)
 {
 	mockOnMonitoredParametersSampled();
 
@@ -88,12 +95,36 @@ void test_timeChanged_onPublished_expectTmr0lIsUsedAsTimestamp(void)
 		.second = anyByteLessThan(60)
 	};
 
-	publishTimeChanged(&now);
+	for (uint8_t i = 0; i < numberOfTimes; i++)
+	{
+		publishTimeChanged(&now);
+		TMR0L = anyByte();
+		dispatchAllEvents();
+	}
 
-	TMR0L = anyByte();
-	dispatchAllEvents();
 	TEST_ASSERT_NOT_NULL(monitoredParametersSampled);
-	TEST_ASSERT_EQUAL_UINT8(TMR0L, monitoredParametersSampled->timestamp);
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(numberOfTimes, monitoredParametersSampledCalls, "CALLS");
+	TEST_ASSERT_EQUAL_UINT8_MESSAGE(expectedTimestamp, monitoredParametersSampled->timestamp, "STAMP");
+}
+
+void test_timeChanged_onPublishedForSecondTime_expectTimestampIs240(void)
+{
+	timeChanged_onPublishedNumberOfTimes_expectTimestampIs(2, 240);
+}
+
+void test_timeChanged_onPublishedForThirdTime_expectTimestampIs480Modulo256(void)
+{
+	timeChanged_onPublishedNumberOfTimes_expectTimestampIs(3, 224);
+}
+
+void test_timeChanged_onPublishedForThirdTime_expectTimestampIs720Modulo256(void)
+{
+	timeChanged_onPublishedNumberOfTimes_expectTimestampIs(4, 208);
+}
+
+void test_timeChanged_onPublishedForSeventeenthTime_expectTimestampRollsOverToZero(void)
+{
+	timeChanged_onPublishedNumberOfTimes_expectTimestampIs(17, 0);
 }
 
 void test_timeChanged_onPublishedWhenRb0IsLow_expectIsVddRegulatedIsFalse(void)
