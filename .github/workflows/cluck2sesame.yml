@@ -39,7 +39,7 @@ jobs:
       - name: Package Build Artefacts
         run: |
           mkdir -p output/Cluck2Sesame;
-          cp src/firmware/build/ceedling/generated/release/Cluck3Sesame.{elf,hex,hxl,map,sym,s} output/Cluck2Sesame;
+          cp src/firmware/build/ceedling/generated/release/Cluck2Sesame.{elf,hex,hxl,map,sym,s} output/Cluck2Sesame;
           cp src/schematics/Plots/Cluck2SesameSchematics.pdf output/Cluck2Sesame;
 
       - name: Archive Build Artefacts

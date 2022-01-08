@@ -1,5 +1,5 @@
-#ifndef __CLUCK3SESAME_SRC_SUNEVENTS_H
-#define __CLUCK3SESAME_SRC_SUNEVENTS_H
+#ifndef __CLUCK2SESAME_SRC_SUNEVENTS_H
+#define __CLUCK2SESAME_SRC_SUNEVENTS_H
 #include "Platform/Event.h"
 #include "Platform/Clock.h"
 

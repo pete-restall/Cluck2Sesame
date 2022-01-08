@@ -1,5 +1,5 @@
-#ifndef __CLUCK3SESAME_SRC_LOCATION_H
-#define __CLUCK3SESAME_SRC_LOCATION_H
+#ifndef __CLUCK2SESAME_SRC_LOCATION_H
+#define __CLUCK2SESAME_SRC_LOCATION_H
 #include <stdint.h>
 #include "Platform/Event.h"
 

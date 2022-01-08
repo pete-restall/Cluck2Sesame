@@ -1,5 +1,5 @@
-#ifndef __CLUCK3SESAME_SRC_DOOR_DOOR_H
-#define __CLUCK3SESAME_SRC_DOOR_DOOR_H
+#ifndef __CLUCK2SESAME_SRC_DOOR_DOOR_H
+#define __CLUCK2SESAME_SRC_DOOR_DOOR_H
 #include "../Platform/Event.h"
 #include "../Door.h"
 

@@ -1,9 +1,9 @@
-# Cluck<sup>3</sup>Sesame - Yet Another Chicken Coop Door Opener (Revision II)
+# Cluck<sup>2</sup>Sesame - Yet Another Chicken Coop Door Opener (Revision II)
 
 ## What is it ?
 It opens and closes the door of my wife's chicken coop based on Sunrise and
 Sunset times so that she doesn't have to.  This is a refinement of the
-[Cluck<sup>2</sup>Sesame](https://github.com/pete-restall/Cluck2Sesame/)
+[Cluck<sup>2</sup>Sesame](https://github.com/pete-restall/Cluck2Sesame-Prototype/)
 project, building on lessons learned from the original attempt.  Notably:
 
  - The parts are not based on what I have lying around, but rather on parts
@@ -36,13 +36,9 @@ That said, some of the parts from the original have been incorporated into
 the newer design since they are known to work and are already stocked in my
 parts bins.
 
-## Why 'Cluck<sup>3</sup>Sesame' ?
+## Why 'Cluck<sup>2</sup>Sesame' ?
 Because 'Cluck Cluck Sesame' is obviously what the chickens would say if
-they needed to open a door but
-[that name's already taken](https://github.com/pete-restall/Cluck2Sesame/).
-The only completely logical alternative is thus 'Cluck Cluck Cluck Sesame',
-conveying the increment in the version number while still being comprehensible
-and pronouncible for garden-based fowl.
+they needed to open a door.
 
 ## The Hardware and Firmware
 The hardware and firmware are all mine.  The board is based around a
@@ -54,4 +50,4 @@ board through more integration and a higher pin count.
 None yet.  But there will be.
 
 ## Build
-[![Build Status](https://github.com/pete-restall/Cluck3Sesame/actions/workflows/cluck2sesame.yml/badge.svg)](https://github.com/pete-restall/Cluck3Sesame/actions/workflows/cluck2sesame.yml)
+[![Build Status](https://github.com/pete-restall/Cluck2Sesame/actions/workflows/cluck2sesame.yml/badge.svg)](https://github.com/pete-restall/Cluck2Sesame/actions/workflows/cluck2sesame.yml)

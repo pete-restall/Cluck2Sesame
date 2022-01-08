@@ -51,7 +51,7 @@
     - TEST
 
 :release_build:
-  :output: Cluck3Sesame.elf
+  :output: Cluck2Sesame.elf
   :use_assembly: TRUE
 
 :unity:
