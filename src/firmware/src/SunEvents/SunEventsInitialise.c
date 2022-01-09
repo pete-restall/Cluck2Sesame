@@ -3,6 +3,8 @@
 
 #include "../Platform/Event.h"
 #include "../Platform/Clock.h"
+#include "../Platform/NvmSettings.h"
+
 #include "../Location.h"
 
 #include "SunEvents.h"
@@ -12,7 +14,6 @@ static void onDateChanged(const struct Event *event);
 
 void sunEventsInitialise(void)
 {
-	// TODO: THE NVM_SETTINGS_CHANGED EVENT SHOULD BE HANDLED; PROBABLY RENDERS LOCATION_CHANGED OBSOLETE
 	static const struct EventSubscription onLocationChangedSubscription =
 	{
 		.type = LOCATION_CHANGED,
@@ -30,23 +31,21 @@ void sunEventsInitialise(void)
 	};
 
 	eventSubscribe(&onDateChangedSubscription);
+
+	sunEventsCalculationContext.inputs.latitudeOffset = nvmSettings.application.location.latitudeOffset;
+	sunEventsCalculationContext.inputs.longitudeOffset = nvmSettings.application.location.longitudeOffset;
 }
 
 static void onLocationChanged(const struct Event *event)
 {
-	const struct Location *args =
-		((const struct LocationChanged *) event->args)->location;
-
+	const struct Location *args = ((const struct LocationChanged *) event->args)->location;
 	sunEventsCalculationContext.inputs.latitudeOffset = args->latitudeOffset;
 	sunEventsCalculationContext.inputs.longitudeOffset = args->longitudeOffset;
-
 	sunEventsCalculate();
 }
 
 static void onDateChanged(const struct Event *event)
 {
-	sunEventsCalculationContext.inputs.dayOfYear =
-		((const struct DateChanged *) event->args)->today->dayOfYear;
-
+	sunEventsCalculationContext.inputs.dayOfYear = ((const struct DateChanged *) event->args)->today->dayOfYear;
 	sunEventsCalculate();
 }
