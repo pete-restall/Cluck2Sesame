@@ -21,4 +21,6 @@ struct Location
 	int8_t longitudeOffset;
 };
 
+extern void locationInitialise(void);
+
 #endif
