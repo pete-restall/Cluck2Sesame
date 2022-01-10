@@ -5,6 +5,8 @@
 #include "Mock_Event.h"
 #include "Platform/Battery.h"
 
+#include "BatteryFixture.h"
+
 #include "../../Fixture.h"
 #include "../../NonDeterminism.h"
 
@@ -14,10 +16,12 @@ const struct Event eventEmptyArgs = { };
 
 void onBeforeTest(void)
 {
+	batteryFixtureSetUp();
 }
 
 void onAfterTest(void)
 {
+	batteryFixtureTearDown();
 }
 
 void test_batteryInitialise_called_expectChargerEnablePinIsOutput(void)

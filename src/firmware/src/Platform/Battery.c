@@ -2,7 +2,17 @@
 #include <stdint.h>
 
 #include "Event.h"
+#include "Nvm.h"
+#include "PeriodicMonitor.h"
+
 #include "Battery.h"
+
+#define MINIMUM_FVR_ADC_COUNT (8 * 0x015a)
+#define MAXIMUM_FVR_ADC_COUNT (8 * 0x0342)
+
+static void onMonitoredParametersSampled(const struct Event *event);
+
+static uint32_t scaledFvrNumerator;
 
 void batteryInitialise(void)
 {
@@ -13,6 +23,29 @@ void batteryInitialise(void)
 	TRISBbits.TRISB5 = 1;
 	INLVLBbits.INLVLB4 = 0;
 	INLVLBbits.INLVLB5 = 0;
+
+	static const struct EventSubscription onMonitoredParametersSampledSubscription =
+	{
+		.type = MONITORED_PARAMETERS_SAMPLED,
+		.handler = &onMonitoredParametersSampled,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onMonitoredParametersSampledSubscription);
+
+	scaledFvrNumerator = (uint32_t) 8192 * nvmWordAt(DIA_FVRA2X);
+}
+
+static void onMonitoredParametersSampled(const struct Event *event)
+{
+	const struct MonitoredParametersSampled *args = (const struct MonitoredParametersSampled *) event->args;
+	if (args->flags.isVddRegulated || args->fvr < MINIMUM_FVR_ADC_COUNT || args->fvr > MAXIMUM_FVR_ADC_COUNT)
+		return;
+
+	static struct BatteryVoltageSampled eventArgs;
+	eventArgs.sample = args->fvr;
+	eventArgs.millivolts = (uint16_t) (scaledFvrNumerator / eventArgs.sample);
+	eventPublish(BATTERY_VOLTAGE_SAMPLED, &eventArgs);
 }
 
 // TODO: INTERRUPT ON CHANGE
