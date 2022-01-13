@@ -236,9 +236,3 @@ void nearSchedulerAddOrUpdate(const struct NearSchedule *schedule)
 			sizeof(const struct NearSchedule *))
 	] = schedule;
 }
-
-void publishWokenFromSleep(void)
-{
-	static const struct WokenFromSleep emptyEventArgs = { };
-	eventPublish(WOKEN_FROM_SLEEP, &emptyEventArgs);
-}

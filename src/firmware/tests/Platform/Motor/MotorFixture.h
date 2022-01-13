@@ -43,6 +43,5 @@ extern void ensureMotorFullyEnabled(void);
 extern int16_t anyClockwiseCount(void);
 extern int16_t anyAntiClockwiseCount(void);
 extern int16_t anyEncoderCount(void);
-extern void publishWokenFromSleep(void);
 
 #endif

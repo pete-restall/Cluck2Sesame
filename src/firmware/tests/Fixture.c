@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include "Platform/Event.h"
+#include "Platform/PowerManagement.h"
 
 #include "Fixture.h"
 
@@ -22,4 +23,9 @@ void dispatchAllEvents(void)
 {
 	while (eventDispatchNext())
 		;;
+}
+
+void publishWokenFromSleep(void)
+{
+	eventPublish(WOKEN_FROM_SLEEP, &eventEmptyArgs);
 }

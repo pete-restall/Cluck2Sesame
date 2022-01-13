@@ -47,7 +47,6 @@ extern void assertEqualTime(
 	const struct Time *expected,
 	const struct Time *actual);
 
-extern void publishWokenFromSleep(void);
 extern void mockOnTimeChanged(void);
 extern void onTimeChanged(const struct Event *event);
 extern void mockOnDateChanged(void);

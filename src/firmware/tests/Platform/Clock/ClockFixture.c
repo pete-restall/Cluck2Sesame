@@ -154,12 +154,6 @@ void assertEqualTime(
 	TEST_ASSERT_EQUAL_UINT8_ARRAY(expected, actual, sizeof(struct Time));
 }
 
-void publishWokenFromSleep(void)
-{
-	static const struct WokenFromSleep emptyArgs = { };
-	eventPublish(WOKEN_FROM_SLEEP, &emptyArgs);
-}
-
 void mockOnDateChanged(void)
 {
 	static const struct EventSubscription onDateChangedSubscription =
