@@ -3,6 +3,7 @@
 
 #include "Event.h"
 #include "Nvm.h"
+#include "PowerManagement.h"
 #include "PeriodicMonitor.h"
 
 #include "Battery.h"
@@ -11,6 +12,7 @@
 #define MAXIMUM_FVR_ADC_COUNT (8 * 0x0342)
 
 static void onMonitoredParametersSampled(const struct Event *event);
+static void onWokenFromSleep(const struct Event *event);
 
 static uint32_t scaledFvrNumerator;
 
@@ -24,6 +26,11 @@ void batteryInitialise(void)
 	INLVLBbits.INLVLB4 = 0;
 	INLVLBbits.INLVLB5 = 0;
 
+	PMD0bits.IOCMD = 0;
+	IOCBPbits.IOCBP5 = 1;
+	IOCBNbits.IOCBN5 = 1;
+	PIE0bits.IOCIE = 1;
+
 	static const struct EventSubscription onMonitoredParametersSampledSubscription =
 	{
 		.type = MONITORED_PARAMETERS_SAMPLED,
@@ -32,6 +39,15 @@ void batteryInitialise(void)
 	};
 
 	eventSubscribe(&onMonitoredParametersSampledSubscription);
+
+	static const struct EventSubscription onWokenFromSleepSubscription =
+	{
+		.type = WOKEN_FROM_SLEEP,
+		.handler = &onWokenFromSleep,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onWokenFromSleepSubscription);
 
 	scaledFvrNumerator = (uint32_t) 8192 * nvmWordAt(DIA_FVRA2X);
 }
@@ -48,7 +64,20 @@ static void onMonitoredParametersSampled(const struct Event *event)
 	eventPublish(BATTERY_VOLTAGE_SAMPLED, &eventArgs);
 }
 
-// TODO: INTERRUPT ON CHANGE
+static void onWokenFromSleep(const struct Event *event)
+{
+	if (!IOCBFbits.IOCBF5)
+		return;
+
+	IOCBFbits.IOCBF5 = 0;
+	if (!PORTBbits.RB5)
+	{
+		LATBbits.LATB3 = 1;
+		eventPublish(BATTERY_CHARGER_ENABLED, &eventEmptyArgs);
+	}
+	else
+		LATBbits.LATB3 = 0;
+}
 
 /*
 TODO:

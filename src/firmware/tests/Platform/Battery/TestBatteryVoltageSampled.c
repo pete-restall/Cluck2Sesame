@@ -18,12 +18,9 @@ static uint16_t anyValidFvrSample(void);
 
 static const struct BatteryVoltageSampled *batteryVoltageSampledEventArgs;
 
-const struct Event eventEmptyArgs = { };
-
 void onBeforeTest(void)
 {
 	batteryFixtureSetUp();
-	eventInitialise();
 
 	static const struct EventSubscription onBatteryVoltageSampledSubscription =
 	{

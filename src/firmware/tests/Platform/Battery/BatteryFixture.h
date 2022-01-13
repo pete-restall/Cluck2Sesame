@@ -11,5 +11,9 @@ extern void batteryFixtureSetUp(void);
 extern void batteryFixtureTearDown(void);
 extern uint16_t stubAnyDiaFvra2xMillivolts(void);
 extern void stubDiaFvra2xMillivolts(uint16_t millivolts);
+extern void stubChargerGoodPinHigh(void);
+extern void stubChargerGoodPinLow(void);
+extern void stubTemperatureWithinChargingRange(void);
+extern void stubBatteryVoltageWithinChargingRange(void);
 
 #endif

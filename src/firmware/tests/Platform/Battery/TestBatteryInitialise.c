@@ -12,8 +12,6 @@
 
 TEST_FILE("Platform/Battery.c")
 
-const struct Event eventEmptyArgs = { };
-
 void onBeforeTest(void)
 {
 	batteryFixtureSetUp();
@@ -125,4 +123,40 @@ void test_batteryInitialise_called_expectNonChargerInputPinThresholdsAreUnchange
 
 	batteryInitialise();
 	TEST_ASSERT_EQUAL_HEX8(expectedInlvlb, INLVLB | usedPins);
+}
+
+void test_batteryInitialise_called_expectIocModuleIsEnabled(void)
+{
+	PMD0 = anyByteWithMaskSet(_PMD0_IOCMD_MASK);
+	uint8_t expectedPmd0 = PMD0 & ~_PMD0_IOCMD_MASK;
+
+	batteryInitialise();
+	TEST_ASSERT_EQUAL_HEX8(expectedPmd0, PMD0);
+}
+
+void test_batteryInitialise_called_expectIocInterruptsAreEnabled(void)
+{
+	PIE0 = anyByteWithMaskClear(_PIE0_IOCIE_MASK);
+	uint8_t expectedPie0 = PIE0 | _PIE0_IOCIE_MASK;
+
+	batteryInitialise();
+	TEST_ASSERT_EQUAL_HEX8(expectedPie0, PIE0);
+}
+
+void test_batteryInitialise_called_expectIocIsEnabledForPositiveEdgeOnChargerGoodPin(void)
+{
+	IOCBP = anyByteWithMaskClear(_IOCBP_IOCBP5_MASK);
+	uint8_t expectedIocbp = IOCBP | _IOCBP_IOCBP5_MASK;
+
+	batteryInitialise();
+	TEST_ASSERT_EQUAL_HEX8(expectedIocbp, IOCBP);
+}
+
+void test_batteryInitialise_called_expectIocIsEnabledForNegativeEdgeOnChargerGoodPin(void)
+{
+	IOCBN = anyByteWithMaskClear(_IOCBN_IOCBN5_MASK);
+	uint8_t expectedIocbn = IOCBN | _IOCBN_IOCBN5_MASK;
+
+	batteryInitialise();
+	TEST_ASSERT_EQUAL_HEX8(expectedIocbn, IOCBN);
 }

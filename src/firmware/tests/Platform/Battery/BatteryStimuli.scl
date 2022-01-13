@@ -1,0 +1,18 @@
+configuration for "PIC16F15356" is
+	shared variable isChargerGoodPinHigh;
+end configuration;
+
+testbench for "PIC16F15356" is
+begin
+	toggleChargerGoodPin: process is
+	begin
+		loop
+			if isChargerGoodPinHigh != 0 then
+				RB5 <= '1';
+			else
+				RB5 <= '0';
+			end if;
+			wait on isChargerGoodPinHigh;
+		end loop;
+	end process;
+end testbench;
