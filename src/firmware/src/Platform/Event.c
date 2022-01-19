@@ -3,7 +3,7 @@
 
 #include "Event.h"
 
-#define MAX_SUBSCRIPTIONS 32
+#define MAX_SUBSCRIPTIONS 48
 #define MAX_EVENTS 16
 
 const struct Event eventEmptyArgs = { };
