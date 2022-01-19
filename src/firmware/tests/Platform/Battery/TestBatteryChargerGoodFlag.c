@@ -101,8 +101,9 @@ void test_chargerEnablePin_getWhenChargerGoodPinIsHighWhenOtherParametersAllowCh
 	stubAllParametersThatWillEnableCharging();
 	stubChargerGoodPinHigh();
 	publishWokenFromSleep();
+	LATBbits.LATB3 = 1;
 	dispatchAllEvents();
-	TEST_ASSERT_FALSE(PORTBbits.RB3);
+	TEST_ASSERT_FALSE(LATBbits.LATB3);
 }
 
 void test_batteryChargerEnabled_eventWhenChargerGoodPinTransitionsFromHighToLowWhenOtherParametersAllowCharging_expectBatteryChargerEnabledEventIsPublished(void)
@@ -125,8 +126,9 @@ void test_chargerEnablePin_getWhenChargerGoodPinIsLowWhenOtherParametersAllowCha
 	stubAllParametersThatWillEnableCharging();
 	stubChargerGoodPinLow();
 	publishWokenFromSleep();
+	LATBbits.LATB3 = 0;
 	dispatchAllEvents();
-	TEST_ASSERT_TRUE(PORTBbits.RB3);
+	TEST_ASSERT_TRUE(LATBbits.LATB3);
 }
 
 void test_onWokenFromSleep_eventWhenIocInterruptFlagSet_expectOnlyChargerGoodPinFlagIsCleared(void)
