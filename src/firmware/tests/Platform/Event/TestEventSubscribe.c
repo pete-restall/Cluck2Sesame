@@ -12,7 +12,7 @@
 
 TEST_FILE("Platform/Event.c")
 
-#define MAX_SUBSCRIPTIONS 32
+#define MAX_SUBSCRIPTIONS 48
 
 static void buggyCompilerWorkaround(void)
 {
