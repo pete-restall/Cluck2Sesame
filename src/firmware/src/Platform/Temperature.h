@@ -12,6 +12,8 @@ struct TemperatureSampled
 	uint8_t deltaSeconds;
 };
 
+#define CELSIUS(celsius) ((int16_t) ((celsius) * 10))
+
 extern void temperatureInitialise(void);
 
 #endif

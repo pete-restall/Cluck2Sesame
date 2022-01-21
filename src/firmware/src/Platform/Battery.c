@@ -1,10 +1,12 @@
 #include <xc.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "Event.h"
 #include "Nvm.h"
 #include "PowerManagement.h"
 #include "PeriodicMonitor.h"
+#include "Temperature.h"
 
 #include "Battery.h"
 
@@ -13,8 +15,13 @@
 
 static void onMonitoredParametersSampled(const struct Event *event);
 static void onWokenFromSleep(const struct Event *event);
+static void evaluateChargingConditions(void);
+static void onTemperatureSampled(const struct Event *event);
 
 static uint32_t scaledFvrNumerator;
+static bool isChargerGood;
+static bool isTemperatureWithinChargingRange;
+static bool isBatteryVoltageWithinChargingRange;
 
 void batteryInitialise(void)
 {
@@ -49,7 +56,19 @@ void batteryInitialise(void)
 
 	eventSubscribe(&onWokenFromSleepSubscription);
 
+	static const struct EventSubscription onTemperatureSampledSubscription =
+	{
+		.type = TEMPERATURE_SAMPLED,
+		.handler = &onTemperatureSampled,
+		.state = (void *) 0
+	};
+
+	eventSubscribe(&onTemperatureSampledSubscription);
+
 	scaledFvrNumerator = (uint32_t) 8192 * nvmWordAt(DIA_FVRA2X);
+	isChargerGood = false;
+	isTemperatureWithinChargingRange = false;
+	isBatteryVoltageWithinChargingRange = false;
 }
 
 static void onMonitoredParametersSampled(const struct Event *event)
@@ -66,17 +85,38 @@ static void onMonitoredParametersSampled(const struct Event *event)
 
 static void onWokenFromSleep(const struct Event *event)
 {
-	if (!IOCBFbits.IOCBF5)
-		return;
-
 	IOCBFbits.IOCBF5 = 0;
-	if (!PORTBbits.RB5)
+	isChargerGood = !PORTBbits.RB5;
+	evaluateChargingConditions();
+}
+
+static void evaluateChargingConditions(void)
+{
+	// TODO - add in voltage predicate - the NOP is used to prevent the variable being removed by the compiler and causing link failures...
+	if (isBatteryVoltageWithinChargingRange) asm("nop"); // TODO: will be removed once the below line is added...
+	if (isChargerGood && isTemperatureWithinChargingRange)// && isBatteryVoltageWithinChargingRange)
 	{
-		LATBbits.LATB3 = 1;
-		eventPublish(BATTERY_CHARGER_ENABLED, &eventEmptyArgs);
+		if (LATBbits.LATB3 == 0)
+		{
+			LATBbits.LATB3 = 1;
+			eventPublish(BATTERY_CHARGER_ENABLED, &eventEmptyArgs);
+		}
 	}
 	else
-		LATBbits.LATB3 = 0;
+	{
+		if (LATBbits.LATB3 != 0)
+		{
+			LATBbits.LATB3 = 0;
+			eventPublish(BATTERY_CHARGER_DISABLED, &eventEmptyArgs);
+		}
+	}
+}
+
+static void onTemperatureSampled(const struct Event *event)
+{
+	const struct TemperatureSampled *args = (const struct TemperatureSampled *) event->args;
+	isTemperatureWithinChargingRange = args->currentCelsius >= CELSIUS(5) && args->currentCelsius <= CELSIUS(30);
+	evaluateChargingConditions();
 }
 
 /*

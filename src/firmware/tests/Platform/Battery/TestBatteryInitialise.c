@@ -160,3 +160,17 @@ void test_batteryInitialise_called_expectIocIsEnabledForNegativeEdgeOnChargerGoo
 	batteryInitialise();
 	TEST_ASSERT_EQUAL_HEX8(expectedIocbn, IOCBN);
 }
+
+void test_batteryInitialise_expectNoBatteryChargerEnabledEventIsPublished(void)
+{
+	batteryInitialise();
+	dispatchAllEvents();
+	TEST_ASSERT_NULL(batteryChargerEnabledEventArgs);
+}
+
+void test_batteryInitialise_expectBatteryChargerDisabledEventIsNotPublished(void)
+{
+	batteryInitialise();
+	dispatchAllEvents();
+	TEST_ASSERT_NULL(batteryChargerDisabledEventArgs);
+}
