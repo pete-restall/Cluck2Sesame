@@ -3,6 +3,7 @@
 #include <unity.h>
 
 #include "Platform/Event.h"
+#include "Platform/PeriodicMonitor.h"
 #include "Platform/Temperature.h"
 #include "Platform/Battery.h"
 
@@ -49,6 +50,8 @@ void batteryFixtureSetUp(void)
 
 	batteryChargerEnabledEventArgs = (const struct BatteryChargerEnabled *) 0;
 	batteryChargerDisabledEventArgs = (const struct BatteryChargerDisabled *) 0;
+
+	stubAnyDiaFvra2xMillivolts();
 }
 
 static void onBatteryChargerEnabled(const struct Event *event)
@@ -111,7 +114,7 @@ void stubChargerGoodPinHigh(void)
 
 void stubTemperatureWithinChargingRange(void)
 {
-	stubTemperatureOf((int16_t) (50 + anyWordLessThan(251)));
+	stubTemperatureOf((int16_t) (CELSIUS(5) + anyWordLessThan(CELSIUS(25.1))));
 }
 
 void stubTemperatureOf(int16_t celsius)
@@ -126,8 +129,16 @@ void stubTemperatureOf(int16_t celsius)
 
 void stubBatteryVoltageWithinChargingRange(void)
 {
-	static struct BatteryVoltageSampled eventArgs;
-	eventArgs.sample = anyWord();
-	eventArgs.millivolts = anyWordLessThan(3100);
-	eventPublish(BATTERY_VOLTAGE_SAMPLED, &eventArgs);
+	stubBatteryVoltageOf(2500 + anyWordLessThan(1300));
+}
+
+void stubBatteryVoltageOf(uint16_t millivolts)
+{
+	static struct MonitoredParametersSampled eventArgs =
+	{
+		.flags = { .isVddRegulated = 0 },
+		.temperature = 12345
+	};
+	eventArgs.fvr = (uint16_t) ((uint32_t) 8192 * nvmWordAt(DIA_FVRA2X) / millivolts);
+	eventPublish(MONITORED_PARAMETERS_SAMPLED, &eventArgs);
 }

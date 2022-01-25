@@ -17,6 +17,7 @@ extern void stubChargerGoodPinHigh(void);
 extern void stubTemperatureWithinChargingRange(void);
 extern void stubTemperatureOf(int16_t celsius);
 extern void stubBatteryVoltageWithinChargingRange(void);
+extern void stubBatteryVoltageOf(uint16_t millivolts);
 
 extern const struct BatteryChargerEnabled *batteryChargerEnabledEventArgs;
 extern const struct BatteryChargerDisabled *batteryChargerDisabledEventArgs;
