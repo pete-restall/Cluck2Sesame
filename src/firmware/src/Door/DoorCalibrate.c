@@ -68,6 +68,7 @@ static void onDoorAbortedForCalibration(const struct Event *event)
 	const struct DoorAborted *aborted = (const struct DoorAborted *) event->args;
 	doorCalibrationEventArgs.fault.all = aborted->fault.all;
 	doorCalibrationEventArgs.height = 0;
+	// TODO: SINCE NO DOOR_CALIBRATED EVENT IS PUBLISHED HERE, THE UI HANGS...
 	eventUnsubscribe(&onDoorAbortedSubscription);
 	eventUnsubscribe(&onDoorClosedSubscription);
 }
