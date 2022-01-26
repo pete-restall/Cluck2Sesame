@@ -31,9 +31,9 @@ union NvmSettings
 
 				struct
 				{
-					uint16_t temperatureHighAdc; // TODO: 8x SAMPLES OF ADC AT THE HIGHEST CALIBRATION TEMPERATURE
-					uint8_t temperatureHighCelsius; // TODO: CELSIUS OF HIGHEST CALIBRATION TEMPERATURE
-					uint16_t temperatureCoefficient; // TODO: COEFFICIENT (TH - TL) / (TH_adc - TL_adc); ALWAYS POSITIVE, AROUND 1 COUNT PER CELSIUS, EVEN THOUGH SLOPE IS NEGATIVE
+					uint16_t temperatureHighAdc;
+					uint8_t temperatureHighCelsius;
+					uint16_t temperatureCoefficient;
 				} temperature;
 
 				struct
